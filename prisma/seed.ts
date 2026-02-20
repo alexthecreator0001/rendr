@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client"
 import crypto from "node:crypto"
-import argon2 from "argon2"
+import bcrypt from "bcryptjs"
 
 const prisma = new PrismaClient()
 
@@ -8,7 +8,7 @@ async function main() {
   console.log("Seeding database...")
 
   // Create demo user
-  const passwordHash = await argon2.hash("demo1234")
+  const passwordHash = await bcrypt.hash("demo1234", 12)
   const user = await prisma.user.upsert({
     where: { email: "demo@rendr.dev" },
     update: {},
