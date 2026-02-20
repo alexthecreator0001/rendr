@@ -1,120 +1,124 @@
-"use client";
+import { auth } from "@/auth";
+import { prisma } from "@/lib/db";
+import { redirect } from "next/navigation";
+import { JobStatus } from "@prisma/client";
 
-import { useState } from "react";
-import { mockJobs, type JobStatus } from "@/lib/mock/jobs";
-import { StatusPill } from "@/components/dashboard/status-pill";
-import { EmptyState } from "@/components/dashboard/empty-state";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { BriefcaseBusiness } from "lucide-react";
-
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+function StatusPill({ status }: { status: string }) {
+  const map: Record<string, string> = {
+    queued: "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400",
+    processing: "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+    succeeded: "bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400",
+    failed: "bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400",
+  };
+  return (
+    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${map[status] ?? map.queued}`}>
+      {status}
+    </span>
+  );
 }
 
-export default function JobsPage() {
-  const [statusFilter, setStatusFilter] = useState<string>("all");
+const VALID_STATUSES = ["queued", "processing", "succeeded", "failed"] as const;
 
-  const filtered = statusFilter === "all"
-    ? mockJobs
-    : mockJobs.filter((j) => j.status === statusFilter);
+export default async function JobsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ status?: string }>;
+}) {
+  const session = await auth();
+  if (!session?.user?.id) redirect("/login");
+  const userId = session.user.id;
+
+  const { status: rawStatus } = await searchParams;
+  const statusFilter = VALID_STATUSES.find((s) => s === rawStatus);
+
+  const jobs = await prisma.job.findMany({
+    where: {
+      userId,
+      ...(statusFilter ? { status: statusFilter as JobStatus } : {}),
+    },
+    orderBy: { createdAt: "desc" },
+    take: 100,
+    select: {
+      id: true,
+      status: true,
+      inputType: true,
+      createdAt: true,
+      downloadToken: true,
+      errorMessage: true,
+    },
+  });
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-start justify-between gap-4">
+    <div className="p-6 lg:p-8 space-y-6">
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Jobs</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            {mockJobs.length} total jobs this workspace.
-          </p>
+          <h1 className="text-2xl font-bold tracking-tight">Jobs</h1>
+          <p className="text-sm text-muted-foreground mt-1">All your PDF render jobs.</p>
         </div>
-
-        {/* Filters */}
-        <div className="flex items-center gap-2">
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-36 h-8 text-xs">
-              <SelectValue placeholder="Filter by status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All statuses</SelectItem>
-              <SelectItem value="done">Done</SelectItem>
-              <SelectItem value="processing">Processing</SelectItem>
-              <SelectItem value="queued">Queued</SelectItem>
-              <SelectItem value="failed">Failed</SelectItem>
-            </SelectContent>
-          </Select>
+        <div className="flex gap-2 flex-wrap">
+          {([undefined, "queued", "processing", "succeeded", "failed"] as const).map((s) => (
+            <a
+              key={s ?? "all"}
+              href={s ? `/app/jobs?status=${s}` : "/app/jobs"}
+              className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
+                statusFilter === s
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {s ?? "All"}
+            </a>
+          ))}
         </div>
       </div>
 
-      {filtered.length === 0 ? (
-        <EmptyState
-          icon={BriefcaseBusiness}
-          title="No jobs match this filter"
-          description="Try changing the status filter or check back after your next render."
-          action={{
-            label: "Clear filter",
-            onClick: () => setStatusFilter("all"),
-          }}
-        />
+      {jobs.length === 0 ? (
+        <div className="rounded-xl border border-dashed border-border py-16 text-center">
+          <p className="text-sm text-muted-foreground">
+            No jobs found{statusFilter ? ` with status "${statusFilter}"` : ""}.
+          </p>
+        </div>
       ) : (
         <div className="rounded-xl border border-border overflow-hidden">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Job</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="hidden sm:table-cell">Template</TableHead>
-                <TableHead className="hidden md:table-cell">Pages</TableHead>
-                <TableHead className="hidden lg:table-cell">Duration</TableHead>
-                <TableHead className="hidden md:table-cell">Created</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filtered.map((job) => (
-                <TableRow key={job.id}>
-                  <TableCell>
-                    <div>
-                      <p className="font-medium text-sm">{job.name}</p>
-                      <p className="font-mono text-xs text-muted-foreground">{job.id}</p>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <StatusPill status={job.status} />
-                  </TableCell>
-                  <TableCell className="hidden sm:table-cell text-xs font-mono text-muted-foreground">
-                    {job.templateId ?? <span className="text-muted-foreground/60">inline</span>}
-                  </TableCell>
-                  <TableCell className="hidden md:table-cell text-sm text-muted-foreground">
-                    {job.pages ?? "—"}
-                  </TableCell>
-                  <TableCell className="hidden lg:table-cell text-sm text-muted-foreground">
-                    {job.durationMs ? `${job.durationMs}ms` : "—"}
-                  </TableCell>
-                  <TableCell className="hidden md:table-cell text-sm text-muted-foreground">
-                    {formatDate(job.createdAt)}
-                  </TableCell>
-                </TableRow>
+          <table className="w-full text-sm">
+            <thead className="bg-muted/40">
+              <tr>
+                <th className="px-4 py-3 text-left font-medium text-muted-foreground">Job ID</th>
+                <th className="px-4 py-3 text-left font-medium text-muted-foreground">Type</th>
+                <th className="px-4 py-3 text-left font-medium text-muted-foreground">Status</th>
+                <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden sm:table-cell">Created</th>
+                <th className="px-4 py-3 text-left font-medium text-muted-foreground">PDF</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {jobs.map((job) => (
+                <tr key={job.id} className="hover:bg-muted/30 transition-colors">
+                  <td className="px-4 py-3 font-mono text-xs text-muted-foreground">{job.id.slice(0, 8)}…</td>
+                  <td className="px-4 py-3 capitalize">{job.inputType}</td>
+                  <td className="px-4 py-3"><StatusPill status={job.status} /></td>
+                  <td className="px-4 py-3 text-muted-foreground text-xs hidden sm:table-cell">
+                    {new Date(job.createdAt).toLocaleString()}
+                  </td>
+                  <td className="px-4 py-3">
+                    {job.downloadToken ? (
+                      <a
+                        href={`/api/v1/files/${job.downloadToken}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-primary hover:underline"
+                      >
+                        Download
+                      </a>
+                    ) : job.status === "failed" ? (
+                      <span className="text-xs text-destructive" title={job.errorMessage ?? undefined}>Failed</span>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">—</span>
+                    )}
+                  </td>
+                </tr>
               ))}
-            </TableBody>
-          </Table>
+            </tbody>
+          </table>
         </div>
       )}
     </div>

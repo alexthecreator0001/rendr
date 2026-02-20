@@ -1,73 +1,75 @@
-import type { Metadata } from "next";
+"use client";
+
+import { useActionState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-
-export const metadata: Metadata = { title: "Create account" };
+import { registerAction } from "@/app/actions/auth";
 
 export default function RegisterPage() {
+  const [state, action, pending] = useActionState(registerAction, null);
+
   return (
-    <div className="w-full max-w-[400px]">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold tracking-tight">Create an account</h1>
-        <p className="mt-1.5 text-sm text-muted-foreground">
-          Free tier included. No credit card needed.
+    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+      <div className="w-full max-w-sm">
+        <div className="mb-8 text-center">
+          <Link href="/">
+            <img src="/logo.svg" alt="Rendr" className="mx-auto h-6 w-auto dark:invert" />
+          </Link>
+          <h1 className="mt-6 text-2xl font-bold tracking-tight">Create your account</h1>
+          <p className="mt-1.5 text-sm text-muted-foreground">
+            500 free renders/month. No credit card required.
+          </p>
+        </div>
+
+        <form action={action} className="space-y-4">
+          {state?.error && (
+            <div className="rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
+              {state.error}
+            </div>
+          )}
+          <div className="space-y-1.5">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              name="email"
+              type="email"
+              autoComplete="email"
+              placeholder="you@company.com"
+              required
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
+              name="password"
+              type="password"
+              autoComplete="new-password"
+              placeholder="Min. 8 characters"
+              required
+              minLength={8}
+            />
+          </div>
+          <Button type="submit" className="w-full" disabled={pending}>
+            {pending ? "Creating account…" : "Create account"}
+          </Button>
+        </form>
+
+        <p className="mt-6 text-center text-sm text-muted-foreground">
+          Already have an account?{" "}
+          <Link href="/login" className="font-medium text-primary hover:underline">
+            Sign in
+          </Link>
+        </p>
+
+        <p className="mt-4 text-center text-xs text-muted-foreground/60">
+          By creating an account you agree to our{" "}
+          <Link href="/terms" className="hover:underline">Terms</Link> and{" "}
+          <Link href="/privacy" className="hover:underline">Privacy Policy</Link>.
         </p>
       </div>
-
-      <Button variant="outline" className="w-full rounded-xl h-11 gap-2.5 mb-6 font-medium" size="lg">
-        <svg viewBox="0 0 16 16" className="h-4 w-4 fill-current" aria-hidden="true">
-          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
-        </svg>
-        Continue with GitHub
-      </Button>
-
-      <div className="relative mb-6">
-        <Separator />
-        <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-background px-3 text-xs text-muted-foreground">
-          or continue with email
-        </span>
-      </div>
-
-      <form className="space-y-4">
-        <div className="grid grid-cols-2 gap-3">
-          <div className="space-y-1.5">
-            <Label htmlFor="first-name" className="text-sm font-medium">First name</Label>
-            <Input id="first-name" placeholder="Alex" autoComplete="given-name" className="h-11 rounded-xl" />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="last-name" className="text-sm font-medium">Last name</Label>
-            <Input id="last-name" placeholder="Kim" autoComplete="family-name" className="h-11 rounded-xl" />
-          </div>
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="email" className="text-sm font-medium">Work email</Label>
-          <Input id="email" type="email" placeholder="you@company.com" autoComplete="email" className="h-11 rounded-xl" />
-          <p className="text-xs text-muted-foreground">We'll send a confirmation link here.</p>
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="password" className="text-sm font-medium">Password</Label>
-          <Input id="password" type="password" placeholder="Min. 8 characters" autoComplete="new-password" className="h-11 rounded-xl" />
-        </div>
-        <Button type="submit" className="w-full h-11 rounded-xl font-medium" size="lg">
-          Create account
-        </Button>
-      </form>
-
-      <p className="mt-6 text-center text-sm text-muted-foreground">
-        Already have an account?{" "}
-        <Link href="/login" className="font-medium text-foreground hover:text-primary transition-colors">
-          Sign in
-        </Link>
-      </p>
-      <p className="mt-3 text-center text-xs text-muted-foreground">
-        By signing up you agree to our{" "}
-        <Link href="/terms" className="underline hover:text-foreground">Terms</Link>
-        {" and "}
-        <Link href="/privacy" className="underline hover:text-foreground">Privacy Policy</Link>.
-      </p>
     </div>
   );
 }

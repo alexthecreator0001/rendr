@@ -1,242 +1,187 @@
 "use client";
 
-import { useState } from "react";
-import { Plus, Eye, EyeOff, Trash2, Key } from "lucide-react";
-import { mockApiKeys, type ApiKey } from "@/lib/mock/api-keys";
+import { useState, useActionState, useEffect, useCallback } from "react";
+import { createApiKeyAction, revokeApiKeyAction } from "@/app/actions/api-keys";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogFooter,
+  DialogDescription,
 } from "@/components/ui/dialog";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
+import { Plus, Copy, Check, Key } from "lucide-react";
 
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
+type ApiKeyRow = {
+  id: string;
+  name: string;
+  keyPrefix: string;
+  revokedAt: string | null;
+  createdAt: string;
+  lastUsedAt: string | null;
+};
+
+async function fetchApiKeys(): Promise<ApiKeyRow[]> {
+  const res = await fetch("/api/dashboard/api-keys", { cache: "no-store" });
+  if (!res.ok) return [];
+  return res.json();
 }
 
-function KeyRow({ apiKey }: { apiKey: ApiKey }) {
-  const [revealed, setRevealed] = useState(false);
-
+function CopyButton({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false);
   return (
-    <TableRow>
-      <TableCell>
-        <div>
-          <p className="font-medium text-sm">{apiKey.name}</p>
-          <Badge
-            variant={apiKey.environment === "live" ? "default" : "secondary"}
-            className="mt-0.5 rounded-full text-[10px]"
-          >
-            {apiKey.environment}
-          </Badge>
-        </div>
-      </TableCell>
-      <TableCell>
-        <div className="flex items-center gap-2">
-          <code className="font-mono text-xs text-muted-foreground">
-            {revealed ? "rk_live_a1b2c3d4e5f6a8f2" : apiKey.maskedKey}
-          </code>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-6 w-6"
-            onClick={() => setRevealed(!revealed)}
-            aria-label={revealed ? "Hide key" : "Reveal key"}
-          >
-            {revealed ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
-          </Button>
-        </div>
-      </TableCell>
-      <TableCell className="hidden sm:table-cell text-sm text-muted-foreground">
-        {formatDate(apiKey.createdAt)}
-      </TableCell>
-      <TableCell className="hidden md:table-cell text-sm text-muted-foreground">
-        {apiKey.lastUsedAt ? formatDate(apiKey.lastUsedAt) : "Never"}
-      </TableCell>
-      <TableCell>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-7 w-7 text-destructive hover:text-destructive hover:bg-destructive/10"
-          aria-label="Revoke key"
-        >
-          <Trash2 className="h-3.5 w-3.5" />
-        </Button>
-      </TableCell>
-    </TableRow>
-  );
-}
-
-function CreateKeyDialog() {
-  const [open, setOpen] = useState(false);
-  const [name, setName] = useState("");
-  const [env, setEnv] = useState<"live" | "test">("live");
-  const [created, setCreated] = useState(false);
-
-  const handleCreate = () => {
-    setCreated(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-    setTimeout(() => {
-      setCreated(false);
-      setName("");
-      setEnv("live");
-    }, 300);
-  };
-
-  return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button size="sm" className="gap-1.5">
-          <Plus className="h-4 w-4" />
-          New key
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
-        {!created ? (
-          <>
-            <DialogHeader>
-              <DialogTitle>Create API key</DialogTitle>
-              <DialogDescription>
-                Give this key a name so you can identify it later. You&apos;ll only see the full key once.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4 py-2">
-              <div className="space-y-1.5">
-                <Label htmlFor="key-name">Key name</Label>
-                <Input
-                  id="key-name"
-                  placeholder="e.g. Production, CI Bot, Staging"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                />
-                <p className="text-xs text-muted-foreground">
-                  Visible only to workspace members.
-                </p>
-              </div>
-              <div className="space-y-1.5">
-                <Label>Environment</Label>
-                <div className="flex gap-2">
-                  {(["live", "test"] as const).map((e) => (
-                    <button
-                      key={e}
-                      onClick={() => setEnv(e)}
-                      className={`flex-1 rounded-lg border py-2 text-sm transition-colors ${
-                        env === e
-                          ? "border-primary bg-primary/5 text-primary font-medium"
-                          : "border-border text-muted-foreground hover:border-muted-foreground"
-                      }`}
-                    >
-                      {e === "live" ? "Live" : "Test"}
-                    </button>
-                  ))}
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Test keys won&apos;t count against your render quota.
-                </p>
-              </div>
-            </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={handleClose}>Cancel</Button>
-              <Button onClick={handleCreate} disabled={!name.trim()}>
-                Create key
-              </Button>
-            </DialogFooter>
-          </>
-        ) : (
-          <>
-            <DialogHeader>
-              <DialogTitle>Key created</DialogTitle>
-              <DialogDescription>
-                Copy it now — you won&apos;t see this again.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="my-2 rounded-lg border border-border bg-muted p-3">
-              <code className="break-all font-mono text-xs text-foreground">
-                rk_{env}_d4e5f6g7h8i9j0k1l2m3n4o5
-              </code>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Store this in your environment variables, not in source code.
-            </p>
-            <DialogFooter className="mt-2">
-              <Button onClick={handleClose}>Done</Button>
-            </DialogFooter>
-          </>
-        )}
-      </DialogContent>
-    </Dialog>
+    <button
+      type="button"
+      onClick={() => {
+        navigator.clipboard.writeText(text);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      }}
+      className="ml-2 inline-flex h-6 w-6 items-center justify-center rounded text-muted-foreground hover:text-foreground transition-colors"
+    >
+      {copied ? <Check className="h-3.5 w-3.5 text-green-500" /> : <Copy className="h-3.5 w-3.5" />}
+    </button>
   );
 }
 
 export default function ApiKeysPage() {
-  const keys = mockApiKeys;
+  const [keys, setKeys] = useState<ApiKeyRow[]>([]);
+  const [open, setOpen] = useState(false);
+  const [newKey, setNewKey] = useState<string | null>(null);
+  const [createState, createAction, createPending] = useActionState(createApiKeyAction, null);
+  const [revokeState, revokeAction, revokePending] = useActionState(revokeApiKeyAction, null);
+
+  const load = useCallback(() => {
+    fetchApiKeys().then(setKeys);
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  useEffect(() => {
+    if (createState?.key) {
+      setNewKey(createState.key);
+      setOpen(false);
+      load();
+    }
+  }, [createState, load]);
+
+  useEffect(() => {
+    if (revokeState && !("error" in revokeState && revokeState.error)) {
+      load();
+    }
+  }, [revokeState, load]);
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-start justify-between">
+    <div className="p-6 lg:p-8 space-y-6">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">API Keys</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            {keys.length} key{keys.length !== 1 ? "s" : ""} in this workspace.
+          <h1 className="text-2xl font-bold tracking-tight">API Keys</h1>
+          <p className="text-sm text-muted-foreground mt-1">Keys are shown in full only at creation time.</p>
+        </div>
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+            <Button size="sm" className="gap-1.5">
+              <Plus className="h-4 w-4" /> New key
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Create API key</DialogTitle>
+              <DialogDescription>Give your key a name to remember where it&apos;s used.</DialogDescription>
+            </DialogHeader>
+            <form action={createAction} className="space-y-4 pt-2">
+              {createState?.error && (
+                <p className="text-sm text-destructive">{createState.error}</p>
+              )}
+              <div className="space-y-1.5">
+                <Label htmlFor="name">Key name</Label>
+                <Input id="name" name="name" placeholder="e.g. Production, CI Bot" required />
+              </div>
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
+                <Button type="submit" disabled={createPending}>
+                  {createPending ? "Creating…" : "Create key"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      {newKey && (
+        <div className="rounded-xl border border-green-200 bg-green-50 dark:border-green-900/50 dark:bg-green-900/20 p-4">
+          <p className="text-sm font-medium text-green-800 dark:text-green-300 mb-2">
+            Your new API key — copy it now. It won&apos;t be shown again.
           </p>
-        </div>
-        <CreateKeyDialog />
-      </div>
-
-      <div className="rounded-xl border border-border overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Key</TableHead>
-              <TableHead className="hidden sm:table-cell">Created</TableHead>
-              <TableHead className="hidden md:table-cell">Last used</TableHead>
-              <TableHead className="w-12" />
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {keys.map((key) => (
-              <KeyRow key={key.id} apiKey={key} />
-            ))}
-          </TableBody>
-        </Table>
-      </div>
-
-      <div className="rounded-xl border border-dashed border-border p-5">
-        <div className="flex items-start gap-3">
-          <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-muted">
-            <Key className="h-4 w-4 text-muted-foreground" />
+          <div className="flex items-center gap-2 rounded-lg border border-green-200 dark:border-green-900 bg-white dark:bg-zinc-900 px-3 py-2 font-mono text-sm">
+            <span className="flex-1 truncate">{newKey}</span>
+            <CopyButton text={newKey} />
           </div>
-          <div>
-            <p className="text-sm font-medium">Keep keys safe</p>
-            <p className="mt-0.5 text-xs text-muted-foreground">
-              API keys grant full access to your workspace. Use environment variables,
-              never commit them to source control. If a key is compromised, revoke it here immediately.
-            </p>
-          </div>
+          <Button size="sm" variant="ghost" className="mt-2 text-green-700 dark:text-green-400" onClick={() => setNewKey(null)}>
+            Dismiss
+          </Button>
         </div>
-      </div>
+      )}
+
+      {keys.length === 0 ? (
+        <div className="rounded-xl border border-dashed border-border py-16 text-center">
+          <Key className="mx-auto h-8 w-8 text-muted-foreground/40 mb-3" />
+          <p className="text-sm text-muted-foreground">No API keys yet. Create one to start rendering PDFs.</p>
+        </div>
+      ) : (
+        <div className="rounded-xl border border-border overflow-hidden">
+          <table className="w-full text-sm">
+            <thead className="bg-muted/40">
+              <tr>
+                <th className="px-4 py-3 text-left font-medium text-muted-foreground">Name</th>
+                <th className="px-4 py-3 text-left font-medium text-muted-foreground">Key</th>
+                <th className="px-4 py-3 text-left font-medium text-muted-foreground">Status</th>
+                <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden sm:table-cell">Last used</th>
+                <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden md:table-cell">Created</th>
+                <th className="px-4 py-3" />
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {keys.map((k) => (
+                <tr key={k.id} className="hover:bg-muted/30 transition-colors">
+                  <td className="px-4 py-3 font-medium">{k.name}</td>
+                  <td className="px-4 py-3 font-mono text-xs text-muted-foreground">{k.keyPrefix}…</td>
+                  <td className="px-4 py-3">
+                    {k.revokedAt ? (
+                      <Badge variant="destructive" className="text-xs">Revoked</Badge>
+                    ) : (
+                      <Badge variant="secondary" className="text-xs bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-0">Active</Badge>
+                    )}
+                  </td>
+                  <td className="px-4 py-3 text-muted-foreground text-xs hidden sm:table-cell">
+                    {k.lastUsedAt ? new Date(k.lastUsedAt).toLocaleDateString() : "Never"}
+                  </td>
+                  <td className="px-4 py-3 text-muted-foreground text-xs hidden md:table-cell">
+                    {new Date(k.createdAt).toLocaleDateString()}
+                  </td>
+                  <td className="px-4 py-3 text-right">
+                    {!k.revokedAt && (
+                      <form action={revokeAction}>
+                        <input type="hidden" name="id" value={k.id} />
+                        <Button type="submit" size="sm" variant="ghost" className="text-destructive hover:text-destructive" disabled={revokePending}>
+                          Revoke
+                        </Button>
+                      </form>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }

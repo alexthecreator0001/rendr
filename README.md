@@ -1,263 +1,299 @@
 # Rendr
 
-A premium HTML-to-PDF rendering SaaS — Phase 1 UI scaffold.
+HTML-to-PDF as a service. One API call converts your HTML templates into pixel-perfect PDFs. Async jobs, webhooks, signed download URLs — all included.
 
-Built with Next.js 15, Tailwind CSS v4, and shadcn/ui. UI-only: no backend, no database, no real auth. All data is mocked.
+## Local Development
 
----
+### Prerequisites
+- Node.js 20+
+- Docker + Docker Compose (for Postgres)
 
-## Local dev
+### Setup
 
 ```bash
-# Install dependencies
+# 1. Install dependencies
 npm install
 
-# Start dev server (Turbopack)
+# 2. Copy env file and fill in values
+cp .env.example .env
+# Edit DATABASE_URL, NEXTAUTH_SECRET (must be 32+ chars), NEXTAUTH_URL
+
+# 3. Start Postgres
+docker compose up postgres -d
+
+# 4. Run migrations and generate Prisma client
+npm run db:migrate
+npm run db:generate
+
+# 5. Seed demo user (demo@rendr.dev / demo1234)
+npm run db:seed
+
+# 6. Start the web app (terminal 1)
 npm run dev
 
-# Open http://localhost:3000
+# 7. Start the PDF worker (terminal 2)
+npm run worker
 ```
 
-Other commands:
+App runs at http://localhost:3000
+
+### Environment Variables
+
+| Variable | Description | Default |
+|---|---|---|
+| `DATABASE_URL` | PostgreSQL connection string | required |
+| `NEXTAUTH_SECRET` | Session encryption secret (32+ chars) | required |
+| `NEXTAUTH_URL` | App base URL | `http://localhost:3000` |
+| `API_RATE_LIMIT_PER_MINUTE` | API requests per key per minute | `60` |
+| `STORAGE_MODE` | Storage backend (`local`) | `local` |
+| `STORAGE_LOCAL_DIR` | Directory for PDF files | `/data` |
+| `WEBHOOK_RETRY_ATTEMPTS` | Max webhook delivery attempts | `3` |
+| `WEBHOOK_RETRY_DELAY_MS` | Initial backoff delay (ms) | `1000` |
+| `PLAYWRIGHT_TIMEOUT_MS` | Chromium page timeout (ms) | `30000` |
+
+### npm Scripts
+
+| Script | Description |
+|---|---|
+| `npm run dev` | Start Next.js dev server (Turbopack) |
+| `npm run build` | Production build |
+| `npm start` | Start production server |
+| `npm run worker` | Start PDF worker process |
+| `npm run db:generate` | Regenerate Prisma client |
+| `npm run db:migrate` | Apply migrations (dev) |
+| `npm run db:seed` | Seed demo user |
+
+---
+
+## Production Deployment (Vultr VPS)
+
+### Prerequisites
+- Ubuntu 22.04 VPS
+- Domain pointed at VPS IP
+- SSH access as root or sudo user
+
+### 1. Initial Server Setup
 
 ```bash
-npm run build        # Production build
-npm run start        # Start production server
-npm run lint         # ESLint
-npx tsc --noEmit     # Type-check without emitting
+apt update && apt upgrade -y
+
+# Node.js 20
+curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+apt install -y nodejs
+
+# Docker
+apt install -y docker.io docker-compose-plugin
+systemctl enable --now docker
+
+# Nginx + Certbot
+apt install -y nginx certbot python3-certbot-nginx
+
+# PM2
+npm install -g pm2
 ```
 
----
-
-## Tech stack
-
-| Layer         | Choice                                              |
-|---------------|-----------------------------------------------------|
-| Framework     | Next.js 15 (App Router, Turbopack)                  |
-| Language      | TypeScript 5                                        |
-| Styles        | Tailwind CSS v4 + shadcn/ui (new-york, zinc base)   |
-| Icons         | lucide-react                                        |
-| Fonts         | Inter (next/font/google)                            |
-| Dark mode     | next-themes                                         |
-
----
-
-## Route map
-
-### Public — `app/(public)/`
-
-| Route       | File                            | Description                        |
-|-------------|---------------------------------|------------------------------------|
-| `/`         | `app/(public)/page.tsx`         | Landing page (7 sections)          |
-| `/features` | `app/(public)/features/page.tsx`| Features detail + deep dives        |
-| `/pricing`  | `app/(public)/pricing/page.tsx` | 3-tier pricing + FAQ accordion     |
-| `/blog`     | `app/(public)/blog/page.tsx`    | Blog placeholder                   |
-
-### Auth — `app/(auth)/`
-
-| Route       | File                          | Description   |
-|-------------|-------------------------------|---------------|
-| `/login`    | `app/(auth)/login/page.tsx`   | Sign in form  |
-| `/register` | `app/(auth)/register/page.tsx`| Create account|
-
-### Docs — `app/docs/`
-
-| Route                | File                                | Description                     |
-|----------------------|-------------------------------------|---------------------------------|
-| `/docs`              | `app/docs/page.tsx`                 | Docs home — quick links + endpoints |
-| `/docs/quick-start`  | `app/docs/quick-start/page.tsx`     | Quick start + CodeTabs          |
-| `/docs/api`          | `app/docs/api/page.tsx`             | API reference + error codes     |
-| `/docs/templates`    | `app/docs/templates/page.tsx`       | Templates guide                 |
-
-### Dashboard — `app/app/`
-
-| Route              | File                           | Description                       |
-|--------------------|--------------------------------|-----------------------------------|
-| `/app`             | `app/app/page.tsx`             | Overview — summary cards + jobs   |
-| `/app/api-keys`    | `app/app/api-keys/page.tsx`    | Key management + create dialog    |
-| `/app/jobs`        | `app/app/jobs/page.tsx`        | Job table + status filter         |
-| `/app/templates`   | `app/app/templates/page.tsx`   | Template cards + create form      |
-| `/app/webhooks`    | `app/app/webhooks/page.tsx`    | Webhook list + Switch toggles     |
-| `/app/usage`       | `app/app/usage/page.tsx`       | Progress bars + chart placeholder |
-| `/app/billing`     | `app/app/billing/page.tsx`     | Plan + invoices                   |
-
----
-
-## shadcn/ui components used
-
-If you ever need to re-install:
+### 2. Clone Repository
 
 ```bash
-npx shadcn@latest add button card badge table dialog tabs accordion \
-  dropdown-menu input label select switch tooltip separator sheet \
-  avatar navigation-menu scroll-area
+mkdir -p /var/www && cd /var/www
+git clone https://github.com/alexthecreator0001/rendr.git
+cd rendr
 ```
 
-Components are written manually in `components/ui/` — they match the shadcn new-york style exactly.
-
----
-
-## Design system
-
-| Token       | Light                  | Dark                  |
-|-------------|------------------------|-----------------------|
-| Background  | zinc-50                | zinc-950              |
-| Foreground  | zinc-900               | zinc-50               |
-| Muted text  | zinc-500               | zinc-400              |
-| Border      | zinc-200               | zinc-800 (10% white)  |
-| Primary     | blue-600               | blue-400              |
-| Card        | white                  | zinc-900              |
-
-All tokens are defined as OKLCH CSS variables in `app/globals.css`.
-
----
-
-## Adding a chart to Usage page
-
-Install recharts:
+### 3. Configure Environment
 
 ```bash
-npm install recharts
+cp .env.example .env
+nano .env
 ```
 
-In `app/app/usage/page.tsx`, replace the `<ImagePlaceholder>` with:
-
-```tsx
-import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid,
-  Tooltip, ResponsiveContainer
-} from "recharts";
-
-<ResponsiveContainer width="100%" height={220}>
-  <LineChart data={mockUsage.daily}>
-    <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-    <XAxis dataKey="date" tick={{ fontSize: 11 }} />
-    <YAxis tick={{ fontSize: 11 }} />
-    <Tooltip />
-    <Line
-      type="monotone"
-      dataKey="jobs"
-      stroke="var(--color-primary)"
-      strokeWidth={2}
-      dot={false}
-    />
-  </LineChart>
-</ResponsiveContainer>
+Set these values:
+```env
+DATABASE_URL=postgresql://rendr:STRONG_PASSWORD@localhost:5432/rendr
+NEXTAUTH_SECRET=<run: openssl rand -base64 32>
+NEXTAUTH_URL=https://rendrpdf.com
+STORAGE_LOCAL_DIR=/var/www/rendr/data
 ```
 
----
-
-## Mock data
-
-All mock data lives in `lib/mock/`. Each file exports a typed array and an interface:
-
-| File              | Exports                        |
-|-------------------|--------------------------------|
-| `jobs.ts`         | `mockJobs`, `Job`, `JobStatus` |
-| `api-keys.ts`     | `mockApiKeys`, `ApiKey`        |
-| `templates.ts`    | `mockTemplates`, `Template`    |
-| `webhooks.ts`     | `mockWebhooks`, `Webhook`      |
-| `usage.ts`        | `mockUsage`, `UsageSummary`    |
-
-Replace each export with a real API call (SWR, TanStack Query, or RSC fetch) when the backend is ready.
-
----
-
-## Image placeholders
-
-Every `<ImagePlaceholder>` has a comment above it describing:
-- The intended final asset (screenshot, illustration, icon, SVG)
-- Suggested export format (PNG / SVG)
-- Exact dimensions and aspect ratio
-
-Search for `ImagePlaceholder` across the codebase to find all placeholder slots:
+### 4. Start Postgres
 
 ```bash
-grep -r "ImagePlaceholder" app/ components/ --include="*.tsx" -l
+docker run -d \
+  --name rendr-postgres \
+  --restart unless-stopped \
+  -e POSTGRES_USER=rendr \
+  -e POSTGRES_PASSWORD=STRONG_PASSWORD \
+  -e POSTGRES_DB=rendr \
+  -p 127.0.0.1:5432:5432 \
+  -v pgdata:/var/lib/postgresql/data \
+  postgres:16-alpine
+```
+
+### 5. Install Dependencies and Build
+
+```bash
+cd /var/www/rendr
+npm ci
+npx prisma generate
+npm run db:migrate -- --name init
+npm run db:seed
+npm run build
+```
+
+### 6. Create Storage Directory
+
+```bash
+mkdir -p /var/www/rendr/data/pdfs
+```
+
+### 7. Install Playwright Chromium
+
+```bash
+npx playwright install chromium
+npx playwright install-deps chromium
+```
+
+### 8. Configure Nginx
+
+```bash
+cp nginx/rendr.conf /etc/nginx/sites-available/rendrpdf.com
+ln -s /etc/nginx/sites-available/rendrpdf.com /etc/nginx/sites-enabled/
+rm /etc/nginx/sites-enabled/default
+nginx -t
+certbot --nginx -d rendrpdf.com -d www.rendrpdf.com --non-interactive --agree-tos -m your@email.com
+systemctl restart nginx
+```
+
+### 9. Start with PM2
+
+```bash
+cd /var/www/rendr
+pm2 start npm --name "rendr-web" -- start
+pm2 start npm --name "rendr-worker" -- run worker
+pm2 save
+pm2 startup
+# Run the command it outputs
+```
+
+### 10. Update After Code Changes
+
+After each `git push`, run on server:
+
+```bash
+cd /var/www/rendr && git pull && npm ci && npx prisma generate && npx prisma migrate deploy && npm run build && pm2 restart rendr-web && pm2 restart rendr-worker
+```
+
+### 11. Monitoring
+
+```bash
+pm2 logs rendr-web
+pm2 logs rendr-worker
+pm2 status
+curl https://rendrpdf.com/api/v1/health
+```
+
+### 12. Firewall
+
+```bash
+ufw allow 22 && ufw allow 80 && ufw allow 443 && ufw enable
 ```
 
 ---
 
-## GitHub setup
+## API Reference
 
-```bash
-# 1. Initialize git
-git init
+Base URL: `https://rendrpdf.com/api/v1`
 
-# 2. Stage all files
-git add .
-
-# 3. First commit
-git commit -m "feat: initial Rendr Phase 1 UI scaffold
-
-- Next.js 15 App Router + TypeScript + Tailwind CSS v4
-- shadcn/ui components (new-york, zinc base)
-- Marketing pages: landing, features, pricing, blog
-- Auth pages: login, register
-- Docs layout + pages: home, quick-start, API reference, templates
-- Dashboard: overview, api-keys, jobs, templates, webhooks, usage, billing
-- ImagePlaceholder component for all asset slots
-- Mock data in lib/mock/ for all dashboard pages
-- Dark mode via next-themes"
-
-# 4. Add remote (your repo is already created)
-git remote add origin git@github.com:alexthecreator0001/rendr.git
-
-# 5. Push
-git push -u origin main
+All endpoints (except `/health` and `/files/:token`) require:
+```
+Authorization: Bearer rk_live_<your-api-key>
 ```
 
-If your default branch is `master` instead of `main`:
+### POST /convert
 
-```bash
-git branch -M main
-git push -u origin main
+Synchronous — waits up to 8s, returns 200 (done) or 202 (queued).
+
+```json
+{
+  "input": {
+    "type": "html",
+    "content": "<h1>Hello {{name}}</h1>",
+    "variables": { "name": "World" }
+  },
+  "options": { "format": "A4" }
+}
 ```
+
+### POST /convert-async
+
+Always returns 202 immediately. Poll `/jobs/:id` for status.
+
+### GET /jobs/:id
+
+Returns job status + `pdf_url` when `status: "succeeded"`.
+
+### GET /files/:token
+
+Download rendered PDF. No auth required — token is the credential.
+
+### GET/POST /templates, GET/PUT/DELETE /templates/:id
+
+Manage reusable HTML templates.
+
+### GET/POST /webhooks, GET/PUT/DELETE /webhooks/:id
+
+Configure webhook endpoints. Payloads signed with `X-Rendr-Signature: sha256=<hmac>`.
+
+### GET /usage
+
+Returns `{ today, last_7_days, last_30_days }` request counts.
 
 ---
 
-## Project structure
+## Architecture
 
 ```
 rendr/
 ├── app/
-│   ├── layout.tsx              ← Root layout (Inter, ThemeProvider)
-│   ├── globals.css             ← Design tokens (OKLCH), base styles
-│   ├── (public)/               ← Marketing layout (Navbar + Footer)
-│   │   ├── page.tsx
-│   │   ├── features/
-│   │   ├── pricing/
-│   │   └── blog/
-│   ├── (auth)/                 ← Clean auth layout
-│   │   ├── login/
-│   │   └── register/
-│   ├── docs/                   ← Docs layout (sidebar + TOC)
-│   │   ├── page.tsx
-│   │   ├── quick-start/
-│   │   ├── api/
-│   │   └── templates/
-│   └── app/                    ← Dashboard layout (sidebar + topbar)
-│       ├── page.tsx
-│       ├── api-keys/
-│       ├── jobs/
-│       ├── templates/
-│       ├── webhooks/
-│       ├── usage/
-│       └── billing/
+│   ├── (public)/       # Marketing pages
+│   ├── (auth)/         # Login / register
+│   ├── app/            # Dashboard (/app/*)
+│   ├── docs/           # Documentation
+│   └── api/
+│       ├── auth/       # NextAuth handlers
+│       ├── v1/         # Public API
+│       └── dashboard/  # Internal dashboard API
 ├── components/
-│   ├── ui/                     ← shadcn/ui components
-│   ├── layout/                 ← Navbar, Footer, sidebars, topbar
-│   ├── media/                  ← ImagePlaceholder
-│   ├── marketing/              ← Hero, FeaturesGrid, PricingCards, etc.
-│   ├── docs/                   ← CodeBlock, CodeTabs, Prose
-│   ├── dashboard/              ← SummaryCards, EmptyState, StatusPill
-│   └── theme-toggle.tsx
 ├── lib/
-│   ├── utils.ts                ← cn() helper
-│   └── mock/                   ← Mock data arrays + TypeScript types
-├── package.json
-├── next.config.ts
-├── postcss.config.mjs
-├── tsconfig.json
-└── components.json             ← shadcn config
+│   ├── db.ts           # Prisma singleton
+│   ├── api-key.ts      # Key generation + SHA-256
+│   ├── queue.ts        # pg-boss singleton
+│   ├── storage.ts      # Local disk PDF storage
+│   ├── webhook.ts      # HMAC webhook delivery
+│   ├── rate-limit.ts   # In-memory rate limiter
+│   └── require-api-key.ts
+├── worker/             # PDF worker (separate process)
+│   ├── index.ts        # pg-boss entry
+│   └── processor.ts    # Playwright PDF generation
+└── prisma/
+    └── schema.prisma
+```
+
+**Web process** — HTTP only, no Playwright.
+**Worker process** — consumes `pdf-conversion` queue, runs Playwright Chromium.
+
+---
+
+## Webhook Verification
+
+```javascript
+const crypto = require("crypto");
+
+function verifySignature(secret, rawBody, signature) {
+  const expected = "sha256=" + crypto
+    .createHmac("sha256", secret)
+    .update(rawBody, "utf8")
+    .digest("hex");
+  return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected));
+}
 ```
