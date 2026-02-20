@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { FileText } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
 const footerLinks = {
@@ -26,33 +25,34 @@ const footerLinks = {
 export function Footer() {
   return (
     <footer className="border-t border-border bg-background">
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 gap-8 sm:grid-cols-4 lg:grid-cols-4">
+      <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-2 gap-10 sm:grid-cols-4">
           {/* Brand */}
           <div className="col-span-2 sm:col-span-1">
-            <Link href="/" className="flex items-center gap-2 font-semibold">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary">
-                <FileText className="h-4 w-4 text-primary-foreground" />
-              </div>
-              <span className="tracking-tight">Rendr</span>
+            <Link href="/" className="inline-flex items-center">
+              <img src="/logo.svg" alt="Rendr" className="h-5 w-auto dark:invert" />
             </Link>
-            <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
-              HTML to PDF, done simply.<br />No browser to babysit.
+            <p className="mt-4 text-sm text-muted-foreground leading-relaxed max-w-[180px]">
+              HTML to PDF, done right.
+              No browser to babysit.
             </p>
+            <div className="mt-4 flex items-center gap-1.5">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+              <span className="text-xs text-muted-foreground">All systems operational</span>
+            </div>
           </div>
 
-          {/* Links */}
           {Object.entries(footerLinks).map(([category, links]) => (
             <div key={category}>
-              <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+              <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-muted-foreground/60">
                 {category}
               </p>
-              <ul className="mt-3 space-y-2.5">
+              <ul className="space-y-3">
                 {links.map((link) => (
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                      className="text-sm text-muted-foreground transition-colors duration-150 hover:text-foreground"
                     >
                       {link.label}
                     </Link>
@@ -63,14 +63,14 @@ export function Footer() {
           ))}
         </div>
 
-        <Separator className="my-8" />
+        <Separator className="my-10" />
 
         <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
           <p className="text-xs text-muted-foreground">
             © {new Date().getFullYear()} Rendr. All rights reserved.
           </p>
           <p className="text-xs text-muted-foreground">
-            Status: <span className="text-emerald-500">All systems operational</span>
+            Made for developers who ship fast.
           </p>
         </div>
       </div>

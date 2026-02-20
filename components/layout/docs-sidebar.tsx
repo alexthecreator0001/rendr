@@ -10,6 +10,7 @@ interface NavItem {
   title: string;
   href?: string;
   items?: NavItem[];
+  badge?: string;
 }
 
 const docsNav: NavItem[] = [
@@ -17,7 +18,7 @@ const docsNav: NavItem[] = [
     title: "Getting started",
     items: [
       { title: "Overview", href: "/docs" },
-      { title: "Quick start", href: "/docs/quick-start" },
+      { title: "Quick start", href: "/docs/quick-start", badge: "5 min" },
     ],
   },
   {
@@ -52,28 +53,23 @@ const docsNav: NavItem[] = [
 
 function NavGroup({ group }: { group: NavItem }) {
   const pathname = usePathname();
-  const isActive = group.items?.some((item) => item.href && pathname === item.href);
+  const isActive = group.items?.some((item) => item.href && pathname.startsWith(item.href.split("#")[0]));
   const [open, setOpen] = useState(isActive ?? true);
 
   return (
-    <div className="mb-4">
+    <div className="mb-5">
       <button
         onClick={() => setOpen(!open)}
-        className="flex w-full items-center justify-between py-1 text-xs font-semibold uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors"
+        className="flex w-full items-center justify-between px-1 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground/60 hover:text-muted-foreground transition-colors"
       >
         {group.title}
-        <ChevronDown
-          className={cn(
-            "h-3 w-3 transition-transform duration-200",
-            open && "rotate-180"
-          )}
-        />
+        <ChevronDown className={cn("h-3 w-3 transition-transform duration-200", open && "rotate-180")} />
       </button>
       {open && (
         <ul className="mt-1 space-y-0.5">
           {group.items?.map((item) => (
-            <li key={item.href}>
-              <NavLink href={item.href!} label={item.title} />
+            <li key={`${item.href}-${item.title}`}>
+              <NavLink href={item.href!} label={item.title} badge={item.badge} />
             </li>
           ))}
         </ul>
@@ -82,28 +78,33 @@ function NavGroup({ group }: { group: NavItem }) {
   );
 }
 
-function NavLink({ href, label }: { href: string; label: string }) {
+function NavLink({ href, label, badge }: { href: string; label: string; badge?: string }) {
   const pathname = usePathname();
-  const isActive = pathname === href;
+  const isActive = pathname === href || pathname === href.split("#")[0];
 
   return (
     <Link
       href={href}
       className={cn(
-        "block rounded-md py-1.5 pl-3 pr-2 text-sm transition-colors",
+        "flex items-center gap-2 rounded-lg py-1.5 pl-2.5 pr-2 text-sm transition-colors duration-150",
         isActive
-          ? "bg-primary/10 text-primary font-medium"
-          : "text-muted-foreground hover:text-foreground hover:bg-accent/60"
+          ? "bg-primary/8 text-primary font-medium"
+          : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
       )}
     >
-      {label}
+      <span className="flex-1">{label}</span>
+      {badge && (
+        <span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground font-medium">
+          {badge}
+        </span>
+      )}
     </Link>
   );
 }
 
 export function DocsSidebar() {
   return (
-    <nav className="py-6">
+    <nav className="py-5">
       {docsNav.map((group) => (
         <NavGroup key={group.title} group={group} />
       ))}

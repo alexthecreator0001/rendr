@@ -11,23 +11,22 @@ const logos = [
 
 export function TrustRow() {
   return (
-    <section className="border-y border-border py-10">
+    <section className="bg-background py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <p className="mb-8 text-center text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-          Used by teams at
+        <p className="mb-10 text-center text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground/50">
+          Trusted by engineering teams at
         </p>
-        <div className="flex flex-wrap items-center justify-center gap-8">
+        <div className="flex flex-wrap items-center justify-center gap-10 sm:gap-14">
           {logos.map((name) => (
-            <div key={name} className="flex flex-col items-center gap-1.5">
-              {/* intended final asset: company logo (SVG, 80×32) */}
+            <div key={name} className="flex items-center opacity-40 grayscale transition-all duration-200 hover:opacity-80 hover:grayscale-0">
+              {/* intended final asset: company logo (SVG, 100×32) */}
               {/* suggested export format: SVG */}
-              {/* exact size: 80×32, aspect: 5/2 */}
+              {/* exact size: 100×32, aspect: 25/8 */}
               <ImagePlaceholder
                 label={`${name} logo`}
-                width={80}
-                height={32}
-                rounded="md"
-                className="opacity-60 grayscale hover:opacity-100 hover:grayscale-0 transition-all duration-200"
+                width={100}
+                height={28}
+                rounded="sm"
               />
             </div>
           ))}
