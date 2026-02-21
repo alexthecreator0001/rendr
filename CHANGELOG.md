@@ -2,6 +2,10 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.6.3] — 2026-02-21
+### Fixed
+- Worker: added Prisma-based polling loop (every 2s) alongside pg-boss. `queue.send()` in Next.js was silently returning null so jobs never reached pg-boss. Worker now directly queries the `Job` table with `FOR UPDATE SKIP LOCKED` to atomically claim and process queued jobs, bypassing pg-boss for job discovery.
+
 ## [0.6.2] — 2026-02-21
 ### Added
 - Convert page: PDF render settings — format (A4/Letter), orientation (portrait/landscape), margins (none/small/normal/large)
