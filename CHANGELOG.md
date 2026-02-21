@@ -2,6 +2,13 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.7.1] — 2026-02-21
+### Changed
+- **Settings redesign**: professional two-column layout (260px label + content area); sections for Profile (avatar initials, email, join date), Security (change password), API & Integrations (link cards to API Keys and Webhooks), and Danger Zone (disabled delete)
+- **Billing redesign**: real render usage from Prisma (count vs 100 limit), color-coded progress bar (green/amber/red at 70/90%), plan comparison cards (Starter/Growth/Pro), empty invoice history state
+### Fixed
+- **Sidebar duplicate links**: Settings appeared in both Account nav and user footer dropdown; Billing appeared in both Account nav and footer dropdown. Settings is now exclusively in the footer dropdown; Billing is exclusively in the sidebar nav.
+
 ## [0.7.0] — 2026-02-21
 ### Fixed
 - **Sign out**: root cause was Radix DropdownMenuContent intercepting form submit before the DOM element could fire. Fixed by using `onSelect` + `useTransition` to call `signOutAction()` directly as a server action — no form needed

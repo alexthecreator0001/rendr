@@ -6,7 +6,7 @@ import { useTransition } from "react";
 import {
   LayoutDashboard, Key, Layers, Webhook, BarChart2,
   CreditCard, BriefcaseBusiness, FileOutput, BookOpen,
-  Settings, LogOut, MoreVertical,
+  Settings, LogOut, MoreVertical, ExternalLink,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -39,7 +39,6 @@ const navItems = [
     section: "Account",
     items: [
       { href: "/app/billing",   label: "Billing",    icon: CreditCard },
-      { href: "/app/settings",  label: "Settings",   icon: Settings },
     ],
   },
   {
@@ -126,11 +125,6 @@ export function AppSidebar({ user }: AppSidebarProps) {
             <DropdownMenuItem asChild>
               <Link href="/app/settings" className="flex items-center gap-2">
                 <Settings className="h-4 w-4" /> Settings
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link href="/app/billing" className="flex items-center gap-2">
-                <CreditCard className="h-4 w-4" /> Billing
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
