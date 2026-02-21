@@ -8,6 +8,13 @@ import { z } from "zod";
 const urlSchema = z.string().url("Please enter a valid URL (include https://)");
 const htmlSchema = z.string().min(10, "HTML content is too short");
 
+const marginMap = {
+  none:   { top: "0",    right: "0",    bottom: "0",    left: "0"    },
+  small:  { top: "10mm", right: "10mm", bottom: "10mm", left: "10mm" },
+  normal: { top: "20mm", right: "15mm", bottom: "20mm", left: "15mm" },
+  large:  { top: "30mm", right: "25mm", bottom: "30mm", left: "25mm" },
+} as const;
+
 export type ConvertState =
   | { jobId: string; error?: never }
   | { error: string; jobId?: never }
@@ -38,12 +45,17 @@ export async function convertUrlAction(
     inputContent = parsed.data;
   }
 
+  const format = formData.get("format") === "Letter" ? "Letter" : "A4";
+  const landscape = formData.get("orientation") === "landscape";
+  const marginKey = (formData.get("margin") as string) || "normal";
+  const margin = marginMap[marginKey as keyof typeof marginMap] ?? marginMap.normal;
+
   const job = await prisma.job.create({
     data: {
       userId: session.user.id,
       inputType,
       inputContent,
-      optionsJson: {},
+      optionsJson: { format, landscape, margin },
     },
   });
 

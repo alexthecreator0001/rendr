@@ -2,6 +2,13 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.6.2] — 2026-02-21
+### Added
+- Convert page: PDF render settings — format (A4/Letter), orientation (portrait/landscape), margins (none/small/normal/large)
+- Convert page: slow-job warning banner after 30s of polling with `pm2 list` hint
+- Worker: landscape orientation support via `optionsJson.landscape`
+- Server action `convertUrlAction`: parses and passes format/landscape/margin into `optionsJson`
+
 ## [0.6.1] — 2026-02-21
 ### Fixed
 - Billing page: removed all mock data (fake Growth plan, fake Visa card, fake invoices). Now shows honest Starter/free state with a usage bar and empty invoice history.

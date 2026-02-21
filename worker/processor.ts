@@ -54,6 +54,7 @@ export async function processJob(jobId: string): Promise<void> {
 
     const pdfBuffer = await page.pdf({
       format: (opts.format as "A4" | "Letter") ?? "A4",
+      landscape: (opts.landscape as boolean) ?? false,
       printBackground: true,
       margin: (opts.margin as {
         top?: string
