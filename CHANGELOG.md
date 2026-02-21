@@ -2,6 +2,11 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.4.1] — 2026-02-21
+### Changed
+- Redesigned hero right side: replaced overflowing floating cards with a clean pipeline visualization (request card → processing indicator → PDF output card)
+- Fixed hero vertical centering: removed asymmetric padding, content now properly centers in the viewport
+
 ## [0.4.0] — 2026-02-21
 ### Changed
 - Redesigned footer: dark zinc-950 content section with gradient bridge into a full-width landscape photo (no cropping, natural aspect ratio)
