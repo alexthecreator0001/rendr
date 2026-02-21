@@ -5,7 +5,7 @@ import { saveFile } from "@/lib/storage"
 import { deliverWebhooks } from "@/lib/webhook"
 
 const TIMEOUT = parseInt(process.env.PLAYWRIGHT_TIMEOUT_MS ?? "30000", 10)
-const BASE_URL = process.env.NEXTAUTH_URL ?? "http://localhost:3000"
+const BASE_URL = process.env.AUTH_URL ?? process.env.NEXTAUTH_URL ?? "http://localhost:3000"
 
 export async function processJob(jobId: string): Promise<void> {
   // Mark as processing

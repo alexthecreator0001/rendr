@@ -11,6 +11,7 @@ import {
   CreditCard,
   BriefcaseBusiness,
   ChevronRight,
+  FileOutput,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -21,7 +22,8 @@ const navItems = [
     section: "Workspace",
     items: [
       { href: "/app", label: "Overview", icon: LayoutDashboard, exact: true },
-      { href: "/app/jobs", label: "Jobs", icon: BriefcaseBusiness, badge: "6" },
+      { href: "/app/convert", label: "Convert", icon: FileOutput },
+      { href: "/app/jobs", label: "Jobs", icon: BriefcaseBusiness },
       { href: "/app/usage", label: "Usage", icon: BarChart2 },
     ],
   },

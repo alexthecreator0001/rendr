@@ -2,6 +2,15 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.6.0] — 2026-02-21
+### Added
+- `/app/convert` — new dashboard page: paste a URL or raw HTML, click Convert, download the PDF. Supports both input modes (URL/HTML) with live polling and a download button on completion.
+- `app/actions/convert.ts` — server action that creates a Job and enqueues it to the pg-boss queue (no API key required, works via session auth)
+- `app/api/dashboard/jobs/[id]` — internal session-auth polling route used by the convert page to watch job status
+- Convert added to the dashboard sidebar under Workspace
+### Fixed
+- `BASE_URL` in convert route, convert-async route, jobs route, and worker now checks `AUTH_URL` before `NEXTAUTH_URL` — fixes download URLs pointing to raw IP instead of rendrpdf.com when `AUTH_URL=https://rendrpdf.com` is set on the server
+
 ## [0.5.2] — 2026-02-21
 ### Fixed
 - `auth.ts`: added `trustHost: true` — required for NextAuth v5 behind nginx/Cloudflare; without it, the callback URL host check fails and throws "server configuration" error

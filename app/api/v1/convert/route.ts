@@ -21,7 +21,7 @@ function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms))
 }
 
-const BASE_URL = () => process.env.NEXTAUTH_URL ?? "http://localhost:3000"
+const BASE_URL = () => process.env.AUTH_URL ?? process.env.NEXTAUTH_URL ?? "http://localhost:3000"
 
 function formatJob(job: {
   id: string

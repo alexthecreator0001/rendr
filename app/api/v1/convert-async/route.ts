@@ -16,7 +16,7 @@ const convertSchema = z.object({
   variables: z.record(z.string()).optional(),
 })
 
-const BASE_URL = () => process.env.NEXTAUTH_URL ?? "http://localhost:3000"
+const BASE_URL = () => process.env.AUTH_URL ?? process.env.NEXTAUTH_URL ?? "http://localhost:3000"
 
 export async function POST(req: NextRequest) {
   try {

@@ -3,7 +3,7 @@ import { requireApiKey } from "@/lib/require-api-key"
 import { prisma } from "@/lib/db"
 import { apiError, ApiError } from "@/lib/errors"
 
-const BASE_URL = () => process.env.NEXTAUTH_URL ?? "http://localhost:3000"
+const BASE_URL = () => process.env.AUTH_URL ?? process.env.NEXTAUTH_URL ?? "http://localhost:3000"
 
 export async function GET(
   req: NextRequest,
