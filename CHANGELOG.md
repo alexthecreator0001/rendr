@@ -2,6 +2,11 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.5.1] — 2026-02-21
+### Fixed
+- `loginAction`: replaced `redirect: false` + manual `redirect("/app")` with `redirectTo: "/app"` — the correct NextAuth v5 server-action API. Previously the manual redirect was unreachable and users landed on the wrong page after login.
+- `registerAction`: removed the `catch {}` block that was swallowing the internal NEXT_REDIRECT thrown by NextAuth on successful sign-in, causing every new registration to redirect to `/login` instead of `/app`.
+
 ## [0.5.0] — 2026-02-21
 ### Changed
 - Complete homepage redesign inspired by sent.dm: code-first, image-free, dark throughout
