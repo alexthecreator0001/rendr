@@ -45,9 +45,9 @@ async function main() {
     console.log("Demo key already exists, skipping.")
   }
 
-  // Seed starter templates for demo user
-  await seedStarterTemplates(user.id, prisma)
-  console.log("Starter templates seeded.")
+  // Seed / refresh starter templates for demo user (force=true to update HTML)
+  await seedStarterTemplates(user.id, prisma, { force: true })
+  console.log("Starter templates seeded / refreshed.")
 
   console.log("Seed complete.")
 }

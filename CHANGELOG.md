@@ -2,6 +2,21 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.7.0] — 2026-02-21
+### Fixed
+- **Sign out**: root cause was Radix DropdownMenuContent intercepting form submit before the DOM element could fire. Fixed by using `onSelect` + `useTransition` to call `signOutAction()` directly as a server action — no form needed
+- **Template thumbnails**: templates with vertical-flex-centered bodies showed blank space in preview. Redesigned all templates to use top-aligned layouts
+
+### Added
+- **Search / command palette**: clicking the search button (or pressing ⌘K) opens a dialog with links to all dashboard pages; filters as you type
+- **Overview redesign**: time-aware greeting ("Good morning, alex 👋"), quick-action cards, improved stat cards with icons, cleaner recent-jobs table
+- **Sign out in sidebar**: clicking the user footer opens a dropdown with Settings, Billing, Sign out
+- **Settings page** (`/app/settings`): view email, change password with validation
+- **Docs in sidebar**: Resources section with Documentation link
+- **8 redesigned templates**: Invoice, Receipt, Business Letter, Certificate — all visually upgraded with blue/violet gradients, proper typography, top-aligned content; plus 3 new: Job Offer Letter, Statement of Work, Monthly Report
+- **`changePasswordAction`**: verifies current password, validates length/match, updates hash
+- **Seed refresh**: `npm run db:seed` now upserts templates by name so existing users get updated HTML
+
 ## [0.6.6] — 2026-02-21
 ### Fixed
 - **Sign out**: topbar "Sign out" was a dead link with no action — now calls `signOutAction` (NextAuth v5 server action) and redirects to `/login`

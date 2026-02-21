@@ -2,7 +2,7 @@
 
 import { signIn, signOut } from "@/auth";
 import { prisma } from "@/lib/db";
-import { hashPassword } from "@/lib/auth-utils";
+import { hashPassword, verifyPassword } from "@/lib/auth-utils";
 import { seedStarterTemplates } from "@/lib/starter-templates";
 import { z } from "zod";
 import { AuthError } from "next-auth";
@@ -106,4 +106,30 @@ export async function registerAction(
 
 export async function signOutAction() {
   await signOut({ redirectTo: "/login" });
+}
+
+export async function changePasswordAction(
+  _prevState: { error?: string; success?: boolean } | null,
+  formData: FormData
+): Promise<{ error?: string; success?: boolean }> {
+  const session = await auth();
+  if (!session?.user?.id) return { error: "Not authenticated." };
+
+  const current = (formData.get("current") as string) ?? "";
+  const next = (formData.get("new") as string) ?? "";
+  const confirm = (formData.get("confirm") as string) ?? "";
+
+  if (next.length < 8) return { error: "New password must be at least 8 characters." };
+  if (next !== confirm) return { error: "Passwords don't match." };
+
+  const user = await prisma.user.findUnique({ where: { id: session.user.id } });
+  if (!user) return { error: "User not found." };
+
+  const valid = await verifyPassword(current, user.passwordHash);
+  if (!valid) return { error: "Current password is incorrect." };
+
+  const hash = await hashPassword(next);
+  await prisma.user.update({ where: { id: session.user.id }, data: { passwordHash: hash } });
+
+  return { success: true };
 }
