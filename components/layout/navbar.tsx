@@ -66,24 +66,37 @@ export function Navbar() {
 
         {/* Desktop nav */}
         <nav className="hidden items-center gap-0.5 md:flex">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={cn(
-                "rounded-lg px-3.5 py-1.5 text-sm font-medium transition-colors duration-150",
-                isHeroPage && !scrolled
-                  ? pathname === link.href
-                    ? "bg-white/15 text-white"
-                    : "text-white/70 hover:text-white hover:bg-white/10"
-                  : pathname === link.href || pathname.startsWith(link.href + "/")
-                    ? "bg-accent text-accent-foreground"
-                    : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
-              )}
-            >
-              {link.label}
-            </Link>
-          ))}
+          {navLinks.map((link) => {
+            const isActive =
+              pathname === link.href ||
+              (link.href !== "/" && pathname.startsWith(link.href + "/"));
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={cn(
+                  "relative rounded-lg px-3.5 py-1.5 text-sm font-medium transition-colors duration-150",
+                  isHeroPage && !scrolled
+                    ? isActive
+                      ? "text-white"
+                      : "text-white/55 hover:text-white hover:bg-white/[0.07]"
+                    : isActive
+                      ? "text-foreground"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                )}
+              >
+                {link.label}
+                {isActive && (
+                  <span
+                    className={cn(
+                      "absolute inset-x-3 -bottom-px h-px rounded-full",
+                      isHeroPage && !scrolled ? "bg-white/40" : "bg-primary/70"
+                    )}
+                  />
+                )}
+              </Link>
+            );
+          })}
         </nav>
 
         {/* Right */}
@@ -94,7 +107,7 @@ export function Navbar() {
           )}>
             <ThemeToggle />
           </div>
-          <div className="hidden items-center gap-2 md:flex">
+          <div className="hidden items-center gap-1.5 md:flex">
             <Button
               variant="ghost"
               size="sm"
@@ -102,8 +115,8 @@ export function Navbar() {
               className={cn(
                 "rounded-lg text-sm font-medium",
                 isHeroPage && !scrolled
-                  ? "text-white/80 hover:text-white hover:bg-white/10"
-                  : ""
+                  ? "text-white/55 hover:text-white hover:bg-white/[0.08]"
+                  : "text-muted-foreground hover:text-foreground"
               )}
             >
               <Link href="/login">Sign in</Link>
@@ -112,9 +125,9 @@ export function Navbar() {
               size="sm"
               asChild
               className={cn(
-                "rounded-lg text-sm font-medium",
+                "rounded-lg text-sm font-semibold",
                 isHeroPage && !scrolled
-                  ? "bg-white text-zinc-900 hover:bg-white/90"
+                  ? "bg-white text-zinc-900 hover:bg-zinc-50 shadow-sm"
                   : ""
               )}
             >
