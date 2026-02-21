@@ -5,6 +5,10 @@ import { prisma } from "@/lib/db"
 import { verifyPassword } from "@/lib/auth-utils"
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  // NextAuth v5 renamed NEXTAUTH_SECRET → AUTH_SECRET. Support both.
+  secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET,
+  // Required when running behind a reverse proxy (nginx, Cloudflare, etc.)
+  trustHost: true,
   providers: [
     Credentials({
       credentials: {

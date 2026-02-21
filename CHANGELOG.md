@@ -2,6 +2,11 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.5.2] — 2026-02-21
+### Fixed
+- `auth.ts`: added `trustHost: true` — required for NextAuth v5 behind nginx/Cloudflare; without it, the callback URL host check fails and throws "server configuration" error
+- `auth.ts`: added explicit `secret` fallback — NextAuth v5 reads `AUTH_SECRET` but server may only have `NEXTAUTH_SECRET` set; now supports both
+
 ## [0.5.1] — 2026-02-21
 ### Fixed
 - `loginAction`: replaced `redirect: false` + manual `redirect("/app")` with `redirectTo: "/app"` — the correct NextAuth v5 server-action API. Previously the manual redirect was unreachable and users landed on the wrong page after login.
