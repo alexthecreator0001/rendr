@@ -2,6 +2,17 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.9.0] — 2026-02-21
+### Added
+- **Logo update**: sidebar now uses `logo-white.svg` with `invert dark:invert-0` — black in light mode, white in dark mode
+- **Sidebar usage widget**: real-time renders-this-month bar (green → amber at 70% → red at 90%), plan badge, "Upgrade" link when ≥70%; fetched in `app/app/layout.tsx` via Prisma
+- **Page loading state**: `app/app/loading.tsx` — minimal spinner shown in main content area while navigating between pages; sidebar + topbar remain visible throughout
+- **Templates redesign** (Apple-inspired): card grid with frosted-glass hover action buttons (Preview/Edit/Delete), "Open in Studio" slide-up overlay, `xl:grid-cols-4` grid, cleaner dialogs, polished empty state
+- **Studio redesign** (Apple unified panel): single `rounded-2xl` container with toolbar (segmented tabs), two-column split (input left + inspector right), inline status in toolbar, Generate button + status in bottom bar
+### Changed
+- `app/app/layout.tsx`: now fetches `rendersThisMonth` and passes as `usage` prop to `AppSidebar`
+- `AppSidebar`: accepts `usage: { used, limit }` prop; shows usage widget between nav and user footer
+
 ## [0.8.0] — 2026-02-21
 ### Added
 - **Studio page** (formerly "Convert"): renamed to "Studio" with a two-column playground layout — source input on the left, full PDF options panel on the right
