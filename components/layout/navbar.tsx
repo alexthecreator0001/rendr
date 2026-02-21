@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 
@@ -101,12 +100,6 @@ export function Navbar() {
 
         {/* Right */}
         <div className="flex items-center gap-2">
-          <div className={cn(
-            "transition-colors",
-            isHeroPage && !scrolled ? "[&_button]:text-white/70 [&_button:hover]:text-white [&_button:hover]:bg-white/10" : ""
-          )}>
-            <ThemeToggle />
-          </div>
           <div className="hidden items-center gap-1.5 md:flex">
             <Button
               variant="ghost"

@@ -2,6 +2,12 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.4.0] — 2026-02-21
+### Changed
+- Redesigned footer: dark zinc-950 content section with gradient bridge into a full-width landscape photo (no cropping, natural aspect ratio)
+- Removed light mode — site is now dark-only (`forcedTheme="dark"`)
+- Removed ThemeToggle from navbar
+
 ## [0.3.0] — 2026-02-21
 ### Changed
 - Redesigned hero section: split layout (text left, product visual right) featuring a live syntax-highlighted API request card and floating PDF output card with rendered-in timing badge

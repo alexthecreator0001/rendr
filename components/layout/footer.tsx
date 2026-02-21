@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Separator } from "@/components/ui/separator";
 
 const footerLinks = {
   Product: [
@@ -24,27 +23,28 @@ const footerLinks = {
 
 export function Footer() {
   return (
-    <footer className="border-t border-border bg-background">
-      <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+    <footer className="bg-zinc-950">
+      {/* Dark content section */}
+      <div className="mx-auto max-w-7xl px-6 pt-16 pb-12 sm:px-8 lg:px-10">
         <div className="grid grid-cols-2 gap-10 sm:grid-cols-4">
           {/* Brand */}
           <div className="col-span-2 sm:col-span-1">
             <Link href="/" className="inline-flex items-center">
-              <img src="/logo.svg" alt="Rendr" className="h-5 w-auto dark:invert" />
+              <img src="/logo-white.svg" alt="Rendr" className="h-5 w-auto" />
             </Link>
-            <p className="mt-4 text-sm text-muted-foreground leading-relaxed max-w-[180px]">
+            <p className="mt-4 text-sm leading-relaxed text-zinc-500 max-w-[180px]">
               HTML to PDF, done right.
               No browser to babysit.
             </p>
             <div className="mt-4 flex items-center gap-1.5">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-              <span className="text-xs text-muted-foreground">All systems operational</span>
+              <span className="text-xs text-zinc-500">All systems operational</span>
             </div>
           </div>
 
           {Object.entries(footerLinks).map(([category, links]) => (
             <div key={category}>
-              <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-muted-foreground/60">
+              <p className="mb-4 text-[10px] font-semibold uppercase tracking-widest text-zinc-500/50">
                 {category}
               </p>
               <ul className="space-y-3">
@@ -52,7 +52,7 @@ export function Footer() {
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className="text-sm text-muted-foreground transition-colors duration-150 hover:text-foreground"
+                      className="text-sm text-zinc-500 transition-colors duration-150 hover:text-white"
                     >
                       {link.label}
                     </Link>
@@ -63,16 +63,27 @@ export function Footer() {
           ))}
         </div>
 
-        <Separator className="my-10" />
-
-        <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-          <p className="text-xs text-muted-foreground">
+        {/* Bottom copyright row */}
+        <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-white/[0.06] pt-8 sm:flex-row">
+          <p className="text-xs text-zinc-600">
             © {new Date().getFullYear()} Rendr. All rights reserved.
           </p>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-zinc-600">
             Made for developers who ship fast.
           </p>
         </div>
+      </div>
+
+      {/* Gradient bridge — dark to transparent */}
+      <div className="h-10 bg-gradient-to-b from-zinc-950 to-transparent" />
+
+      {/* Full landscape image — no cropping, natural proportions */}
+      <div className="w-full">
+        <img
+          src="/footer.jpg"
+          alt="Meadow landscape"
+          className="block w-full h-auto"
+        />
       </div>
     </footer>
   );
