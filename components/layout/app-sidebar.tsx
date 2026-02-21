@@ -43,8 +43,14 @@ const navItems = [
   },
 ];
 
-export function AppSidebar() {
+interface AppSidebarProps {
+  user: { email: string };
+}
+
+export function AppSidebar({ user }: AppSidebarProps) {
   const pathname = usePathname();
+  const initials = user.email.slice(0, 2).toUpperCase();
+  const workspaceName = user.email.split("@")[0];
 
   return (
     <aside className="flex h-full w-56 flex-col border-r border-border bg-background">
@@ -57,13 +63,12 @@ export function AppSidebar() {
 
       {/* Workspace selector */}
       <div className="border-b border-border px-3 py-2.5">
-        <button className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors hover:bg-accent/50">
+        <div className="flex items-center gap-2.5 rounded-lg px-2.5 py-2">
           <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-primary/10 text-[11px] font-bold text-primary">
-            A
+            {initials.charAt(0)}
           </div>
-          <span className="flex-1 truncate text-left font-medium text-sm">Acme Internal</span>
-          <ChevronRight className="h-3.5 w-3.5 rotate-90 text-muted-foreground" />
-        </button>
+          <span className="flex-1 truncate text-left font-medium text-sm">{workspaceName}</span>
+        </div>
       </div>
 
       {/* Nav */}
@@ -107,13 +112,13 @@ export function AppSidebar() {
 
       {/* User */}
       <div className="border-t border-border p-3">
-        <div className="flex items-center gap-2.5 rounded-lg px-2.5 py-2 transition-colors hover:bg-accent/50 cursor-pointer">
+        <div className="flex items-center gap-2.5 rounded-lg px-2.5 py-2">
           <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-violet-600 text-xs font-semibold text-white">
-            AK
+            {initials}
           </div>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-xs font-semibold">Alex K.</p>
-            <p className="truncate text-[11px] text-muted-foreground">Growth plan</p>
+            <p className="truncate text-xs font-semibold">{user.email}</p>
+            <p className="truncate text-[11px] text-muted-foreground">Starter plan</p>
           </div>
         </div>
       </div>

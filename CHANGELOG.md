@@ -2,6 +2,12 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.6.1] — 2026-02-21
+### Fixed
+- Billing page: removed all mock data (fake Growth plan, fake Visa card, fake invoices). Now shows honest Starter/free state with a usage bar and empty invoice history.
+- Sidebar: replaced hardcoded "Acme Internal" workspace and "AK" initials with real values derived from the authenticated user's email.
+- App layout: now async server component — fetches `auth()` session, redirects to `/login` if unauthenticated, passes real user email to AppSidebar.
+
 ## [0.6.0] — 2026-02-21
 ### Added
 - `/app/convert` — new dashboard page: paste a URL or raw HTML, click Convert, download the PDF. Supports both input modes (URL/HTML) with live polling and a download button on completion.
