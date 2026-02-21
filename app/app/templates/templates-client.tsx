@@ -19,7 +19,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Plus, FileCode, Pencil, Trash2, Braces, ArrowRight } from "lucide-react";
+import { Plus, FileCode, Pencil, Trash2, Braces, ArrowRight, Eye } from "lucide-react";
 import Link from "next/link";
 
 type Template = { id: string; name: string; html: string; createdAt: Date; updatedAt: Date };
@@ -27,6 +27,56 @@ type Template = { id: string; name: string; html: string; createdAt: Date; updat
 function extractVariables(html: string): string[] {
   const matches = [...html.matchAll(/\{\{\s*(\w+)\s*\}\}/g)];
   return [...new Set(matches.map((m) => m[1]))];
+}
+
+/** Sandboxed iframe thumbnail — shows the top portion of the rendered HTML */
+function TemplateThumbnail({ html, name }: { html: string; name: string }) {
+  return (
+    <div className="relative overflow-hidden rounded-t-xl bg-muted/30 border-b border-border" style={{ height: 168 }}>
+      <iframe
+        srcDoc={html}
+        sandbox=""
+        title={`Preview of ${name}`}
+        className="absolute top-0 left-0 border-0 pointer-events-none select-none"
+        style={{
+          width: 860,
+          height: 1100,
+          transform: "scale(0.345)",
+          transformOrigin: "top left",
+        }}
+      />
+      {/* Fade overlay at the bottom so the cut-off isn't jarring */}
+      <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-background/60 to-transparent" />
+    </div>
+  );
+}
+
+/** Full-size preview modal */
+function PreviewDialog({ template }: { template: Template }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button size="sm" variant="ghost" className="h-7 w-7 p-0">
+          <Eye className="h-3.5 w-3.5" />
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="max-w-4xl h-[85vh] flex flex-col p-0 gap-0">
+        <DialogHeader className="px-6 py-4 border-b border-border shrink-0">
+          <DialogTitle>{template.name}</DialogTitle>
+          <DialogDescription>Read-only HTML preview (no scripts run)</DialogDescription>
+        </DialogHeader>
+        <div className="flex-1 overflow-hidden">
+          <iframe
+            srcDoc={template.html}
+            sandbox=""
+            title={`Full preview of ${template.name}`}
+            className="w-full h-full border-0"
+          />
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
 }
 
 function CreateDialog() {
@@ -196,51 +246,53 @@ export function TemplatesClient({ templates }: { templates: Template[] }) {
             return (
               <div
                 key={t.id}
-                className="group relative rounded-2xl border border-border bg-card p-5 hover:border-primary/40 hover:shadow-sm transition-all"
+                className="group relative rounded-2xl border border-border bg-card overflow-hidden hover:border-primary/40 hover:shadow-sm transition-all"
               >
-                {/* Actions */}
-                <div className="absolute right-3 top-3 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                {/* Thumbnail preview */}
+                <TemplateThumbnail html={t.html} name={t.name} />
+
+                {/* Actions — shown on hover, positioned over the thumbnail */}
+                <div className="absolute right-3 top-3 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                  <PreviewDialog template={t} />
                   <EditDialog template={t} />
                   <DeleteButton id={t.id} />
                 </div>
 
-                {/* Icon + name */}
-                <div className="flex items-center gap-2.5 min-w-0 pr-16">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-                    <FileCode className="h-4 w-4 text-primary" />
+                {/* Card body */}
+                <div className="p-4">
+                  {/* Name */}
+                  <p className="font-semibold text-sm truncate">{t.name}</p>
+
+                  {/* Variables */}
+                  <div className="mt-2 flex flex-wrap gap-1.5 min-h-[20px]">
+                    {vars.length > 0 ? (
+                      vars.map((v) => (
+                        <Badge
+                          key={v}
+                          variant="secondary"
+                          className="rounded-full px-2 py-0 text-[10px] font-mono gap-1"
+                        >
+                          <Braces className="h-2.5 w-2.5" />
+                          {v}
+                        </Badge>
+                      ))
+                    ) : (
+                      <span className="text-[11px] text-muted-foreground/60">No variables</span>
+                    )}
                   </div>
-                  <p className="font-semibold truncate text-sm">{t.name}</p>
-                </div>
 
-                {/* Variables */}
-                <div className="mt-3 flex flex-wrap gap-1.5 min-h-[22px]">
-                  {vars.length > 0 ? (
-                    vars.map((v) => (
-                      <Badge
-                        key={v}
-                        variant="secondary"
-                        className="rounded-full px-2 py-0 text-[10px] font-mono gap-1"
-                      >
-                        <Braces className="h-2.5 w-2.5" />
-                        {v}
-                      </Badge>
-                    ))
-                  ) : (
-                    <span className="text-[11px] text-muted-foreground/60">No variables</span>
-                  )}
-                </div>
-
-                {/* Footer */}
-                <div className="mt-4 flex items-center justify-between">
-                  <p className="text-[11px] text-muted-foreground">
-                    Updated {new Date(t.updatedAt).toLocaleDateString()}
-                  </p>
-                  <Link
-                    href={`/app/convert?template=${t.id}`}
-                    className="flex items-center gap-1 text-[11px] text-primary opacity-0 group-hover:opacity-100 transition-opacity hover:underline"
-                  >
-                    Use <ArrowRight className="h-3 w-3" />
-                  </Link>
+                  {/* Footer */}
+                  <div className="mt-3 flex items-center justify-between">
+                    <p className="text-[11px] text-muted-foreground">
+                      Updated {new Date(t.updatedAt).toLocaleDateString()}
+                    </p>
+                    <Link
+                      href={`/app/convert?template=${t.id}`}
+                      className="flex items-center gap-1 text-[11px] text-primary opacity-0 group-hover:opacity-100 transition-opacity hover:underline"
+                    >
+                      Use <ArrowRight className="h-3 w-3" />
+                    </Link>
+                  </div>
                 </div>
               </div>
             );

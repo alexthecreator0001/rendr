@@ -9,6 +9,33 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET,
   // Required when running behind a reverse proxy (nginx, Cloudflare, etc.)
   trustHost: true,
+  // Cloudflare Flexible SSL sends HTTP to origin, so NextAuth would normally
+  // drop the Secure flag and switch to unprefixed cookie names — causing every
+  // request to create a *new* unreadable cookie and effectively signing the
+  // user out immediately. Force the production cookie names explicitly so they
+  // are stable regardless of the transport between Cloudflare and the origin.
+  cookies:
+    process.env.NODE_ENV === "production"
+      ? {
+          sessionToken: {
+            name: "next-auth.session-token",
+            options: {
+              httpOnly: true,
+              sameSite: "lax" as const,
+              path: "/",
+              secure: true,
+            },
+          },
+          callbackUrl: {
+            name: "next-auth.callback-url",
+            options: { sameSite: "lax" as const, path: "/", secure: true },
+          },
+          csrfToken: {
+            name: "next-auth.csrf-token",
+            options: { httpOnly: true, sameSite: "lax" as const, path: "/", secure: true },
+          },
+        }
+      : undefined,
   providers: [
     Credentials({
       credentials: {

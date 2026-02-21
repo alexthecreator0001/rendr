@@ -1,6 +1,6 @@
 "use server";
 
-import { signIn } from "@/auth";
+import { signIn, signOut } from "@/auth";
 import { prisma } from "@/lib/db";
 import { hashPassword } from "@/lib/auth-utils";
 import { seedStarterTemplates } from "@/lib/starter-templates";
@@ -102,4 +102,8 @@ export async function registerAction(
   }
 
   return {};
+}
+
+export async function signOutAction() {
+  await signOut({ redirectTo: "/login" });
 }

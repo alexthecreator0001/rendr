@@ -2,6 +2,16 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.6.6] — 2026-02-21
+### Fixed
+- **Sign out**: topbar "Sign out" was a dead link with no action — now calls `signOutAction` (NextAuth v5 server action) and redirects to `/login`
+- **Auth / auto sign-out behind Cloudflare**: added explicit cookie configuration in `auth.ts` for production. Cloudflare Flexible SSL sends HTTP to the origin, causing NextAuth to strip the `Secure` flag and use unprefixed cookie names — every request created a new unreadable cookie, effectively signing users out immediately. Cookies are now named and flagged explicitly regardless of transport protocol.
+- **Topbar mock data**: removed all hardcoded "Acme Internal", "Alex K.", "AK", "alex@acme.io", fake "Growth" badge. Topbar now receives real `user.email` from the app layout and derives initials/display from it.
+- **Sidebar workspace section**: removed the redundant workspace block (showing ugly `email.split("@")[0]` strings). User identity is shown only once, in the bottom user footer.
+### Added
+- **Template thumbnails**: each template card now shows a scaled-down sandboxed iframe preview of the actual rendered HTML (no scripts, safe)
+- **Template full-preview dialog**: eye icon on hover opens the template at full size in a modal iframe
+
 ## [0.6.5] — 2026-02-21
 ### Added
 - `lib/starter-templates.ts`: 5 production-ready PDF templates — Invoice, Receipt, Business Letter, Certificate of Completion, Project Proposal

@@ -22,7 +22,7 @@ export default async function AppLayout({
     <div className="flex h-screen overflow-hidden bg-background">
       <AppSidebar user={{ email: session.user.email ?? "" }} />
       <div className="flex flex-1 flex-col overflow-hidden">
-        <AppTopbar />
+        <AppTopbar user={{ email: session.user.email ?? "" }} />
         <main className="flex-1 overflow-y-auto">
           <div className="mx-auto max-w-6xl px-6 py-8">{children}</div>
         </main>
