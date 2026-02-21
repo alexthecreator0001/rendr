@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { ConvertClient } from "./convert-client";
 
-export const metadata = { title: "Convert" };
+export const metadata = { title: "Studio" };
 
 export default async function ConvertPage() {
   const session = await auth();
@@ -16,11 +16,11 @@ export default async function ConvertPage() {
   });
 
   return (
-    <div className="mx-auto max-w-2xl px-6 py-10">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold tracking-tight">Convert</h1>
+    <div>
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold tracking-tight">Studio</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Convert a URL, raw HTML, or a saved template to PDF.
+          Render URLs, HTML, and templates to high-quality PDFs with full control over every option.
         </p>
       </div>
       <ConvertClient templates={templates} />

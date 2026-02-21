@@ -2,6 +2,20 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.8.0] — 2026-02-21
+### Added
+- **Studio page** (formerly "Convert"): renamed to "Studio" with a two-column playground layout — source input on the left, full PDF options panel on the right
+- **Full PDF options panel** with four sections:
+  - **Layout**: Format (A4/Letter/Legal/Tabloid/A0-A6), custom Width & Height, Scale (0.1–2), Page Ranges (e.g. `1-3, 5`)
+  - **Print Production**: Landscape, Print Background, Prefer CSS Page Size toggles
+  - **Margins**: quick presets (None/Small/Normal/Large) + individual Top/Right/Bottom/Left inputs
+  - **Header & Footer**: toggle with editable HTML templates (`.title`, `.pageNumber`, `.totalPages` class hints)
+  - **Output & Accessibility**: Tagged PDF, Embed Outline toggles; Compression shown as Pro feature
+- **Sidebar redesign**: removed section text labels; groups separated by `<Separator />`; active items have a left border indicator + `bg-accent`; cleaner user footer; `Wand2` icon for Studio, `ExternalLink` indicator on Documentation
+### Changed
+- `worker/processor.ts`: passes all new options to Playwright `page.pdf()` (scale, pageRanges, preferCSSPageSize, displayHeaderFooter, headerTemplate, footerTemplate, tagged, outline, custom width/height)
+- `app/actions/convert.ts`: reads all new form fields and builds complete `pdfOptions` object
+
 ## [0.7.1] — 2026-02-21
 ### Changed
 - **Settings redesign**: professional two-column layout (260px label + content area); sections for Profile (avatar initials, email, join date), Security (change password), API & Integrations (link cards to API Keys and Webhooks), and Danger Zone (disabled delete)

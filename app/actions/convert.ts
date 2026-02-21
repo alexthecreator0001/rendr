@@ -8,17 +8,21 @@ import { z } from "zod";
 const urlSchema = z.string().url("Please enter a valid URL (include https://)");
 const htmlSchema = z.string().min(10, "HTML content is too short");
 
-const marginMap = {
-  none:   { top: "0",    right: "0",    bottom: "0",    left: "0"    },
-  small:  { top: "10mm", right: "10mm", bottom: "10mm", left: "10mm" },
-  normal: { top: "20mm", right: "15mm", bottom: "20mm", left: "15mm" },
-  large:  { top: "30mm", right: "25mm", bottom: "30mm", left: "25mm" },
-} as const;
-
 export type ConvertState =
   | { jobId: string; error?: never }
   | { error: string; jobId?: never }
   | null;
+
+function parseBoolean(val: FormDataEntryValue | null, defaultVal: boolean): boolean {
+  if (val === null) return defaultVal;
+  return val === "true";
+}
+
+function parseNumber(val: FormDataEntryValue | null, defaultVal: number): number {
+  if (!val) return defaultVal;
+  const n = parseFloat(val as string);
+  return isNaN(n) ? defaultVal : n;
+}
 
 export async function convertUrlAction(
   _prev: ConvertState,
@@ -28,10 +32,51 @@ export async function convertUrlAction(
   if (!session?.user?.id) return { error: "Not authenticated." };
 
   const mode = formData.get("mode") as string;
-  const format = formData.get("format") === "Letter" ? "Letter" : "A4";
-  const landscape = formData.get("orientation") === "landscape";
-  const marginKey = (formData.get("margin") as string) || "normal";
-  const margin = marginMap[marginKey as keyof typeof marginMap] ?? marginMap.normal;
+
+  // ── Layout options ──────────────────────────────────────
+  const format = (formData.get("format") as string) || "A4";
+  const customWidth = (formData.get("customWidth") as string)?.trim() || "";
+  const customHeight = (formData.get("customHeight") as string)?.trim() || "";
+  const scale = Math.min(Math.max(parseNumber(formData.get("scale"), 1), 0.1), 2);
+  const pageRanges = (formData.get("pageRanges") as string)?.trim() || "";
+
+  // ── Print production ────────────────────────────────────
+  const landscape = parseBoolean(formData.get("landscape"), false);
+  const printBackground = parseBoolean(formData.get("printBackground"), true);
+  const preferCSSPageSize = parseBoolean(formData.get("preferCSSPageSize"), false);
+
+  // ── Margins ─────────────────────────────────────────────
+  const marginTop = (formData.get("marginTop") as string)?.trim() || "20mm";
+  const marginRight = (formData.get("marginRight") as string)?.trim() || "15mm";
+  const marginBottom = (formData.get("marginBottom") as string)?.trim() || "20mm";
+  const marginLeft = (formData.get("marginLeft") as string)?.trim() || "15mm";
+  const margin = { top: marginTop, right: marginRight, bottom: marginBottom, left: marginLeft };
+
+  // ── Header & Footer ─────────────────────────────────────
+  const displayHeaderFooter = parseBoolean(formData.get("displayHeaderFooter"), false);
+  const headerTemplate = (formData.get("headerTemplate") as string) || "<span></span>";
+  const footerTemplate = (formData.get("footerTemplate") as string) || "<span></span>";
+
+  // ── Output & Accessibility ──────────────────────────────
+  const tagged = parseBoolean(formData.get("tagged"), false);
+  const outline = parseBoolean(formData.get("outline"), false);
+
+  const pdfOptions = {
+    // Paper size
+    ...(customWidth || customHeight
+      ? { width: customWidth || undefined, height: customHeight || undefined }
+      : { format }),
+    landscape,
+    printBackground,
+    preferCSSPageSize,
+    scale,
+    ...(pageRanges ? { pageRanges } : {}),
+    displayHeaderFooter,
+    ...(displayHeaderFooter ? { headerTemplate, footerTemplate } : {}),
+    margin,
+    tagged,
+    outline,
+  };
 
   let jobData: Parameters<typeof prisma.job.create>[0]["data"];
 
@@ -43,7 +88,7 @@ export async function convertUrlAction(
       userId: session.user.id,
       inputType: "url",
       inputContent: parsed.data,
-      optionsJson: { format, landscape, margin },
+      optionsJson: pdfOptions,
     };
   } else if (mode === "html") {
     const raw = (formData.get("input") as string) ?? "";
@@ -53,7 +98,7 @@ export async function convertUrlAction(
       userId: session.user.id,
       inputType: "html",
       inputContent: parsed.data,
-      optionsJson: { format, landscape, margin },
+      optionsJson: pdfOptions,
     };
   } else if (mode === "template") {
     const templateId = (formData.get("templateId") as string) ?? "";
@@ -78,7 +123,7 @@ export async function convertUrlAction(
       inputType: "template",
       inputContent: "",
       templateId,
-      optionsJson: { format, landscape, margin, variables },
+      optionsJson: { ...pdfOptions, variables },
     };
   } else {
     return { error: "Invalid mode." };
@@ -86,7 +131,6 @@ export async function convertUrlAction(
 
   const job = await prisma.job.create({ data: jobData });
 
-  // Best-effort pg-boss enqueue (worker also polls Prisma directly as fallback)
   try {
     const queue = await getQueue();
     await queue.send("pdf-conversion", { jobId: job.id });

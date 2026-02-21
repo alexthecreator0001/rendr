@@ -43,7 +43,6 @@ export async function processJob(jobId: string): Promise<void> {
     } else if (job.inputType === "template") {
       if (!job.template) throw new Error("Template not found")
       let html = job.template.html
-      // Replace {{varName}} placeholders
       for (const [key, val] of Object.entries(variables)) {
         html = html.replace(new RegExp(`\\{\\{\\s*${key}\\s*\\}\\}`, "g"), val)
       }
@@ -52,10 +51,36 @@ export async function processJob(jobId: string): Promise<void> {
       throw new Error(`Unknown input type: ${job.inputType}`)
     }
 
+    // Build Playwright PDF options from stored optionsJson
+    const hasCustomDimensions = !!(opts.width || opts.height)
+    const scale = typeof opts.scale === "number" ? opts.scale : 1
+    const clampedScale = Math.min(Math.max(scale, 0.1), 2)
+
     const pdfBuffer = await page.pdf({
-      format: (opts.format as "A4" | "Letter") ?? "A4",
+      // Paper size — use format OR custom width/height (mutually exclusive)
+      ...(hasCustomDimensions
+        ? {
+            width: (opts.width as string) || undefined,
+            height: (opts.height as string) || undefined,
+          }
+        : {
+            format: (opts.format as string) ?? "A4",
+          }),
+
       landscape: (opts.landscape as boolean) ?? false,
-      printBackground: true,
+      printBackground: (opts.printBackground as boolean) ?? true,
+      preferCSSPageSize: (opts.preferCSSPageSize as boolean) ?? false,
+
+      scale: clampedScale,
+      pageRanges: (opts.pageRanges as string) || undefined,
+
+      displayHeaderFooter: (opts.displayHeaderFooter as boolean) ?? false,
+      headerTemplate: (opts.headerTemplate as string) || "<span></span>",
+      footerTemplate: (opts.footerTemplate as string) || "<span></span>",
+
+      tagged: (opts.tagged as boolean) ?? false,
+      outline: (opts.outline as boolean) ?? false,
+
       margin: (opts.margin as {
         top?: string
         right?: string
@@ -82,7 +107,6 @@ export async function processJob(jobId: string): Promise<void> {
       },
     })
 
-    // Track usage
     await prisma.usageEvent.create({
       data: {
         userId: job.userId,
@@ -92,7 +116,6 @@ export async function processJob(jobId: string): Promise<void> {
       },
     })
 
-    // Deliver webhooks
     await deliverWebhooks(job.userId, "job.completed", {
       job_id: job.id,
       status: "succeeded",
@@ -123,14 +146,12 @@ export async function processJob(jobId: string): Promise<void> {
       },
     })
 
-    // Deliver failure webhooks
     await deliverWebhooks(job.userId, "job.failed", {
       job_id: job.id,
       status: "failed",
       error: { code: "render_failed", message: errorMessage },
     })
 
-    // Re-throw so pg-boss can mark the pg-boss job as failed
     throw err
   }
 }
