@@ -1,77 +1,103 @@
-export function HowItWorks() {
-  const steps = [
-    {
-      number: "01",
-      title: "Send your template",
-      description: "POST your HTML string or a stored template ID to /v1/render. Pass variables as a JSON object. That's it.",
-      code: `POST /v1/render
+const steps = [
+  {
+    number: "01",
+    title: "Send your template",
+    description:
+      "POST your HTML string or a stored template ID to /v1/convert. Pass variables as JSON.",
+    code: `POST /v1/convert
+Authorization: Bearer rk_live_••••••••
+
 {
-  "template_id": "tmpl_invoice",
-  "variables": { "client": "Acme" }
+  "template": "invoice-pro",
+  "variables": {
+    "client": "Acme Corp",
+    "amount": "$4,200.00"
+  }
 }`,
-    },
-    {
-      number: "02",
-      title: "We render it",
-      description: "Your job queues, gets picked up by an isolated worker, and is processed with your fonts, CSS, and layout exactly as designed.",
-      code: `{
-  "id": "job_7f3k2m",
-  "status": "processing",
+    badge: { label: "202 Accepted", color: "text-blue-400 border-blue-500/30 bg-blue-500/10" },
+  },
+  {
+    number: "02",
+    title: "We render it",
+    description:
+      "Your job queues, gets picked up by an isolated Chromium worker, and is processed with your fonts and CSS — exactly as designed.",
+    code: `{
+  "id":           "job_7f3k2m",
+  "status":       "processing",
+  "queued_at":    "2026-03-15T14:23:01Z",
   "estimated_ms": 900
 }`,
-    },
-    {
-      number: "03",
-      title: "Get your PDF",
-      description: "A signed download URL lands in your webhook payload within seconds. Or poll /v1/jobs/:id if you prefer.",
-      code: `{
-  "event": "job.completed",
-  "download_url": "https://...",
-  "pages": 2,
-  "duration_ms": 843
+    badge: { label: "processing", color: "text-amber-400 border-amber-500/30 bg-amber-500/10" },
+  },
+  {
+    number: "03",
+    title: "Get your PDF",
+    description:
+      "A signed download URL arrives in your webhook payload within seconds. Or poll /v1/jobs/:id.",
+    code: `{
+  "event":        "job.completed",
+  "job_id":       "job_7f3k2m",
+  "download_url": "https://cdn.rendrpdf.com/…",
+  "pages":        2,
+  "duration_ms":  843
 }`,
-    },
-  ];
+    badge: { label: "job.completed", color: "text-emerald-400 border-emerald-500/30 bg-emerald-500/10" },
+  },
+];
 
+export function HowItWorks() {
   return (
-    <section className="relative overflow-hidden bg-zinc-950 py-24 sm:py-32">
+    <section className="relative overflow-hidden border-t border-white/[0.06] bg-zinc-950 py-24 sm:py-32">
       {/* Background orb */}
-      <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[600px] w-[800px] rounded-full bg-blue-900/20 blur-[120px]" />
+      <div className="pointer-events-none absolute left-1/2 top-1/2 h-[600px] w-[900px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-900/10 blur-[140px]" />
 
-      <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8">
+        {/* Header */}
         <div className="mb-16 text-center">
           <p className="mb-3 text-sm font-semibold uppercase tracking-[0.15em] text-blue-400">
             How it works
           </p>
-          <h2 className="text-4xl font-extrabold tracking-[-0.03em] text-white sm:text-5xl">
+          <h2 className="font-heading text-4xl font-extrabold tracking-[-0.03em] text-white sm:text-5xl">
             Three steps. That&apos;s it.
           </h2>
-          <p className="mt-4 text-base text-zinc-400 max-w-md mx-auto">
-            From zero to production PDF in less time than it takes to set up Puppeteer.
+          <p className="mx-auto mt-4 max-w-md text-base text-zinc-400">
+            From zero to production PDF in less time than it takes to set up
+            Puppeteer.
           </p>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-3">
-          {steps.map((step, i) => (
+        {/* Steps */}
+        <div className="relative grid gap-4 lg:grid-cols-3">
+          {/* Connecting line (desktop) */}
+          <div className="pointer-events-none absolute left-[16.67%] right-[16.67%] top-[38px] hidden h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent lg:block" />
+
+          {steps.map((step) => (
             <div
               key={step.number}
-              className="relative rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm"
+              className="relative rounded-2xl border border-white/[0.07] bg-white/[0.02] p-6"
             >
-              {/* Step number */}
-              <div className="mb-5 flex items-center gap-3">
-                <span className="font-mono text-3xl font-bold text-white/20">{step.number}</span>
-                {i < steps.length - 1 && (
-                  <div className="hidden h-px flex-1 bg-white/10 lg:block" />
-                )}
+              {/* Step number + badge */}
+              <div className="mb-5 flex items-center justify-between">
+                <span className="font-heading text-3xl font-extrabold text-white/10">
+                  {step.number}
+                </span>
+                <span
+                  className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold ${step.badge.color}`}
+                >
+                  {step.badge.label}
+                </span>
               </div>
 
-              <h3 className="mb-2 text-lg font-semibold text-white">{step.title}</h3>
-              <p className="mb-5 text-sm text-zinc-400 leading-relaxed">{step.description}</p>
+              <h3 className="mb-2 text-sm font-semibold text-white">
+                {step.title}
+              </h3>
+              <p className="mb-5 text-sm leading-relaxed text-zinc-500">
+                {step.description}
+              </p>
 
-              {/* Code snippet */}
-              <div className="rounded-xl bg-black/40 border border-white/5 p-4">
-                <pre className="font-mono text-xs text-zinc-300 leading-relaxed overflow-x-auto">
-                  {step.code}
+              <div className="overflow-hidden rounded-xl border border-white/[0.05] bg-black/40">
+                <pre className="overflow-x-auto p-4 font-mono text-[11.5px] leading-[1.8] text-zinc-300">
+                  <code>{step.code}</code>
                 </pre>
               </div>
             </div>

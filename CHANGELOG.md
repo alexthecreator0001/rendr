@@ -2,6 +2,20 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.5.0] — 2026-02-21
+### Changed
+- Complete homepage redesign inspired by sent.dm: code-first, image-free, dark throughout
+- Hero: centered layout, language-tabbed code block (Node.js / cURL / Python / PHP), install command pill
+- Trust row: text-only company names replacing image placeholders
+- Features grid: each card now contains embedded code/data demos (job JSON, webhook payload, template list, signed URL, font list, analytics stats)
+- How it works: cleaner 3-step grid with status badges per step
+- CTA: modernized, stripped back
+### Added
+- Pain points section: 4-card grid calling out the problems with DIY PDF stacks
+- Job lifecycle section: 4-state visual timeline (queued → processing → rendered → delivered) with evolving JSON
+- FAQ section: accordion with 8 common questions (shadcn Accordion)
+- Pricing section now integrated into homepage flow
+
 ## [0.4.1] — 2026-02-21
 ### Changed
 - Redesigned hero right side: replaced overflowing floating cards with a clean pipeline visualization (request card → processing indicator → PDF output card)
