@@ -2,6 +2,16 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.6.4] — 2026-02-21
+### Added
+- Templates dashboard: reusable HTML layouts with `{{variable}}` placeholder substitution
+- Templates page (`/app/templates`): create/edit/delete dialogs, variable badges extracted from HTML, "Use in Convert" hover link per card
+- Convert page: third input mode "Template" — pick a saved template, fill in variable values, generate PDF
+- `app/actions/convert.ts`: template mode support — validates templateId ownership, extracts variable key/value pairs, passes to worker via `optionsJson.variables`
+- `app/app/templates/_init.md`: feature init file per CLAUDE.md convention
+### Fixed
+- Templates Edit dialog: HTML textarea now correctly pre-fills with existing template content (was blank before)
+
 ## [0.6.3] — 2026-02-21
 ### Fixed
 - Worker: added Prisma-based polling loop (every 2s) alongside pg-boss. `queue.send()` in Next.js was silently returning null so jobs never reached pg-boss. Worker now directly queries the `Job` table with `FOR UPDATE SKIP LOCKED` to atomically claim and process queued jobs, bypassing pg-boss for job discovery.

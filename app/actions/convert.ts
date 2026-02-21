@@ -28,39 +28,71 @@ export async function convertUrlAction(
   if (!session?.user?.id) return { error: "Not authenticated." };
 
   const mode = formData.get("mode") as string;
-  const raw = (formData.get("input") as string) ?? "";
-
-  let inputType: "url" | "html";
-  let inputContent: string;
-
-  if (mode === "url") {
-    const parsed = urlSchema.safeParse(raw.trim());
-    if (!parsed.success) return { error: parsed.error.issues[0].message };
-    inputType = "url";
-    inputContent = parsed.data;
-  } else {
-    const parsed = htmlSchema.safeParse(raw);
-    if (!parsed.success) return { error: parsed.error.issues[0].message };
-    inputType = "html";
-    inputContent = parsed.data;
-  }
-
   const format = formData.get("format") === "Letter" ? "Letter" : "A4";
   const landscape = formData.get("orientation") === "landscape";
   const marginKey = (formData.get("margin") as string) || "normal";
   const margin = marginMap[marginKey as keyof typeof marginMap] ?? marginMap.normal;
 
-  const job = await prisma.job.create({
-    data: {
-      userId: session.user.id,
-      inputType,
-      inputContent,
-      optionsJson: { format, landscape, margin },
-    },
-  });
+  let jobData: Parameters<typeof prisma.job.create>[0]["data"];
 
-  const queue = await getQueue();
-  await queue.send("pdf-conversion", { jobId: job.id });
+  if (mode === "url") {
+    const raw = (formData.get("input") as string) ?? "";
+    const parsed = urlSchema.safeParse(raw.trim());
+    if (!parsed.success) return { error: parsed.error.issues[0].message };
+    jobData = {
+      userId: session.user.id,
+      inputType: "url",
+      inputContent: parsed.data,
+      optionsJson: { format, landscape, margin },
+    };
+  } else if (mode === "html") {
+    const raw = (formData.get("input") as string) ?? "";
+    const parsed = htmlSchema.safeParse(raw);
+    if (!parsed.success) return { error: parsed.error.issues[0].message };
+    jobData = {
+      userId: session.user.id,
+      inputType: "html",
+      inputContent: parsed.data,
+      optionsJson: { format, landscape, margin },
+    };
+  } else if (mode === "template") {
+    const templateId = (formData.get("templateId") as string) ?? "";
+    if (!templateId) return { error: "Please select a template." };
+
+    const template = await prisma.template.findFirst({
+      where: { id: templateId, userId: session.user.id },
+      select: { id: true },
+    });
+    if (!template) return { error: "Template not found." };
+
+    const variableKeys = ((formData.get("variableKeys") as string) ?? "")
+      .split(",")
+      .filter(Boolean);
+    const variables: Record<string, string> = {};
+    for (const key of variableKeys) {
+      variables[key] = (formData.get(`var_${key}`) as string) ?? "";
+    }
+
+    jobData = {
+      userId: session.user.id,
+      inputType: "template",
+      inputContent: "",
+      templateId,
+      optionsJson: { format, landscape, margin, variables },
+    };
+  } else {
+    return { error: "Invalid mode." };
+  }
+
+  const job = await prisma.job.create({ data: jobData });
+
+  // Best-effort pg-boss enqueue (worker also polls Prisma directly as fallback)
+  try {
+    const queue = await getQueue();
+    await queue.send("pdf-conversion", { jobId: job.id });
+  } catch {
+    // worker will pick up via Prisma poll
+  }
 
   return { jobId: job.id };
 }
