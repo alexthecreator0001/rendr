@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client"
 import crypto from "node:crypto"
 import bcrypt from "bcryptjs"
+import { seedStarterTemplates } from "../lib/starter-templates"
 
 const prisma = new PrismaClient()
 
@@ -43,6 +44,10 @@ async function main() {
   } else {
     console.log("Demo key already exists, skipping.")
   }
+
+  // Seed starter templates for demo user
+  await seedStarterTemplates(user.id, prisma)
+  console.log("Starter templates seeded.")
 
   console.log("Seed complete.")
 }

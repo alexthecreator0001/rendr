@@ -3,6 +3,7 @@
 import { signIn } from "@/auth";
 import { prisma } from "@/lib/db";
 import { hashPassword } from "@/lib/auth-utils";
+import { seedStarterTemplates } from "@/lib/starter-templates";
 import { z } from "zod";
 import { AuthError } from "next-auth";
 
@@ -74,12 +75,15 @@ export async function registerAction(
 
   const passwordHash = await hashPassword(parsed.data.password);
 
-  await prisma.user.create({
+  const newUser = await prisma.user.create({
     data: {
       email: parsed.data.email,
       passwordHash,
     },
   });
+
+  // Seed starter templates in the background — don't block registration
+  seedStarterTemplates(newUser.id, prisma).catch(() => {});
 
   // Sign the new user in immediately and redirect to the dashboard.
   // redirectTo is the NextAuth v5 server-action API.

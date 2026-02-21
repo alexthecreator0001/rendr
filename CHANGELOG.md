@@ -2,6 +2,12 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.6.5] — 2026-02-21
+### Added
+- `lib/starter-templates.ts`: 5 production-ready PDF templates — Invoice, Receipt, Business Letter, Certificate of Completion, Project Proposal
+- New users automatically get all starter templates seeded on registration (non-blocking, via `registerAction`)
+- Demo seed (`npm run db:seed`) also seeds starter templates for `demo@rendr.dev`
+
 ## [0.6.4] — 2026-02-21
 ### Added
 - Templates dashboard: reusable HTML layouts with `{{variable}}` placeholder substitution
