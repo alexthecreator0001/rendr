@@ -33,9 +33,6 @@ const navGroups = [
     { href: "/app/webhooks",  label: "Webhooks",   icon: Webhook },
   ],
   [
-    { href: "/app/billing",  label: "Billing",        icon: CreditCard },
-  ],
-  [
     { href: "/docs",         label: "Documentation",  icon: BookOpen, external: true },
   ],
 ] as const;
@@ -206,6 +203,12 @@ export function AppSidebar({ user, usage, plan }: AppSidebarProps) {
                 <Link href="/app/settings" onClick={close} className="flex items-center gap-2 cursor-pointer">
                   <Settings className="h-4 w-4 text-muted-foreground" />
                   Settings
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/app/billing" onClick={close} className="flex items-center gap-2 cursor-pointer">
+                  <CreditCard className="h-4 w-4 text-muted-foreground" />
+                  Billing
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />

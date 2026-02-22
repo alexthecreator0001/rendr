@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
+import { auth } from "@/auth";
 import { Hero } from "@/components/marketing/hero";
 import { TrustRow } from "@/components/marketing/trust-row";
 import { PainPoints } from "@/components/marketing/pain-points";
@@ -13,7 +15,9 @@ export const metadata: Metadata = {
   title: "Rendr — HTML to PDF API",
 };
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const session = await auth();
+  if (session?.user) redirect("/app");
   return (
     <>
       <Hero />

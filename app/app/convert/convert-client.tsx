@@ -73,7 +73,7 @@ export function ConvertClient({ templates }: { templates: ConvertTemplate[] }) {
   const [elapsed, setElapsed] = useState(0);
   const [slowWarning, setSlowWarning] = useState(false);
   const [showHFHtml, setShowHFHtml] = useState(false);
-  const [inspectorOpen, setInspectorOpen] = useState(true);
+  const [inspectorOpen, setInspectorOpen] = useState(false);
 
   // Template state
   const [selectedTemplateId, setSelectedTemplateId] = useState("");
@@ -137,6 +137,13 @@ export function ConvertClient({ templates }: { templates: ConvertTemplate[] }) {
   }, [state]);
 
   useEffect(() => { if (pending) setPhase("submitting"); }, [pending]);
+
+  // Open inspector by default on desktop
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.innerWidth >= 768) {
+      setInspectorOpen(true);
+    }
+  }, []);
 
   function reset() {
     clearInterval(pollRef.current!); clearInterval(timerRef.current!);
@@ -521,7 +528,13 @@ export function ConvertClient({ templates }: { templates: ConvertTemplate[] }) {
 
         {/* ── Inspector ──────────────────────────────────────────────────────── */}
         {inspectorOpen && (
-          <div className="flex w-[256px] shrink-0 flex-col overflow-y-auto bg-background border-l border-border">
+          <>
+          {/* Mobile backdrop */}
+          <div
+            className="fixed inset-0 z-40 bg-black/50 md:hidden"
+            onClick={() => setInspectorOpen(false)}
+          />
+          <div className="flex w-[256px] shrink-0 flex-col overflow-y-auto bg-background border-l border-border fixed inset-y-0 right-0 z-50 shadow-2xl md:relative md:inset-auto md:z-auto md:shadow-none">
 
             {/* Layout */}
             <div>
@@ -780,6 +793,7 @@ export function ConvertClient({ templates }: { templates: ConvertTemplate[] }) {
             </div>
 
           </div>
+          </>
         )}
       </div>
     </form>

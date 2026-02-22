@@ -2,6 +2,17 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.12.2] — 2026-02-22
+### Added
+- **Homepage redirect**: logged-in users visiting `/` are now redirected to `/app` instead of seeing the landing page
+- **Auth pages redesign**: animated gradient background (blue + violet orbs, subtle grid overlay) on login/register; frosted glass card with dark inputs for a polished dark UI; removed ThemeToggle from auth header
+- **Billing in account dropdown**: Billing link moved from sidebar nav into the user footer dropdown alongside Settings
+
+### Fixed
+- **Billing page centering**: outer wrapper now uses `mx-auto max-w-3xl` so the page centres properly (was left-aligned)
+- **Billing plan mismatch**: billing page now reads `user.plan` from DB; current plan badge, feature pills, usage limit, and "Active" marker on plan cards all reflect the real plan instead of hardcoded Starter
+- **Studio mobile inspector**: inspector defaults closed on mobile; opens automatically on desktop (≥ 768 px); panel slides in as a fixed overlay on mobile with a backdrop to dismiss
+
 ## [0.12.1] — 2026-02-22
 ### Fixed
 - **Studio full width**: removed `max-w-6xl` from the shared layout wrapper; Studio page now uses `h-full overflow-hidden` to fill its flex container — no more capped width
