@@ -2,6 +2,10 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.14.1] — 2026-02-22
+### Fixed
+- **ASCII rain**: completely rewrote canvas animation — replaced Matrix-style vertical falling columns with a proper perspective starburst effect matching the Synk reference design; 130 rays radiate outward from a central vanishing point (W/2, H×0.52), characters scale from 5px (near VP) to 15px (at edges) with matching opacity ramp; deterministic seeded hash prevents per-frame character flicker; characters scroll slowly outward from VP; pure black background with no trail effect
+
 ## [0.14.0] — 2026-02-22
 ### Added
 - **ASCII rain hero**: animated canvas background with perspective binary character columns (0, 1, ·) inspired by Synk design; pure black `bg-black` section; columns brighter/larger at edges, dimmer/smaller at center for depth illusion; radial vignette overlay keeps center readable
