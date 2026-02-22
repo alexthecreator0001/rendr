@@ -2,6 +2,14 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.14.2] — 2026-02-22
+### Changed
+- **Hero**: restored v0.13.0 split-column layout (text left, macOS terminal right); removed ASCII canvas and standalone CodeShowcase section
+- **How it works**: fixed mobile layout — badge row now uses `items-start` + `shrink-0` + `gap-3` so badge never overflows on narrow screens
+- **Login page**: redesigned — split card layout on desktop (branding left panel with testimonial + feature bullets, form on right); wider max-w-4xl card; h-11 inputs with rounded-xl; white submit button; mobile shows logo + form only
+- **Register page**: redesigned — split card layout matching login; left panel shows headline, gradient text, and 3 stat rows with icons; free-tier badge pill on form; same mobile-first approach
+- **Auth layout**: simplified to full-screen centered flex with gradient orbs; removed nav header and footer (moved into page cards)
+
 ## [0.14.1] — 2026-02-22
 ### Fixed
 - **ASCII rain**: completely rewrote canvas animation — replaced Matrix-style vertical falling columns with a proper perspective starburst effect matching the Synk reference design; 130 rays radiate outward from a central vanishing point (W/2, H×0.52), characters scale from 5px (near VP) to 15px (at edges) with matching opacity ramp; deterministic seeded hash prevents per-frame character flicker; characters scroll slowly outward from VP; pure black background with no trail effect

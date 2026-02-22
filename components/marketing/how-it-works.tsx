@@ -77,12 +77,12 @@ export function HowItWorks() {
               className="relative rounded-2xl border border-white/[0.07] bg-white/[0.02] p-6"
             >
               {/* Step number + badge */}
-              <div className="mb-5 flex items-center justify-between">
+              <div className="mb-5 flex items-start justify-between gap-3">
                 <span className="font-heading text-3xl font-extrabold text-white/10">
                   {step.number}
                 </span>
                 <span
-                  className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold ${step.badge.color}`}
+                  className={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-semibold ${step.badge.color}`}
                 >
                   {step.badge.label}
                 </span>
