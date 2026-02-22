@@ -108,12 +108,13 @@ export async function createAdminTemplateAction(
   const userId = formData.get("userId") as string;
   const name = (formData.get("name") as string)?.trim();
   const html = (formData.get("html") as string)?.trim();
+  const coverImageUrl = (formData.get("coverImageUrl") as string)?.trim() || null;
 
   if (!userId) return { error: "Select a user." };
   if (!name || name.length < 2) return { error: "Name too short." };
   if (!html) return { error: "HTML is required." };
 
-  await prisma.template.create({ data: { userId, name, html } });
+  await prisma.template.create({ data: { userId, name, html, coverImageUrl } });
   revalidatePath("/admin/templates");
   return {};
 }
@@ -126,12 +127,13 @@ export async function updateAdminTemplateAction(
   const id = formData.get("id") as string;
   const name = (formData.get("name") as string)?.trim();
   const html = (formData.get("html") as string)?.trim();
+  const coverImageUrl = (formData.get("coverImageUrl") as string)?.trim() || null;
 
   if (!id) return { error: "Missing template ID." };
   if (!name || name.length < 2) return { error: "Name too short." };
   if (!html) return { error: "HTML is required." };
 
-  await prisma.template.update({ where: { id }, data: { name, html } });
+  await prisma.template.update({ where: { id }, data: { name, html, coverImageUrl } });
   revalidatePath("/admin/templates");
   revalidatePath("/app/templates");
   return {};

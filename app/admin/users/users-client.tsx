@@ -1,6 +1,7 @@
 "use client";
 
-import { useRouter, useTransition } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useTransition } from "react";
 import { Search, ChevronLeft, ChevronRight, Shield, Trash2, CheckCircle, Ban, ShieldOff } from "lucide-react";
 import { promoteUserAction, changePlanAction, deleteUserAction, banUserAction, unbanUserAction } from "../_actions";
 import { Button } from "@/components/ui/button";
@@ -180,7 +181,7 @@ export function AdminUsersClient({
   }
 
   return (
-    <div className="px-4 py-6 sm:px-6 sm:py-8 space-y-6">
+    <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8 space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Users</h1>

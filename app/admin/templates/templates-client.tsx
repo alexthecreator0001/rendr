@@ -13,18 +13,48 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
   DialogTrigger, DialogFooter, DialogDescription,
 } from "@/components/ui/dialog";
-import { Plus, Pencil, Trash2, Layers, AlertTriangle } from "lucide-react";
+import { Plus, Pencil, Trash2, Layers, AlertTriangle, ImageIcon } from "lucide-react";
 
 type Template = {
   id: string;
   name: string;
   html: string;
-  createdAt: Date;
-  updatedAt: Date;
+  coverImageUrl: string | null;
+  createdAt: string;
+  updatedAt: string;
 };
 
 function extractVarCount(html: string): number {
   return new Set([...html.matchAll(/\{\{\s*(\w+)\s*\}\}/g)].map((m) => m[1])).size;
+}
+
+function CoverImageField({ defaultValue }: { defaultValue?: string | null }) {
+  const [preview, setPreview] = useState(defaultValue ?? "");
+  return (
+    <div className="space-y-1.5">
+      <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+        Cover Image URL <span className="normal-case text-muted-foreground/50">(optional)</span>
+      </Label>
+      <Input
+        name="coverImageUrl"
+        value={preview}
+        onChange={(e) => setPreview(e.target.value)}
+        placeholder="https://…/cover.png"
+        className="rounded-xl"
+      />
+      {preview && (
+        <div className="mt-2 overflow-hidden rounded-xl border border-border bg-muted/30" style={{ height: 120 }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={preview}
+            alt="Cover preview"
+            className="h-full w-full object-cover"
+            onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+          />
+        </div>
+      )}
+    </div>
+  );
 }
 
 function CreateDialog({ adminUserId }: { adminUserId: string }) {
@@ -35,13 +65,13 @@ function CreateDialog({ adminUserId }: { adminUserId: string }) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button size="sm" className="gap-1.5 rounded-lg">
-          <Plus className="h-4 w-4" /> New default template
+          <Plus className="h-4 w-4" /> New template
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-2xl rounded-2xl">
         <DialogHeader>
           <DialogTitle>Create default template</DialogTitle>
-          <DialogDescription>This template will be added to your admin account and can be seeded to new users.</DialogDescription>
+          <DialogDescription>Added to your admin account as a canonical template.</DialogDescription>
         </DialogHeader>
         <form action={action} className="space-y-4 pt-1">
           {state?.error && (
@@ -49,17 +79,17 @@ function CreateDialog({ adminUserId }: { adminUserId: string }) {
               <AlertTriangle className="h-4 w-4 shrink-0" />{state.error}
             </div>
           )}
-          {/* Hidden: assign to the admin's own account */}
           <input type="hidden" name="userId" value={adminUserId} />
           <div className="space-y-1.5">
             <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Name</Label>
             <Input name="name" placeholder="Invoice, Certificate…" required className="rounded-xl" />
           </div>
+          <CoverImageField />
           <div className="space-y-1.5">
             <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">HTML</Label>
             <textarea
               name="html"
-              rows={14}
+              rows={12}
               className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 font-mono text-xs leading-relaxed placeholder:text-muted-foreground/30 focus:outline-none focus:ring-2 focus:ring-ring resize-none"
               placeholder={"<!DOCTYPE html>\n<html>\n  <body>\n    <h1>{{title}}</h1>\n  </body>\n</html>"}
               required
@@ -91,7 +121,7 @@ function EditDialog({ template }: { template: Template }) {
       <DialogContent className="max-w-3xl rounded-2xl">
         <DialogHeader>
           <DialogTitle>Edit — {template.name}</DialogTitle>
-          <DialogDescription>Changes affect this template only. Existing user copies are not updated.</DialogDescription>
+          <DialogDescription>Changes affect this template only.</DialogDescription>
         </DialogHeader>
         <form action={action} className="space-y-4 pt-1">
           {state?.error && (
@@ -104,11 +134,12 @@ function EditDialog({ template }: { template: Template }) {
             <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Name</Label>
             <Input name="name" defaultValue={template.name} required className="rounded-xl" />
           </div>
+          <CoverImageField defaultValue={template.coverImageUrl} />
           <div className="space-y-1.5">
             <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">HTML</Label>
             <textarea
               name="html"
-              rows={18}
+              rows={16}
               defaultValue={template.html}
               className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 font-mono text-xs leading-relaxed focus:outline-none focus:ring-2 focus:ring-ring resize-none"
               required
@@ -137,7 +168,7 @@ function DeleteButton({ id }: { id: string }) {
         size="sm"
         disabled={pending}
         className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
-        title="Delete template"
+        title="Delete"
       >
         <Trash2 className="h-3.5 w-3.5" />
       </Button>
@@ -158,7 +189,7 @@ export function AdminTemplatesClient({
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Default Templates</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Manage your canonical templates. These are the templates shown in the admin account and used as the basis for new user onboarding.
+            Canonical templates stored in your admin account. Set a cover image so they look great on the templates page.
           </p>
         </div>
         <CreateDialog adminUserId={adminUserId} />
@@ -171,7 +202,7 @@ export function AdminTemplatesClient({
           </div>
           <p className="font-semibold text-sm">No templates yet</p>
           <p className="mt-1.5 max-w-[280px] text-xs text-muted-foreground">
-            Create default templates here — they live in your admin account and serve as your canonical library.
+            Create your canonical templates here — they appear on the user-facing templates page.
           </p>
           <div className="mt-6">
             <CreateDialog adminUserId={adminUserId} />
@@ -180,22 +211,39 @@ export function AdminTemplatesClient({
       ) : (
         <div className="rounded-2xl border border-border bg-card overflow-hidden">
           <div className="px-5 py-3 border-b border-border bg-muted/30">
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{templates.length} template{templates.length !== 1 ? "s" : ""}</p>
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+              {templates.length} template{templates.length !== 1 ? "s" : ""}
+            </p>
           </div>
           <div className="divide-y divide-border">
             {templates.map((t) => (
               <div key={t.id} className="flex items-center gap-4 px-5 py-4">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-violet-500/10 text-violet-600 dark:text-violet-400">
-                  <Layers className="h-4 w-4" />
+                {/* Cover image or icon */}
+                <div className="shrink-0 h-12 w-16 overflow-hidden rounded-lg border border-border bg-muted/30 flex items-center justify-center">
+                  {t.coverImageUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={t.coverImageUrl}
+                      alt={t.name}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <ImageIcon className="h-5 w-5 text-muted-foreground/30" />
+                  )}
                 </div>
+
                 <div className="min-w-0 flex-1">
                   <p className="font-semibold text-sm">{t.name}</p>
                   <p className="text-xs text-muted-foreground mt-0.5">
                     {extractVarCount(t.html)} variable{extractVarCount(t.html) !== 1 ? "s" : ""}
                     {" · "}
                     Updated {new Date(t.updatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                    {!t.coverImageUrl && (
+                      <span className="ml-2 text-amber-500/80">· No cover image</span>
+                    )}
                   </p>
                 </div>
+
                 <div className="flex items-center gap-2 shrink-0">
                   <EditDialog template={t} />
                   <DeleteButton id={t.id} />

@@ -21,8 +21,15 @@ export default async function AdminBlogPage() {
   });
 
   return (
-    <div className="px-4 py-6 sm:px-6 sm:py-8">
-      <AdminBlogClient posts={posts} />
+    <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
+      <AdminBlogClient
+        posts={posts.map((p) => ({
+          ...p,
+          publishedAt: p.publishedAt?.toISOString() ?? null,
+          createdAt: p.createdAt.toISOString(),
+          updatedAt: p.updatedAt.toISOString(),
+        }))}
+      />
     </div>
   );
 }

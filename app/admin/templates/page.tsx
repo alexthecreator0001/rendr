@@ -20,12 +20,19 @@ export default async function AdminTemplatesPage() {
   const templates = await prisma.template.findMany({
     where: { userId: session.user.id },
     orderBy: { updatedAt: "desc" },
-    select: { id: true, name: true, html: true, createdAt: true, updatedAt: true },
+    select: { id: true, name: true, html: true, coverImageUrl: true, createdAt: true, updatedAt: true },
   });
 
   return (
-    <div className="px-4 py-6 sm:px-6 sm:py-8">
-      <AdminTemplatesClient templates={templates} adminUserId={session.user.id} />
+    <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
+      <AdminTemplatesClient
+        templates={templates.map((t) => ({
+          ...t,
+          createdAt: t.createdAt.toISOString(),
+          updatedAt: t.updatedAt.toISOString(),
+        }))}
+        adminUserId={session.user.id}
+      />
     </div>
   );
 }

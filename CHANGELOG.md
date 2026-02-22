@@ -2,6 +2,16 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.21.0] — 2026-02-22
+### Fixed
+- **Admin users crash** — `useTransition` was imported from `"next/navigation"` (incorrect); moved to `"react"` which is the correct source. This caused a client-side exception on the admin users page.
+- **Admin blog dates** — serialized `publishedAt`, `createdAt`, `updatedAt` as ISO strings before passing to client component. Updated `Post` type in `blog-client.tsx` to use `string` instead of `Date` to match.
+### Added
+- **Admin templates: cover image** — Added optional `coverImageUrl` field to `Template` model. Admin template list shows a 64×48 thumbnail (or icon placeholder) and warns "No cover image" in amber. Create/Edit dialogs include a URL input with live preview.
+- **Admin blog: "View blog" link** — Added external link to `/blog` in the admin blog page header alongside the "New post" button.
+- **Page widths** — Reverted to consistent `max-w-6xl mx-auto` on all dashboard/admin pages (Studio stays full-width). Updated `_init.md` files to reflect this convention.
+- **Prisma migration** `20260222000005_template_cover_image` — adds `coverImageUrl TEXT` column to `Template`.
+
 ## [0.20.1] — 2026-02-22
 ### Changed
 - **Full-width layout** — all dashboard and admin pages now use consistent full-width layout. Removed `max-w-*` and `mx-auto` from 20 page wrappers across `/app` and `/admin`. Standardized padding to `px-4 py-6 sm:px-6 sm:py-8` on all pages (was a mix of `max-w-3xl`, `max-w-4xl`, `max-w-5xl`, `max-w-6xl`, and non-responsive `px-6 py-8`).

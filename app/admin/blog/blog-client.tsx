@@ -29,9 +29,9 @@ type Post = {
   content: string;
   tag: string;
   published: boolean;
-  publishedAt: Date | null;
-  createdAt: Date;
-  updatedAt: Date;
+  publishedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
 };
 
 const TAGS = ["Engineering", "Guide", "Case study", "Deep dive", "Product", "News"];
@@ -241,7 +241,16 @@ export function AdminBlogClient({ posts }: { posts: Post[] }) {
             {drafts > 0 && ` · ${drafts} draft${drafts !== 1 ? "s" : ""}`}
           </p>
         </div>
-        <CreateDialog />
+        <div className="flex items-center gap-2">
+          <Link
+            href="/blog"
+            target="_blank"
+            className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+          >
+            <ExternalLink className="h-3.5 w-3.5" /> View blog
+          </Link>
+          <CreateDialog />
+        </div>
       </div>
 
       {posts.length === 0 ? (

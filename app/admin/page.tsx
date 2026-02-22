@@ -188,7 +188,7 @@ export default async function AdminOverviewPage() {
   ];
 
   return (
-    <div className="px-4 py-6 sm:px-6 sm:py-8 space-y-8">
+    <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8 space-y-8">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Overview</h1>
         <p className="text-sm text-muted-foreground mt-1">System-wide metrics at a glance.</p>
