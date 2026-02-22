@@ -2,6 +2,16 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.13.0] — 2026-02-22
+### Added
+- **Testimonials section**: three developer testimonials on the landing page with star ratings, quotes, and gradient avatar initials
+- **Comparison table**: Rendr vs DIY Puppeteer vs wkhtmltopdf vs Prince XML across 8 dimensions (setup time, managed infra, async queue, webhooks, CSS, fonts, dashboard, pricing); scrollable on mobile
+### Changed
+- **Hero redesign**: split two-column layout (text left, macOS terminal right); syntax-highlighted code with tab switcher (Node.js / cURL / Python) using colored spans; check-list of key benefits; mini stats row (render time, uptime, setup time); no more full-viewport height — proper `py-24 lg:py-32` spacing; overflow-hidden fixes mobile horizontal scroll
+- **Trust row**: added 4 key stats (500+ teams, 2M+ PDFs, 99.9% uptime, <1s avg) above the company logo row
+- **CTA section**: larger button, two gradient orbs, replaced footer tagline with checkmark benefit list
+- **Footer**: removed landscape photo and gradient bridge — clean dark footer
+
 ## [0.12.2] — 2026-02-22
 ### Added
 - **Homepage redirect**: logged-in users visiting `/` are now redirected to `/app` instead of seeing the landing page

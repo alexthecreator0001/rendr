@@ -7,6 +7,8 @@ import { PainPoints } from "@/components/marketing/pain-points";
 import { FeaturesGrid } from "@/components/marketing/features-grid";
 import { HowItWorks } from "@/components/marketing/how-it-works";
 import { JobLifecycle } from "@/components/marketing/job-lifecycle";
+import { Testimonials } from "@/components/marketing/testimonials";
+import { ComparisonTable } from "@/components/marketing/comparison-table";
 import { PricingCards } from "@/components/marketing/pricing-cards";
 import { FaqSection } from "@/components/marketing/faq-section";
 import { CtaSection } from "@/components/marketing/cta-section";
@@ -18,6 +20,7 @@ export const metadata: Metadata = {
 export default async function LandingPage() {
   const session = await auth();
   if (session?.user) redirect("/app");
+
   return (
     <>
       <Hero />
@@ -26,6 +29,8 @@ export default async function LandingPage() {
       <FeaturesGrid />
       <HowItWorks />
       <JobLifecycle />
+      <Testimonials />
+      <ComparisonTable />
 
       {/* Pricing */}
       <section className="border-t border-white/[0.06] bg-zinc-950 py-24 sm:py-32">

@@ -24,7 +24,6 @@ const footerLinks = {
 export function Footer() {
   return (
     <footer className="bg-zinc-950">
-      {/* Dark content section */}
       <div className="mx-auto max-w-7xl px-6 pt-16 pb-12 sm:px-8 lg:px-10">
         <div className="grid grid-cols-2 gap-10 sm:grid-cols-4">
           {/* Brand */}
@@ -63,7 +62,6 @@ export function Footer() {
           ))}
         </div>
 
-        {/* Bottom copyright row */}
         <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-white/[0.06] pt-8 sm:flex-row">
           <p className="text-xs text-zinc-600">
             © {new Date().getFullYear()} Rendr. All rights reserved.
@@ -72,18 +70,6 @@ export function Footer() {
             Made for developers who ship fast.
           </p>
         </div>
-      </div>
-
-      {/* Gradient bridge — dark to transparent */}
-      <div className="h-10 bg-gradient-to-b from-zinc-950 to-transparent" />
-
-      {/* Full landscape image — no cropping, natural proportions */}
-      <div className="w-full">
-        <img
-          src="/footer.jpg"
-          alt="Meadow landscape"
-          className="block w-full h-auto"
-        />
       </div>
     </footer>
   );
