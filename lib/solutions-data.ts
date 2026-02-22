@@ -8,7 +8,8 @@ export interface Solution {
   slug: string;
   icon: string; // lucide icon name
   color: string; // "blue" | "emerald" | "violet" | "amber" | "slate" | "rose" | "orange" | "sky"
-  label: string;
+  label: string; // category eyebrow, e.g. "Finance & Billing"
+  name: string;  // short display name for nav dropdown, e.g. "Invoicing"
   title: string;
   tagline: string;
   description: string;
@@ -28,6 +29,7 @@ export const SOLUTIONS: Solution[] = [
     icon: "Receipt",
     color: "blue",
     label: "Finance & Billing",
+    name: "Invoicing",
     title: "Invoice Generation at Scale",
     tagline: "Pixel-perfect invoices. Every client. Every month. Zero effort.",
     description:
@@ -102,6 +104,7 @@ const job = await fetch("https://rendrpdf.com/api/v1/convert", {
     icon: "ShoppingBag",
     color: "emerald",
     label: "E-commerce",
+    name: "Receipts & Slips",
     title: "Order Receipts & Packing Slips",
     tagline: "One template. Thousands of orders. Zero manual work.",
     description:
@@ -170,6 +173,7 @@ app.post("/webhooks/order-completed", async (req, res) => {
     icon: "UserCheck",
     color: "violet",
     label: "Human Resources",
+    name: "Offer Letters",
     title: "Offer Letters & HR Documents",
     tagline: "Personalized documents at any hiring volume.",
     description:
@@ -241,6 +245,7 @@ const results = await Promise.all(
     icon: "BarChart2",
     color: "amber",
     label: "Analytics & BI",
+    name: "Reports & Exports",
     title: "Automated Reports & PDF Exports",
     tagline: "Schedule reports. Deliver PDFs. No clicks required.",
     description:
@@ -309,6 +314,7 @@ async function generateWeeklyReports() {
     icon: "Scale",
     color: "slate",
     label: "LegalTech",
+    name: "Legal Contracts",
     title: "Contracts & Legal Documents",
     tagline: "Dynamic legal docs. Consistent formatting. Auditable output.",
     description:
@@ -375,6 +381,7 @@ const nda = await fetch("https://rendrpdf.com/api/v1/convert", {
     icon: "Award",
     color: "rose",
     label: "EdTech",
+    name: "Certificates",
     title: "Certificates & Diplomas",
     tagline: "Every learner gets a certificate that actually looks good.",
     description:
@@ -445,6 +452,7 @@ async function issueCertificate(learner, course) {
     icon: "Building2",
     color: "orange",
     label: "PropTech",
+    name: "Real Estate",
     title: "Real Estate & Property Documents",
     tagline: "Lease agreements, listing one-pagers, and inspection reports — print-ready.",
     description:
@@ -519,6 +527,7 @@ async function generateLeaseAgreement(tenancy) {
     icon: "Activity",
     color: "sky",
     label: "Health Tech",
+    name: "Patient Documents",
     title: "Healthcare & Patient Documents",
     tagline: "Clinical documents delivered with precision.",
     description:

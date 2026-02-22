@@ -2,6 +2,11 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.25.0] — 2026-02-22
+### Changed
+- **Navbar redesigned** — icons on all nav items (Zap for Features, CreditCard for Pricing, BookOpen for Docs, FileText for Blog). Solutions replaced with a hover-triggered megamenu showing all 8 solutions with colored icons and short names in a 4×2 grid, plus a "View all solutions" footer link. Docs now opens in a new tab with an ExternalLink indicator. Mobile sheet has expandable Solutions section with 2-column grid.
+- **`Solution.name`** — added short name field (e.g. "Invoicing", "Receipts & Slips", "Offer Letters") used in the navbar dropdown.
+
 ## [0.24.0] — 2026-02-22
 ### Added
 - **Solutions pages** — `/solutions` index with 8 solution cards, plus individual pages at `/solutions/[slug]` (statically generated). Each page has a dark hero with for-who tags, a 3-card "challenge" section, a 3-card "how Rendr helps" section, a copy-ready Node.js code example in a terminal widget, related solution cards, and a CTA.
