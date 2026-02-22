@@ -3,7 +3,42 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
 import { getQueue } from "@/lib/queue";
+import { sendUsageWarningEmail, sendUsageLimitReachedEmail } from "@/lib/email";
 import { z } from "zod";
+
+const PLAN_LIMITS: Record<string, number> = {
+  starter: 100,
+  growth: 1000,
+  pro: Infinity,
+};
+
+async function checkUsageThresholds(userId: string): Promise<void> {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { email: true, plan: true },
+  });
+  if (!user) return;
+
+  const limit = PLAN_LIMITS[user.plan] ?? 100;
+  if (!isFinite(limit)) return; // unlimited plan
+
+  const startOfMonth = new Date();
+  startOfMonth.setDate(1);
+  startOfMonth.setHours(0, 0, 0, 0);
+
+  const used = await prisma.job.count({
+    where: { userId, createdAt: { gte: startOfMonth } },
+  });
+
+  // Send at exactly 80% mark
+  if (used === Math.floor(limit * 0.8)) {
+    await sendUsageWarningEmail(user.email, used, limit);
+  }
+  // Send at exactly 100% mark
+  else if (used === limit) {
+    await sendUsageLimitReachedEmail(user.email, limit);
+  }
+}
 
 const urlSchema = z.string().url("Please enter a valid URL (include https://)");
 const htmlSchema = z.string().min(10, "HTML content is too short");
@@ -141,6 +176,9 @@ export async function convertUrlAction(
   } catch {
     // worker will pick up via Prisma poll
   }
+
+  // Fire-and-forget usage threshold check (sends warning/limit emails)
+  checkUsageThresholds(session.user.id).catch(() => {});
 
   return { jobId: job.id };
 }

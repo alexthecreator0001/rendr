@@ -2,6 +2,19 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.16.0] — 2026-02-22
+### Added
+- **6-digit email verification codes**: Registration now generates a 6-digit code, sends it via Resend, and redirects to `/verify-email`. Code entry page with OTP-style boxes, auto-advance, paste support, resend button (with cooldown), and auto-redirect to dashboard on success.
+- **Usage warning emails**: `sendUsageWarningEmail` (at 80% of plan limit) and `sendUsageLimitReachedEmail` (at 100%). Triggered fire-and-forget after each job creation in `app/actions/convert.ts`. Plan limits: starter=100, growth=1000, pro=unlimited.
+- **Auto-seed templates for existing users**: Templates page now auto-seeds the 8 starter templates for any user who has none (covers accounts created before seeding was added).
+### Changed
+- `lib/email.ts`: `sendVerificationEmail` now shows a large monospace 6-digit code block instead of a link. New exports: `canSend`, `sendUsageWarningEmail`, `sendUsageLimitReachedEmail`.
+- `app/actions/auth.ts`: `registerAction` generates 6-digit code, redirects to `/verify-email` when Resend is configured. Added `verifyEmailCodeAction` (reads `d0`–`d5` form fields) and `resendVerificationCodeAction`.
+- `app/verify-email/page.tsx`: full rewrite — server component checks auth + verification status, auto-creates token if missing.
+- `app/verify-email/verify-client.tsx`: new client component — OTP digit inputs.
+- `app/app/templates/page.tsx`: auto-seeds starter templates if user has none.
+- `app/actions/convert.ts`: fires `checkUsageThresholds` after job creation.
+
 ## [0.15.0] — 2026-02-22
 ### Added
 - **Admin dashboard** (`/admin`): 3-layer protected (middleware JWT + DB re-check on every page). Overview with 4 stat cards + recent users/jobs tables. Users page with search, pagination, promote/demote admin, change plan, delete user. Jobs page with status filter, pagination, duration display.

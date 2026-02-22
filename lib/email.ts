@@ -50,7 +50,7 @@ function btn(href: string, label: string): string {
 }
 
 /** Skip silently if RESEND_API_KEY is not configured */
-function canSend(): boolean {
+export function canSend(): boolean {
   return !!process.env.RESEND_API_KEY;
 }
 
@@ -94,28 +94,30 @@ export async function sendWelcomeEmail(email: string): Promise<void> {
     .catch(console.error);
 }
 
-// ─── Email verification ──────────────────────────────────────────────────────
+// ─── Email verification (6-digit code) ──────────────────────────────────────
 
-export async function sendVerificationEmail(email: string, token: string): Promise<void> {
+export async function sendVerificationEmail(email: string, code: string): Promise<void> {
   if (!canSend()) return;
 
-  const verifyUrl = `${BASE_URL}/verify-email?token=${token}`;
-
   const html = shell(
-    "Verify your email",
-    `<h1 style="margin:0 0 10px;font-size:24px;font-weight:700;color:#fff;letter-spacing:-0.03em;">Verify your email address</h1>
-    <p style="margin:0 0 24px;font-size:15px;color:#a1a1aa;line-height:1.7;">Click below to verify your email. This link expires in <strong style="color:#e4e4e7;">24 hours</strong>.</p>
+    "Your Rendr verification code",
+    `<h1 style="margin:0 0 10px;font-size:24px;font-weight:700;color:#fff;letter-spacing:-0.03em;">Verify your email</h1>
+    <p style="margin:0 0 28px;font-size:15px;color:#a1a1aa;line-height:1.7;">Enter this code on the verification page. It expires in <strong style="color:#e4e4e7;">24 hours</strong>.</p>
 
-    ${btn(verifyUrl, "Verify email")}
+    <div style="text-align:center;margin-bottom:32px;">
+      <div style="display:inline-block;background:#0d0d0d;border:2px solid rgba(255,255,255,0.12);border-radius:14px;padding:24px 40px;">
+        <span style="font-family:'Courier New',Courier,monospace;font-size:44px;font-weight:900;letter-spacing:14px;color:#ffffff;display:block;">${code}</span>
+        <span style="font-size:11px;color:#52525b;letter-spacing:1px;text-transform:uppercase;display:block;margin-top:8px;">verification code</span>
+      </div>
+    </div>
 
-    <p style="margin:24px 0 0;font-size:12px;color:#52525b;">Or paste this link into your browser:<br/>
-      <a href="${verifyUrl}" style="color:#60a5fa;word-break:break-all;">${verifyUrl}</a>
-    </p>
-    <p style="margin:16px 0 0;font-size:12px;color:#52525b;">If you didn't create a Rendr account, you can safely ignore this email.</p>`
+    ${btn(`${BASE_URL}/verify-email`, "Go to verification page")}
+
+    <p style="margin:24px 0 0;font-size:12px;color:#52525b;">If you didn't create a Rendr account, you can safely ignore this email.</p>`
   );
 
   await resend.emails
-    .send({ from: FROM, to: email, subject: "Please verify your Rendr email address", html })
+    .send({ from: FROM, to: email, subject: `${code} — your Rendr verification code`, html })
     .catch(console.error);
 }
 
@@ -154,6 +156,78 @@ export async function sendApiKeyCreatedEmail(
       from: FROM,
       to: email,
       subject: `New API key created: ${keyName}`,
+      html,
+    })
+    .catch(console.error);
+}
+
+// ─── Usage warning (80% of plan limit) ──────────────────────────────────────
+
+export async function sendUsageWarningEmail(
+  email: string,
+  used: number,
+  limit: number
+): Promise<void> {
+  if (!canSend()) return;
+
+  const pct = Math.round((used / limit) * 100);
+
+  const html = shell(
+    "You're approaching your render limit",
+    `<h1 style="margin:0 0 10px;font-size:24px;font-weight:700;color:#fff;letter-spacing:-0.03em;">You've used ${pct}% of your renders</h1>
+    <p style="margin:0 0 24px;font-size:15px;color:#a1a1aa;line-height:1.7;">You've used <strong style="color:#fbbf24;">${used} of ${limit}</strong> renders this month. Upgrade before you hit the limit to avoid interruptions.</p>
+
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0d0b00;border:1px solid rgba(251,191,36,0.2);border-radius:10px;margin-bottom:28px;">
+      <tr><td style="padding:16px 20px;">
+        <div style="background:rgba(255,255,255,0.06);border-radius:6px;height:8px;overflow:hidden;">
+          <div style="background:linear-gradient(90deg,#f59e0b,#ef4444);height:100%;width:${pct}%;border-radius:6px;"></div>
+        </div>
+        <p style="margin:8px 0 0;font-size:12px;color:#71717a;text-align:right;">${used} / ${limit} renders used</p>
+      </td></tr>
+    </table>
+
+    ${btn(`${BASE_URL}/app/billing`, "Upgrade plan")}
+
+    <p style="margin:24px 0 0;font-size:12px;color:#52525b;">Your plan resets on the 1st of each month. Reply if you have questions.</p>`
+  );
+
+  await resend.emails
+    .send({
+      from: FROM,
+      to: email,
+      subject: `Heads up: you've used ${pct}% of your Rendr renders`,
+      html,
+    })
+    .catch(console.error);
+}
+
+// ─── Usage limit reached (100%) ──────────────────────────────────────────────
+
+export async function sendUsageLimitReachedEmail(
+  email: string,
+  limit: number
+): Promise<void> {
+  if (!canSend()) return;
+
+  const html = shell(
+    "Render limit reached",
+    `<h1 style="margin:0 0 10px;font-size:24px;font-weight:700;color:#fff;letter-spacing:-0.03em;">You've hit your render limit</h1>
+    <p style="margin:0 0 24px;font-size:15px;color:#a1a1aa;line-height:1.7;">You've used all <strong style="color:#e4e4e7;">${limit} renders</strong> in your plan this month. New renders will fail until you upgrade or your plan resets.</p>
+
+    <div style="background:#200a0a;border:1px solid rgba(239,68,68,0.25);border-radius:10px;padding:16px 20px;margin-bottom:28px;">
+      <p style="margin:0;font-size:14px;color:#fca5a5;font-weight:600;">⚠ Renders are paused until you upgrade or the month resets.</p>
+    </div>
+
+    ${btn(`${BASE_URL}/app/billing`, "Upgrade now")}
+
+    <p style="margin:24px 0 0;font-size:12px;color:#52525b;">Plans reset on the 1st of each month. Reply to this email if you need help.</p>`
+  );
+
+  await resend.emails
+    .send({
+      from: FROM,
+      to: email,
+      subject: "Your Rendr render limit has been reached",
       html,
     })
     .catch(console.error);

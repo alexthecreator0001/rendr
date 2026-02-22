@@ -19,6 +19,33 @@ const registerSchema = z.object({
   password: z.string().min(8),
 });
 
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+/** Generate a unique 6-digit verification code and store it. Retries on collision. */
+async function createVerificationCode(userId: string): Promise<string> {
+  // Clear any existing tokens for this user
+  await prisma.verificationToken.deleteMany({ where: { userId } });
+
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const code = String(Math.floor(100000 + Math.random() * 900000));
+    try {
+      await prisma.verificationToken.create({
+        data: {
+          userId,
+          token: code,
+          expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24h
+        },
+      });
+      return code;
+    } catch {
+      // Unique constraint violation — retry with a different code
+    }
+  }
+  throw new Error("Failed to generate verification code. Please try again.");
+}
+
+// ─── Login ───────────────────────────────────────────────────────────────────
+
 export async function loginAction(
   _prevState: { error?: string } | null,
   formData: FormData
@@ -33,9 +60,6 @@ export async function loginAction(
   }
 
   try {
-    // redirectTo is the NextAuth v5 server-action API.
-    // On success: throws NEXT_REDIRECT → Next.js handles the redirect.
-    // On failure: throws CredentialsSignin (AuthError subclass) → caught below.
     await signIn("credentials", {
       email: parsed.data.email,
       password: parsed.data.password,
@@ -45,13 +69,13 @@ export async function loginAction(
     if (err instanceof AuthError) {
       return { error: "Invalid email or password." };
     }
-    // Re-throw redirect errors so Next.js can handle them
     throw err;
   }
 
-  // Unreachable — signIn always redirects on success — but satisfies TypeScript
   return {};
 }
+
+// ─── Register ────────────────────────────────────────────────────────────────
 
 export async function registerAction(
   _prevState: { error?: string } | null,
@@ -84,30 +108,33 @@ export async function registerAction(
     },
   });
 
-  // Seed starter templates in the background — don't block registration
+  // Seed starter templates in the background
   seedStarterTemplates(newUser.id, prisma).catch(() => {});
 
-  // Send welcome + verification emails in the background
-  const verificationToken = await prisma.verificationToken.create({
-    data: {
-      userId: newUser.id,
-      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24h
-    },
-  });
+  // Send welcome email in the background
   sendWelcomeEmail(newUser.email).catch(() => {});
-  sendVerificationEmail(newUser.email, verificationToken.token).catch(() => {});
 
-  // Sign the new user in immediately and redirect to the dashboard.
-  // redirectTo is the NextAuth v5 server-action API.
+  // If email is configured, create a verification code and redirect to verify page
+  const emailEnabled = !!process.env.RESEND_API_KEY;
+  if (emailEnabled) {
+    try {
+      const code = await createVerificationCode(newUser.id);
+      sendVerificationEmail(newUser.email, code).catch(() => {});
+    } catch {
+      // Non-fatal — user can request resend
+    }
+  }
+
+  const redirectTo = emailEnabled ? "/verify-email" : "/app";
+
   try {
     await signIn("credentials", {
       email: parsed.data.email,
       password: parsed.data.password,
-      redirectTo: "/app",
+      redirectTo,
     });
   } catch (err) {
     if (err instanceof AuthError) {
-      // Account was created but auto-login failed — send to login page
       return { error: "Account created. Please sign in." };
     }
     throw err;
@@ -116,9 +143,76 @@ export async function registerAction(
   return {};
 }
 
+// ─── Sign out ────────────────────────────────────────────────────────────────
+
 export async function signOutAction() {
   await signOut({ redirectTo: "/login" });
 }
+
+// ─── Email verification ──────────────────────────────────────────────────────
+
+export async function verifyEmailCodeAction(
+  _prev: { error?: string; success?: boolean } | null,
+  formData: FormData
+): Promise<{ error?: string; success?: boolean }> {
+  const session = await auth();
+  if (!session?.user?.id) return { error: "Not authenticated." };
+
+  // Collect 6 separate digit inputs (d0–d5)
+  const code = [0, 1, 2, 3, 4, 5]
+    .map((i) => ((formData.get(`d${i}`) as string) ?? "").trim())
+    .join("");
+
+  if (!/^\d{6}$/.test(code)) {
+    return { error: "Please enter the complete 6-digit code." };
+  }
+
+  const record = await prisma.verificationToken.findFirst({
+    where: {
+      userId: session.user.id,
+      token: code,
+      expiresAt: { gt: new Date() },
+    },
+  });
+
+  if (!record) {
+    return { error: "Invalid or expired code. Request a new one below." };
+  }
+
+  await Promise.all([
+    prisma.user.update({
+      where: { id: session.user.id },
+      data: { emailVerified: new Date() },
+    }),
+    prisma.verificationToken.delete({ where: { id: record.id } }),
+  ]);
+
+  return { success: true };
+}
+
+export async function resendVerificationCodeAction(): Promise<{
+  error?: string;
+  success?: boolean;
+}> {
+  const session = await auth();
+  if (!session?.user?.id) return { error: "Not authenticated." };
+
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { email: true },
+  });
+  if (!user) return { error: "User not found." };
+
+  try {
+    const code = await createVerificationCode(session.user.id);
+    sendVerificationEmail(user.email, code).catch(() => {});
+    return { success: true };
+  } catch {
+    return { error: "Failed to generate code. Please try again." };
+  }
+}
+
+// ─── Change password ─────────────────────────────────────────────────────────
 
 export async function changePasswordAction(
   _prevState: { error?: string; success?: boolean } | null,
