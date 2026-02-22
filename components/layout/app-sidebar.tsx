@@ -7,7 +7,7 @@ import {
   LayoutDashboard, Key, Layers, Webhook, BarChart2,
   CreditCard, BookOpen, Wand2, BriefcaseBusiness,
   Settings, LogOut, MoreVertical, ExternalLink,
-  Zap,
+  Zap, ShieldCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -47,9 +47,10 @@ interface AppSidebarProps {
   user: { email: string };
   usage: { used: number; limit: number };
   plan: string;
+  role?: string;
 }
 
-export function AppSidebar({ user, usage, plan }: AppSidebarProps) {
+export function AppSidebar({ user, usage, plan, role }: AppSidebarProps) {
   const pathname = usePathname();
   const [pending, startTransition] = useTransition();
   const { open, close } = useSidebar();
@@ -62,6 +63,7 @@ export function AppSidebar({ user, usage, plan }: AppSidebarProps) {
     "bg-primary";
 
   const planLabel = PLAN_LABELS[plan] ?? plan;
+  const isAdmin = role === "admin";
 
   return (
     <>
@@ -75,11 +77,8 @@ export function AppSidebar({ user, usage, plan }: AppSidebarProps) {
 
       <aside className={cn(
         "flex w-[220px] shrink-0 flex-col border-r border-border bg-background",
-        // Mobile: fixed drawer, slides in/out
         "fixed inset-y-0 left-0 z-50 h-full transition-transform duration-200",
-        // Desktop: static in flex flow
         "md:relative md:z-auto md:translate-x-0 md:transition-none",
-        // Mobile open/closed
         open ? "translate-x-0" : "-translate-x-full",
       )}>
 
@@ -138,6 +137,32 @@ export function AppSidebar({ user, usage, plan }: AppSidebarProps) {
                 })}
               </div>
             ))}
+
+            {/* Admin link — only for admins */}
+            {isAdmin && (
+              <>
+                <Separator className="my-2 opacity-50" />
+                <Link
+                  href="/admin"
+                  onClick={close}
+                  className={cn(
+                    "group relative flex items-center gap-2.5 rounded-lg px-2.5 py-[7px] text-[13px] transition-all duration-100",
+                    pathname.startsWith("/admin")
+                      ? "bg-red-500/10 text-red-400 font-medium"
+                      : "text-muted-foreground hover:text-red-400 hover:bg-red-500/8"
+                  )}
+                >
+                  {pathname.startsWith("/admin") && (
+                    <span className="absolute left-0 top-1.5 bottom-1.5 w-[2.5px] rounded-full bg-red-500" />
+                  )}
+                  <ShieldCheck className={cn(
+                    "h-[15px] w-[15px] shrink-0 transition-colors",
+                    pathname.startsWith("/admin") ? "text-red-400" : "text-muted-foreground group-hover:text-red-400"
+                  )} />
+                  <span className="flex-1 truncate leading-none">Admin</span>
+                </Link>
+              </>
+            )}
           </nav>
         </ScrollArea>
 
@@ -159,7 +184,6 @@ export function AppSidebar({ user, usage, plan }: AppSidebarProps) {
               </span>
             </div>
 
-            {/* Progress bar */}
             <div className="h-[3px] w-full overflow-hidden rounded-full bg-muted">
               <div
                 className={cn("h-full rounded-full transition-all duration-500", barColor)}

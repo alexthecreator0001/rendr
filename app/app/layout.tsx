@@ -33,11 +33,12 @@ export default async function AppLayout({
     }),
     prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { plan: true },
+      select: { plan: true, role: true },
     }),
   ]);
 
   const plan = user?.plan ?? "starter";
+  const role = user?.role ?? "user";
 
   return (
     <SidebarProvider>
@@ -46,6 +47,7 @@ export default async function AppLayout({
           user={{ email: session.user.email ?? "" }}
           usage={{ used: rendersThisMonth, limit: 100 }}
           plan={plan}
+          role={role}
         />
         <div className="flex flex-1 flex-col overflow-hidden min-w-0">
           <AppTopbar user={{ email: session.user.email ?? "" }} />

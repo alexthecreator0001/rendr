@@ -2,6 +2,17 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.17.0] — 2026-02-22
+### Fixed
+- **Admin access with stale JWT**: middleware no longer checks role (which can be stale after SQL promotion). Role verification now happens exclusively in the admin layout (fresh DB query), so newly-promoted admins can access `/admin` without re-login.
+- **Admin link in sidebar**: visible only to admins (role="admin"), styled with red accent to distinguish from regular nav.
+- **Templates previews**: iframes now show filled sample data instead of raw `{{variable}}` placeholders — previews look like real documents.
+- **Email templates**: complete redesign to light theme (white card, dark text). Gmail-safe: uses `bgcolor` attributes + inline styles. Verification code displayed as large blue monospace block on light blue background. All emails now readable in light and dark email clients.
+### Changed
+- Template card body simplified: shows variable count instead of individual variable tags.
+- `app/app/layout.tsx`: fetches `role` and passes to `AppSidebar`.
+- `components/layout/app-sidebar.tsx`: accepts `role` prop; renders Admin nav item for admins.
+
 ## [0.16.0] — 2026-02-22
 ### Added
 - **6-digit email verification codes**: Registration now generates a 6-digit code, sends it via Resend, and redirects to `/verify-email`. Code entry page with OTP-style boxes, auto-advance, paste support, resend button (with cooldown), and auto-redirect to dashboard on success.

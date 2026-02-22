@@ -4,18 +4,15 @@ import { NextResponse } from "next/server"
 export default auth((req) => {
   const isLoggedIn = !!req.auth
   const pathname = req.nextUrl.pathname
-  const role = (req.auth?.user as { role?: string })?.role
 
-  // Admin routes: must be logged in AND have admin role
+  // Admin routes: only require login here.
+  // The actual role check (DB lookup) happens in app/admin/layout.tsx.
+  // We cannot rely on JWT role because it may be stale after a manual DB promotion.
   if (pathname.startsWith("/admin")) {
     if (!isLoggedIn) {
       const url = new URL("/login", req.url)
       url.searchParams.set("callbackUrl", pathname)
       return NextResponse.redirect(url)
-    }
-    if (role !== "admin") {
-      // Logged-in non-admins are silently redirected to the dashboard
-      return NextResponse.redirect(new URL("/app", req.url))
     }
   }
 
