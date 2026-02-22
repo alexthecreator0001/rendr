@@ -2,6 +2,11 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.20.1] — 2026-02-22
+### Changed
+- **Full-width layout** — all dashboard and admin pages now use consistent full-width layout. Removed `max-w-*` and `mx-auto` from 20 page wrappers across `/app` and `/admin`. Standardized padding to `px-4 py-6 sm:px-6 sm:py-8` on all pages (was a mix of `max-w-3xl`, `max-w-4xl`, `max-w-5xl`, `max-w-6xl`, and non-responsive `px-6 py-8`).
+- **Init files** — added `app/app/_init.md` and `app/admin/_init.md` documenting the mandatory full-width wrapper pattern for all future pages.
+
 ## [0.20.0] — 2026-02-22
 ### Added
 - **Admin: Blog management** — New page at `/admin/blog` for creating, editing, publishing/unpublishing, and deleting blog posts. Posts stored in DB (`BlogPost` model). Slug auto-generated from title with uniqueness handling. Supports tag, excerpt, markdown content, and draft/published status. Blog nav item added to admin sidebar.

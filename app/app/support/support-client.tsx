@@ -51,7 +51,7 @@ export function SupportClient({ tickets }: { tickets: Ticket[] }) {
   }, [state, router]);
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 sm:py-8 space-y-8">
+    <div className="px-4 py-6 sm:px-6 sm:py-8 space-y-8">
       {/* Header */}
       <div className="flex items-start gap-4">
         <div className="h-10 w-10 rounded-xl bg-blue-500/10 flex items-center justify-center shrink-0">

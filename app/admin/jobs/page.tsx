@@ -43,7 +43,7 @@ export default async function AdminJobsPage({
   };
 
   return (
-    <div className="px-6 py-8 space-y-6">
+    <div className="px-4 py-6 sm:px-6 sm:py-8 space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Jobs</h1>
         <p className="text-sm text-muted-foreground mt-1">{total.toLocaleString()} jobs</p>

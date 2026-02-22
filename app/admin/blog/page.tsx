@@ -21,7 +21,7 @@ export default async function AdminBlogPage() {
   });
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8">
+    <div className="px-4 py-6 sm:px-6 sm:py-8">
       <AdminBlogClient posts={posts} />
     </div>
   );

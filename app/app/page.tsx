@@ -160,7 +160,7 @@ export default async function AppOverviewPage() {
   const name = session.user.email?.split("@")[0] ?? "there";
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8 space-y-8">
+    <div className="px-4 py-6 sm:px-6 sm:py-8 space-y-8">
 
       {/* Admin notifications */}
       {notifications.length > 0 && (

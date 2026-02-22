@@ -85,7 +85,7 @@ export function FeaturesClient({ features }: { features: Feature[] }) {
   }, [state, router]);
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 sm:py-8 space-y-8">
+    <div className="px-4 py-6 sm:px-6 sm:py-8 space-y-8">
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-start gap-4">
