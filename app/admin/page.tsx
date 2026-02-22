@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { Users, BriefcaseBusiness, CheckCircle, XCircle, TrendingUp, Clock } from "lucide-react";
 
+export const dynamic = "force-dynamic";
 export const metadata = { title: "Admin Overview" };
 
 // ─── SVG Bar Chart ────────────────────────────────────────────────────────────
