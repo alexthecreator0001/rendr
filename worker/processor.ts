@@ -102,14 +102,6 @@ export async function processJob(jobId: string): Promise<void> {
     await browser.close()
     browser = undefined
 
-    // Enforce 2 MB export limit for Starter plan
-    const MAX_BYTES = 2 * 1024 * 1024
-    if (pdfBuffer.length > MAX_BYTES) {
-      throw new Error(
-        `PDF size (${(pdfBuffer.length / 1024 / 1024).toFixed(1)} MB) exceeds the 2 MB export limit on the Starter plan. Upgrade to Pro for unlimited file sizes.`
-      )
-    }
-
     const { path: resultPath } = await saveFile(job.id, Buffer.from(pdfBuffer))
     const downloadToken = crypto.randomBytes(32).toString("base64url")
     const resultUrl = `${BASE_URL}/api/v1/files/${downloadToken}`

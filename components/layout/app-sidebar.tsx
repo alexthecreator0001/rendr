@@ -33,6 +33,7 @@ const navGroups = [
   ],
   [
     { href: "/app/billing",  label: "Billing",        icon: CreditCard },
+    { href: "/app/settings", label: "Settings",       icon: Settings },
   ],
   [
     { href: "/docs",         label: "Documentation",  icon: BookOpen, external: true },

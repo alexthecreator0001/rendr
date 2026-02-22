@@ -15,14 +15,9 @@ export default async function ConvertPage() {
     select: { id: true, name: true, html: true },
   });
 
+  // Break out of the layout's px-6 py-8 padding so Studio fills the viewport
   return (
-    <div>
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold tracking-tight">Studio</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Render URLs, HTML, and templates to high-quality PDFs with full control over every option.
-        </p>
-      </div>
+    <div className="-mx-6 -my-8" style={{ height: "calc(100dvh - 56px)" }}>
       <ConvertClient templates={templates} />
     </div>
   );

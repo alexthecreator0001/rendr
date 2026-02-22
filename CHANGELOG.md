@@ -2,6 +2,19 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.11.0] — 2026-02-22
+### Added
+- **Studio full-height layout**: Studio now fills the entire viewport (minus topbar) — no more card inside a padded page; matches Figma/Linear tool aesthetic
+- **Settings in sidebar nav**: Settings link added directly to sidebar (Billing group) so it's one click away — no longer buried in footer dropdown only
+- **New logo**: updated `public/logo-white.svg` with latest brand asset
+### Changed
+- **Studio redesign** (Figma/Linear inspired): flat top toolbar with underline-tab mode selector (Template/HTML/URL), status indicator centered in toolbar, Generate/Download button on right; canvas area with distinct `#f5f5f5 / #141414` background; inspector with clean hairline separators and consistent 28px row height; no more rounded outer card
+- **PDF preview fixed**: `Content-Disposition` changed from `attachment` to `inline` in `/api/v1/files/[token]` — iframes can now display PDFs; `download` attribute on anchor still forces download when clicked
+- **Removed 2 MB export limit**: limit removed from worker (no plan system in DB yet); all accounts now have unrestricted export size
+- **Inspector refinements**: switches scaled to 0.75, uniform control height, cleaner section labels, margin presets tighter, `ctrl` class replaces `tinyInput` (no more mono font on number fields)
+### Fixed
+- Studio iframe PDF preview now displays correctly instead of triggering download
+
 ## [0.10.0] — 2026-02-22
 ### Added
 - **PDF preview in Studio**: when a render completes, the left panel shows an inline iframe preview of the PDF before download; "Open in new tab ↗" link also available

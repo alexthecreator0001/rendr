@@ -6,19 +6,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import {
-  Loader2, Download, CheckCircle2, XCircle, FileText,
-  AlertTriangle, FileCode, Braces, Plus, ChevronDown,
+  Loader2, Download, CheckCircle2, XCircle,
+  AlertTriangle, FileCode, Braces, Plus, ChevronDown, Zap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
 type Phase = "idle" | "submitting" | "polling" | "done" | "failed";
+type Mode = "url" | "html" | "template";
 type ConvertTemplate = { id: string; name: string; html: string };
 
 interface JobResult {
@@ -27,9 +26,7 @@ interface JobResult {
   errorMessage: string | null;
 }
 
-const PDF_FORMATS = [
-  "A4", "Letter", "Legal", "Tabloid", "A3", "A5", "A6",
-] as const;
+const PDF_FORMATS = ["A4", "Letter", "Legal", "Tabloid", "A3", "A5", "A6"] as const;
 
 const MARGIN_PRESETS = {
   none:   { top: "0",    right: "0",    bottom: "0",    left: "0"    },
@@ -43,38 +40,33 @@ function extractVariables(html: string): string[] {
   return [...new Set(matches.map((m) => m[1]))];
 }
 
-// ── Inspector primitives ─────────────────────────────────────────────────────
+// ── Inspector primitives ──────────────────────────────────────────────────────
 
 function InspectorSection({ title }: { title: string }) {
   return (
-    <div className="px-4 pb-1.5 pt-3.5">
-      <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-muted-foreground/50">
+    <div className="px-3 pt-4 pb-1">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-muted-foreground/40">
         {title}
       </p>
     </div>
   );
 }
 
-function InspectorRow({
-  label, children,
-}: {
-  label: string; children: React.ReactNode;
-}) {
+function InspectorRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="flex items-center justify-between gap-3 px-4 py-[5px]">
-      <span className="min-w-0 flex-1 text-[13px] text-foreground/75 leading-none">{label}</span>
+    <div className="flex items-center justify-between px-3 h-[28px]">
+      <span className="text-[12px] text-foreground/55 leading-none">{label}</span>
       <div className="shrink-0">{children}</div>
     </div>
   );
 }
 
-// ── Main component ───────────────────────────────────────────────────────────
+// ── Main component ────────────────────────────────────────────────────────────
 export function ConvertClient({ templates }: { templates: ConvertTemplate[] }) {
   const [state, action, pending] = useActionState<ConvertState, FormData>(
-    convertUrlAction,
-    null
+    convertUrlAction, null
   );
-  const [mode, setMode] = useState<"url" | "html" | "template">("url");
+  const [mode, setMode] = useState<Mode>("url");
   const [phase, setPhase] = useState<Phase>("idle");
   const [jobResult, setJobResult] = useState<JobResult | null>(null);
   const [elapsed, setElapsed] = useState(0);
@@ -86,7 +78,7 @@ export function ConvertClient({ templates }: { templates: ConvertTemplate[] }) {
   const selectedTemplate = templates.find((t) => t.id === selectedTemplateId) ?? null;
   const templateVars = selectedTemplate ? extractVariables(selectedTemplate.html) : [];
 
-  // ── PDF options ────────────────────────────────────────────────────────────
+  // PDF options
   const [format, setFormat] = useState("A4");
   const [customWidth, setCustomWidth] = useState("");
   const [customHeight, setCustomHeight] = useState("");
@@ -167,15 +159,27 @@ export function ConvertClient({ templates }: { templates: ConvertTemplate[] }) {
   const useCustomDimensions = !!(customWidth || customHeight);
   const activePreset = getActivePreset();
 
-  const tinyInput = cn(
-    "h-6 w-[72px] rounded-md border border-border/50 bg-muted/40 px-2",
+  const ctrl = cn(
+    "h-6 w-[72px] rounded border border-border/60 bg-muted/50 px-2",
     "text-[11px] text-right tabular-nums",
-    "focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-50"
+    "focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-40"
   );
 
+  const MODES: { id: Mode; label: string }[] = [
+    { id: "template", label: "Template" },
+    { id: "html", label: "HTML" },
+    { id: "url", label: "URL" },
+  ];
+
+  const errorText =
+    (state && "error" in state && state.error) ||
+    jobResult?.errorMessage ||
+    "Render failed";
+
   return (
-    <form action={action}>
-      {/* Hidden inputs */}
+    <form action={action} className="h-full flex flex-col">
+
+      {/* Hidden PDF option inputs */}
       <input type="hidden" name="mode" value={mode} />
       <input type="hidden" name="format" value={format} />
       <input type="hidden" name="customWidth" value={customWidth} />
@@ -196,483 +200,541 @@ export function ConvertClient({ templates }: { templates: ConvertTemplate[] }) {
       <input type="hidden" name="outline" value={String(outline)} />
       <input type="hidden" name="waitFor" value={String(waitFor)} />
 
-      {/* ── Unified panel ───────────────────────────────────────────── */}
-      <div className="overflow-hidden rounded-2xl border border-border/70 bg-card shadow-[0_1px_4px_rgba(0,0,0,0.06)] dark:shadow-[0_1px_4px_rgba(0,0,0,0.3)]">
+      {/* ── Studio shell ─────────────────────────────────────────────────────── */}
+      <div className="flex flex-col flex-1 overflow-hidden bg-background border-r border-b border-border">
 
-        <Tabs value={mode} onValueChange={(v) => { setMode(v as typeof mode); reset(); }}>
+        {/* ── Toolbar ──────────────────────────────────────────────────────── */}
+        <div className="flex h-10 items-stretch border-b border-border shrink-0 bg-background">
 
-          {/* Toolbar ─────────────────────────────────────────────────── */}
-          <div className="flex h-11 items-center justify-between border-b border-border/60 bg-muted/20 px-4">
-            <TabsList className="h-7 bg-background/80 border border-border/50 rounded-lg p-0.5 gap-px shadow-[inset_0_1px_2px_rgba(0,0,0,0.04)]">
-              <TabsTrigger
-                value="template"
-                className="h-6 rounded-md px-3 text-[12px] data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground data-[state=inactive]:text-muted-foreground"
-              >
-                Template
-                {templates.length > 0 && (
-                  <Badge variant="secondary" className="ml-1.5 h-[14px] rounded-full px-1 text-[9px] font-medium">
-                    {templates.length}
-                  </Badge>
+          {/* Mode tabs */}
+          <div className="flex items-stretch border-r border-border">
+            {MODES.map(({ id, label }) => (
+              <button
+                key={id}
+                type="button"
+                onClick={() => { setMode(id); reset(); }}
+                className={cn(
+                  "relative flex items-center gap-1.5 px-4 text-[12px] font-medium transition-colors select-none",
+                  mode === id
+                    ? "text-foreground"
+                    : "text-muted-foreground hover:text-foreground"
                 )}
-              </TabsTrigger>
-              <TabsTrigger
-                value="html"
-                className="h-6 rounded-md px-3 text-[12px] data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground data-[state=inactive]:text-muted-foreground"
               >
-                HTML
-              </TabsTrigger>
-              <TabsTrigger
-                value="url"
-                className="h-6 rounded-md px-3 text-[12px] data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground data-[state=inactive]:text-muted-foreground"
-              >
-                URL
-              </TabsTrigger>
-            </TabsList>
+                {label}
+                {id === "template" && templates.length > 0 && (
+                  <span className="text-[10px] text-muted-foreground/50 font-normal tabular-nums">
+                    {templates.length}
+                  </span>
+                )}
+                {mode === id && (
+                  <span className="absolute bottom-0 inset-x-0 h-[2px] bg-foreground rounded-t-sm" />
+                )}
+              </button>
+            ))}
+          </div>
 
-            {/* Status indicator in toolbar */}
+          {/* Status — center */}
+          <div className="flex-1 flex items-center justify-center px-4 min-w-0">
             {isActive && (
-              <div className="flex items-center gap-2 text-[12px] text-muted-foreground">
-                <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                {phase === "submitting" ? "Queuing…" : `Rendering ${elapsed}s`}
-              </div>
+              <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                <Loader2 className="h-3 w-3 animate-spin shrink-0" />
+                {phase === "submitting" ? "Queuing…" : `Rendering · ${elapsed}s`}
+              </span>
             )}
             {phase === "done" && (
-              <div className="flex items-center gap-1.5 text-[12px] text-emerald-600 dark:text-emerald-400">
-                <CheckCircle2 className="h-3.5 w-3.5" />
-                Ready in {elapsed}s
-              </div>
+              <span className="flex items-center gap-1.5 text-[11px] text-emerald-600 dark:text-emerald-400">
+                <CheckCircle2 className="h-3 w-3 shrink-0" />
+                Rendered in {elapsed}s
+              </span>
             )}
             {phase === "failed" && (
-              <div className="flex items-center gap-1.5 text-[12px] text-destructive">
-                <XCircle className="h-3.5 w-3.5" />
-                Failed
-              </div>
+              <span className="flex items-center gap-1.5 text-[11px] text-destructive min-w-0">
+                <XCircle className="h-3 w-3 shrink-0" />
+                <span className="truncate">{errorText}</span>
+              </span>
             )}
           </div>
 
-          {/* Body: left + divider + inspector ────────────────────────── */}
-          <div className="flex min-h-[480px]">
+          {/* Right actions */}
+          <div className="flex items-center gap-2 px-3 border-l border-border shrink-0">
+            {phase !== "idle" && !isActive && (
+              <button
+                type="button"
+                onClick={reset}
+                className="text-[11px] text-muted-foreground hover:text-foreground transition-colors"
+              >
+                New render
+              </button>
+            )}
+            {phase === "done" && jobResult?.downloadUrl ? (
+              <Button
+                asChild
+                size="sm"
+                variant="secondary"
+                className="h-7 gap-1.5 rounded-md text-[12px] px-3"
+              >
+                <a href={jobResult.downloadUrl} download target="_blank" rel="noreferrer">
+                  <Download className="h-3 w-3" />
+                  Download
+                </a>
+              </Button>
+            ) : (
+              <Button
+                type="submit"
+                size="sm"
+                disabled={isActive || (mode === "template" && !selectedTemplateId)}
+                className="h-7 gap-1.5 rounded-md text-[12px] px-3"
+              >
+                {isActive
+                  ? <Loader2 className="h-3 w-3 animate-spin" />
+                  : <Zap className="h-3 w-3" />
+                }
+                Generate
+              </Button>
+            )}
+          </div>
+        </div>
 
-            {/* ── Left: input ──────────────────────────────────────── */}
-            <div className="flex flex-1 flex-col min-w-0">
-              {/* PDF preview replaces input area when render is done */}
-              {phase === "done" && jobResult?.downloadUrl ? (
-                <div className="flex-1 flex flex-col p-3">
-                  <div
-                    className="flex flex-col overflow-hidden rounded-xl border border-border/50"
-                    style={{ minHeight: 400 }}
+        {/* Slow warning */}
+        {slowWarning && (
+          <div className="flex items-center gap-2 px-4 py-1.5 bg-amber-50 dark:bg-amber-950/20 border-b border-amber-200 dark:border-amber-900/50 text-[11px] text-amber-700 dark:text-amber-400 shrink-0">
+            <AlertTriangle className="h-3 w-3 shrink-0" />
+            Worker may be offline — check <code className="font-mono">pm2 list</code>
+          </div>
+        )}
+
+        {/* ── Body ─────────────────────────────────────────────────────────── */}
+        <div className="flex flex-1 min-h-0">
+
+          {/* ── Canvas ─────────────────────────────────────────────────────── */}
+          <div className="flex flex-1 flex-col min-w-0 bg-[#f5f5f5] dark:bg-[#141414]">
+
+            {phase === "done" && jobResult?.downloadUrl ? (
+              /* PDF Preview */
+              <div className="flex flex-col h-full">
+                <div className="flex items-center justify-between px-4 py-2 border-b border-border/60 bg-background/60 backdrop-blur-sm shrink-0">
+                  <span className="text-[11px] font-medium text-muted-foreground tracking-wide">
+                    PDF Preview
+                  </span>
+                  <a
+                    href={jobResult.downloadUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-[11px] text-primary hover:underline underline-offset-2"
                   >
-                    <div className="flex items-center justify-between px-3.5 py-2.5 border-b border-border/40 bg-muted/30 shrink-0">
-                      <span className="text-[11px] font-medium text-muted-foreground">PDF Preview</span>
-                      <a
-                        href={jobResult.downloadUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-[10px] text-primary hover:underline underline-offset-2"
-                      >
-                        Open in new tab ↗
-                      </a>
-                    </div>
-                    <iframe
-                      src={jobResult.downloadUrl}
-                      className="flex-1 w-full border-0"
-                      title="PDF Preview"
-                      style={{ minHeight: 360 }}
-                    />
-                  </div>
+                    Open in new tab ↗
+                  </a>
                 </div>
-              ) : (
-              <div className="flex-1 p-5">
+                <iframe
+                  src={jobResult.downloadUrl}
+                  className="flex-1 w-full border-0"
+                  title="PDF Preview"
+                />
+              </div>
+            ) : (
+              /* Source input */
+              <div className="flex-1 overflow-auto p-5 flex flex-col">
 
                 {/* URL */}
-                <TabsContent value="url" className="mt-0 h-full flex flex-col">
-                  <p className="mb-1.5 text-[11px] font-medium uppercase tracking-wide text-muted-foreground/60">
-                    Page URL
-                  </p>
-                  <input
-                    name="input"
-                    type="url"
-                    placeholder="https://example.com/invoice/123"
-                    disabled={isActive}
-                    className="w-full rounded-xl border border-border/60 bg-background px-3.5 py-2.5 text-sm font-mono placeholder:text-muted-foreground/30 focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50"
-                  />
-                  <p className="mt-2 text-[12px] text-muted-foreground/70">
-                    Rendr opens this URL in a headless Chromium browser and renders it to PDF.
-                  </p>
-                </TabsContent>
+                {mode === "url" && (
+                  <div className="flex flex-col gap-2.5 max-w-2xl">
+                    <label className="text-[10px] font-semibold uppercase tracking-[0.1em] text-muted-foreground/50">
+                      Page URL
+                    </label>
+                    <input
+                      name="input"
+                      type="url"
+                      placeholder="https://example.com/invoice/123"
+                      disabled={isActive}
+                      className="w-full rounded-lg border border-border bg-background px-3.5 py-2.5 text-[13px] font-mono placeholder:text-muted-foreground/25 focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-50"
+                    />
+                    <p className="text-[12px] text-muted-foreground/50">
+                      Rendr opens this URL in headless Chromium and renders it to PDF.
+                    </p>
+                  </div>
+                )}
 
                 {/* HTML */}
-                <TabsContent value="html" className="mt-0 h-full flex flex-col">
-                  <p className="mb-1.5 text-[11px] font-medium uppercase tracking-wide text-muted-foreground/60">
-                    HTML Source
-                  </p>
-                  <textarea
-                    name="input"
-                    rows={14}
-                    placeholder={"<!DOCTYPE html>\n<html>\n  <body>\n    <h1>Hello, PDF</h1>\n  </body>\n</html>"}
-                    disabled={isActive}
-                    className="flex-1 w-full rounded-xl border border-border/60 bg-background px-3.5 py-2.5 font-mono text-xs leading-relaxed placeholder:text-muted-foreground/30 focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50 resize-none"
-                  />
-                </TabsContent>
+                {mode === "html" && (
+                  <div className="flex flex-col gap-2.5 flex-1 min-h-0">
+                    <label className="text-[10px] font-semibold uppercase tracking-[0.1em] text-muted-foreground/50">
+                      HTML Source
+                    </label>
+                    <textarea
+                      name="input"
+                      placeholder={"<!DOCTYPE html>\n<html>\n  <body>\n    <h1>Hello, PDF</h1>\n  </body>\n</html>"}
+                      disabled={isActive}
+                      className="flex-1 w-full min-h-[320px] rounded-lg border border-border bg-background px-3.5 py-3 font-mono text-xs leading-relaxed placeholder:text-muted-foreground/25 focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-50 resize-none"
+                    />
+                  </div>
+                )}
 
                 {/* Template */}
-                <TabsContent value="template" className="mt-0">
-                  {templates.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-16 text-center">
-                      <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-muted/60">
-                        <FileCode className="h-7 w-7 text-muted-foreground/30" />
-                      </div>
-                      <p className="text-sm font-semibold">No templates yet</p>
-                      <p className="mt-1 text-[12px] text-muted-foreground">
-                        Create your first template to get started.
-                      </p>
-                      <Button asChild size="sm" variant="outline" className="mt-4 gap-1.5 rounded-lg">
-                        <Link href="/app/templates">
-                          <Plus className="h-3.5 w-3.5" /> Create template
-                        </Link>
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground/60">
-                        Select template
-                      </p>
-                      <div className="space-y-1.5">
-                        {templates.map((t) => {
-                          const vars = extractVariables(t.html);
-                          const isSel = selectedTemplateId === t.id;
-                          return (
-                            <button
-                              key={t.id}
-                              type="button"
-                              disabled={isActive}
-                              onClick={() => setSelectedTemplateId(isSel ? "" : t.id)}
-                              className={cn(
-                                "w-full rounded-xl border px-4 py-3 text-left transition-all",
-                                isSel
-                                  ? "border-primary/40 bg-primary/5 shadow-[0_0_0_1px_var(--tw-shadow-color)] shadow-primary/20"
-                                  : "border-border/60 hover:border-border hover:bg-muted/30",
-                                isActive && "pointer-events-none opacity-50"
-                              )}
-                            >
-                              <div className="flex items-center justify-between gap-2">
-                                <div className="flex items-center gap-2.5 min-w-0">
-                                  <FileCode className={cn("h-4 w-4 shrink-0", isSel ? "text-primary" : "text-muted-foreground")} />
-                                  <span className="text-sm font-medium truncate">{t.name}</span>
-                                </div>
-                                {vars.length > 0 && (
-                                  <span className="text-[11px] text-muted-foreground shrink-0">
-                                    {vars.length} var{vars.length !== 1 ? "s" : ""}
-                                  </span>
-                                )}
-                              </div>
-                              {isSel && vars.length > 0 && (
-                                <div className="mt-1.5 flex flex-wrap gap-1">
-                                  {vars.map((v) => (
-                                    <span key={v} className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 font-mono text-[10px] text-primary">
-                                      <Braces className="h-2.5 w-2.5" />{v}
-                                    </span>
-                                  ))}
-                                </div>
-                              )}
-                            </button>
-                          );
-                        })}
-                      </div>
-
-                      {selectedTemplate && (
-                        <div className="rounded-xl border border-border/60 bg-muted/20 px-4 py-3.5">
-                          <input type="hidden" name="templateId" value={selectedTemplateId} />
-                          <input type="hidden" name="variableKeys" value={templateVars.join(",")} />
-                          {templateVars.length > 0 ? (
-                            <div className="space-y-2.5">
-                              <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground/50">
-                                Variables
-                              </p>
-                              {templateVars.map((v) => (
-                                <div key={v} className="flex items-center gap-3">
-                                  <label className="w-24 shrink-0 font-mono text-[11px] text-muted-foreground truncate">{v}</label>
-                                  <Input name={`var_${v}`} placeholder={`Value for ${v}`} disabled={isActive} className="h-8 text-xs" />
-                                </div>
-                              ))}
-                            </div>
-                          ) : (
-                            <p className="text-[12px] text-muted-foreground">This template has no variables — renders as-is.</p>
-                          )}
+                {mode === "template" && (
+                  <div className="flex flex-col gap-3 max-w-xl">
+                    {templates.length === 0 ? (
+                      <div className="flex flex-col items-center justify-center py-24 text-center">
+                        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-muted/60">
+                          <FileCode className="h-6 w-6 text-muted-foreground/30" />
                         </div>
-                      )}
-                    </div>
-                  )}
-                </TabsContent>
-              </div>
-              )}
-
-              {/* Generate button row */}
-              <div className="flex items-center justify-between border-t border-border/60 px-5 py-3.5 bg-muted/10">
-                {phase === "done" && jobResult?.downloadUrl ? (
-                  <Button asChild size="sm" className="gap-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white">
-                    <a href={jobResult.downloadUrl} download target="_blank" rel="noreferrer">
-                      <Download className="h-3.5 w-3.5" /> Download PDF
-                    </a>
-                  </Button>
-                ) : (
-                  <Button
-                    type="submit"
-                    size="sm"
-                    disabled={isActive || (mode === "template" && !selectedTemplateId)}
-                    className="gap-2 rounded-lg"
-                  >
-                    {isActive && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-                    Generate PDF
-                  </Button>
-                )}
-
-                <div className="flex items-center gap-3">
-                  {phase !== "idle" && !isActive && (
-                    <button type="button" onClick={reset} className="text-[12px] text-muted-foreground hover:text-foreground transition-colors">
-                      Reset
-                    </button>
-                  )}
-                  {phase === "idle" && (
-                    <p className="text-[11px] text-muted-foreground/60">
-                      Results in{" "}
-                      <Link href="/app/jobs" className="hover:text-primary transition-colors">Jobs</Link>
-                      {" "}· links valid 24 h
-                    </p>
-                  )}
-                  {slowWarning && (
-                    <div className="flex items-center gap-1.5">
-                      <AlertTriangle className="h-3.5 w-3.5 text-amber-500" />
-                      <span className="text-[11px] text-amber-600 dark:text-amber-400">
-                        Worker may be offline — check <code className="font-mono">pm2 list</code>
-                      </span>
-                    </div>
-                  )}
-                  {phase === "failed" && (
-                    <p className="text-[12px] text-destructive">
-                      {(state && "error" in state && state.error) || jobResult?.errorMessage || "Render failed"}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* ── Divider ───────────────────────────────────────── */}
-            <div className="hidden lg:block w-px bg-border/50 shrink-0" />
-
-            {/* ── Right: Inspector ──────────────────────────────── */}
-            <div className="hidden lg:flex lg:w-[268px] shrink-0 flex-col overflow-y-auto bg-muted/[0.08] divide-y divide-border/50">
-
-              {/* Layout */}
-              <div className="pb-2">
-                <InspectorSection title="Layout" />
-                <InspectorRow label="Format">
-                  <Select value={format} onValueChange={setFormat} disabled={isActive || useCustomDimensions}>
-                    <SelectTrigger className="h-7 w-[90px] rounded-lg border-border/50 bg-background text-xs shadow-none">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {PDF_FORMATS.map((f) => (
-                        <SelectItem key={f} value={f} className="text-xs">{f}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </InspectorRow>
-                <InspectorRow label="Width">
-                  <input
-                    value={customWidth}
-                    onChange={(e) => setCustomWidth(e.target.value)}
-                    placeholder="e.g. 15cm"
-                    disabled={isActive}
-                    className={tinyInput}
-                  />
-                </InspectorRow>
-                <InspectorRow label="Height">
-                  <input
-                    value={customHeight}
-                    onChange={(e) => setCustomHeight(e.target.value)}
-                    placeholder="e.g. 20cm"
-                    disabled={isActive}
-                    className={tinyInput}
-                  />
-                </InspectorRow>
-                {useCustomDimensions && (
-                  <p className="px-4 pb-1 text-[10px] text-amber-600 dark:text-amber-400">
-                    Custom size overrides Format
-                  </p>
-                )}
-                <InspectorRow label="Scale">
-                  <input
-                    value={scale}
-                    onChange={(e) => setScale(e.target.value)}
-                    placeholder="1"
-                    disabled={isActive}
-                    className={tinyInput}
-                  />
-                </InspectorRow>
-                <InspectorRow label="Page Ranges">
-                  <input
-                    value={pageRanges}
-                    onChange={(e) => setPageRanges(e.target.value)}
-                    placeholder="1-3, 5"
-                    disabled={isActive}
-                    className={tinyInput}
-                  />
-                </InspectorRow>
-                <InspectorRow label="Render delay">
-                  <div className="flex items-center gap-1">
-                    <input
-                      value={waitFor}
-                      onChange={(e) => {
-                        const n = parseInt(e.target.value, 10);
-                        setWaitFor(isNaN(n) ? 0 : Math.min(10, Math.max(0, n)));
-                      }}
-                      type="number"
-                      min={0}
-                      max={10}
-                      step={1}
-                      disabled={isActive}
-                      className={tinyInput}
-                    />
-                    <span className="text-[10px] text-muted-foreground/50">s</span>
-                  </div>
-                </InspectorRow>
-              </div>
-
-              {/* Print Production */}
-              <div className="pb-2">
-                <InspectorSection title="Print Production" />
-                <InspectorRow label="Landscape">
-                  <Switch checked={landscape} onCheckedChange={setLandscape} disabled={isActive} className="scale-[0.85]" />
-                </InspectorRow>
-                <InspectorRow label="Print Background">
-                  <Switch checked={printBackground} onCheckedChange={setPrintBackground} disabled={isActive} className="scale-[0.85]" />
-                </InspectorRow>
-                <InspectorRow label="Prefer CSS Page Size">
-                  <Switch checked={preferCSSPageSize} onCheckedChange={setPreferCSSPageSize} disabled={isActive} className="scale-[0.85]" />
-                </InspectorRow>
-              </div>
-
-              {/* Margins */}
-              <div className="pb-3">
-                <InspectorSection title="Margins" />
-                {/* Presets */}
-                <div className="flex gap-1 px-4 pb-2.5">
-                  {(Object.keys(MARGIN_PRESETS) as Array<keyof typeof MARGIN_PRESETS>).map((key) => (
-                    <button
-                      key={key}
-                      type="button"
-                      onClick={() => applyMarginPreset(key)}
-                      disabled={isActive}
-                      className={cn(
-                        "flex-1 rounded-md border py-[3px] text-[10px] capitalize transition-all",
-                        activePreset === key
-                          ? "border-primary/50 bg-primary/10 text-primary font-medium"
-                          : "border-border/50 text-muted-foreground hover:border-border hover:text-foreground",
-                        isActive && "opacity-40 pointer-events-none"
-                      )}
-                    >
-                      {key === "normal" ? "Md" : key.charAt(0).toUpperCase() + key.slice(1)}
-                    </button>
-                  ))}
-                </div>
-                {/* Custom T/R/B/L */}
-                <div className="grid grid-cols-[20px_1fr_20px_1fr] items-center gap-x-1.5 gap-y-1.5 px-4">
-                  {[
-                    { l: "T", v: marginTop, s: setMarginTop },
-                    { l: "R", v: marginRight, s: setMarginRight },
-                    { l: "B", v: marginBottom, s: setMarginBottom },
-                    { l: "L", v: marginLeft, s: setMarginLeft },
-                  ].map(({ l, v, s }) => (
-                    <>
-                      <span key={`${l}-label`} className="text-[10px] text-muted-foreground/60 text-center">{l}</span>
-                      <input
-                        key={`${l}-input`}
-                        value={v}
-                        onChange={(e) => s(e.target.value)}
-                        disabled={isActive}
-                        className="h-6 rounded-md border border-border/50 bg-muted/40 px-1.5 text-[10px] text-center focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-50 w-full"
-                      />
-                    </>
-                  ))}
-                </div>
-              </div>
-
-              {/* Header & Footer */}
-              <div className="pb-2">
-                <InspectorSection title="Header &amp; Footer" />
-                <InspectorRow label="Show header &amp; footer">
-                  <Switch
-                    checked={displayHeaderFooter}
-                    onCheckedChange={(v) => { setDisplayHeaderFooter(v); setShowHFHtml(v); }}
-                    disabled={isActive}
-                    className="scale-[0.85]"
-                  />
-                </InspectorRow>
-                {displayHeaderFooter && (
-                  <div className="px-4 pt-1 pb-2 space-y-2">
-                    <button
-                      type="button"
-                      onClick={() => setShowHFHtml((p) => !p)}
-                      className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground transition-colors"
-                    >
-                      <ChevronDown className={cn("h-3 w-3 transition-transform", showHFHtml && "rotate-180")} />
-                      {showHFHtml ? "Hide" : "Edit"} HTML templates
-                    </button>
-                    {showHFHtml && (
-                      <div className="space-y-2">
-                        <div className="space-y-1">
-                          <p className="text-[9px] uppercase tracking-wide text-muted-foreground/50 font-semibold">Header</p>
-                          <textarea
-                            value={headerTemplate}
-                            onChange={(e) => setHeaderTemplate(e.target.value)}
-                            rows={2}
-                            disabled={isActive}
-                            className="w-full rounded-lg border border-border/50 bg-background px-2.5 py-1.5 font-mono text-[10px] leading-relaxed focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-50 resize-none"
-                          />
-                        </div>
-                        <div className="space-y-1">
-                          <p className="text-[9px] uppercase tracking-wide text-muted-foreground/50 font-semibold">Footer</p>
-                          <textarea
-                            value={footerTemplate}
-                            onChange={(e) => setFooterTemplate(e.target.value)}
-                            rows={2}
-                            disabled={isActive}
-                            className="w-full rounded-lg border border-border/50 bg-background px-2.5 py-1.5 font-mono text-[10px] leading-relaxed focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-50 resize-none"
-                          />
-                        </div>
-                        <p className="text-[9px] text-muted-foreground/50 leading-relaxed">
-                          Use <code className="font-mono bg-muted rounded px-0.5">.title</code>{" "}
-                          <code className="font-mono bg-muted rounded px-0.5">.pageNumber</code>{" "}
-                          <code className="font-mono bg-muted rounded px-0.5">.totalPages</code>
+                        <p className="text-[13px] font-semibold">No templates yet</p>
+                        <p className="mt-1 text-[12px] text-muted-foreground/70">
+                          Create one to get started.
                         </p>
+                        <Button asChild size="sm" variant="outline" className="mt-4 gap-1.5 rounded-lg">
+                          <Link href="/app/templates">
+                            <Plus className="h-3.5 w-3.5" /> New template
+                          </Link>
+                        </Button>
                       </div>
+                    ) : (
+                      <>
+                        <label className="text-[10px] font-semibold uppercase tracking-[0.1em] text-muted-foreground/50">
+                          Select template
+                        </label>
+                        <div className="space-y-1.5">
+                          {templates.map((t) => {
+                            const vars = extractVariables(t.html);
+                            const isSel = selectedTemplateId === t.id;
+                            return (
+                              <button
+                                key={t.id}
+                                type="button"
+                                disabled={isActive}
+                                onClick={() => setSelectedTemplateId(isSel ? "" : t.id)}
+                                className={cn(
+                                  "w-full rounded-lg border px-3.5 py-2.5 text-left transition-all",
+                                  isSel
+                                    ? "border-primary/40 bg-primary/5"
+                                    : "border-border/70 bg-background hover:border-border",
+                                  isActive && "pointer-events-none opacity-50"
+                                )}
+                              >
+                                <div className="flex items-center justify-between gap-2">
+                                  <div className="flex items-center gap-2 min-w-0">
+                                    <FileCode className={cn("h-3.5 w-3.5 shrink-0", isSel ? "text-primary" : "text-muted-foreground")} />
+                                    <span className="text-[13px] font-medium truncate">{t.name}</span>
+                                  </div>
+                                  {vars.length > 0 && (
+                                    <span className="text-[11px] text-muted-foreground/60 shrink-0">
+                                      {vars.length} var{vars.length !== 1 ? "s" : ""}
+                                    </span>
+                                  )}
+                                </div>
+                                {isSel && vars.length > 0 && (
+                                  <div className="mt-1.5 flex flex-wrap gap-1">
+                                    {vars.map((v) => (
+                                      <span key={v} className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 font-mono text-[10px] text-primary">
+                                        <Braces className="h-2.5 w-2.5" />{v}
+                                      </span>
+                                    ))}
+                                  </div>
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+
+                        {selectedTemplate && (
+                          <div className="rounded-lg border border-border bg-background px-3.5 py-3">
+                            <input type="hidden" name="templateId" value={selectedTemplateId} />
+                            <input type="hidden" name="variableKeys" value={templateVars.join(",")} />
+                            {templateVars.length > 0 ? (
+                              <div className="space-y-2.5">
+                                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-muted-foreground/50">
+                                  Variables
+                                </p>
+                                {templateVars.map((v) => (
+                                  <div key={v} className="flex items-center gap-3">
+                                    <label className="w-24 shrink-0 font-mono text-[11px] text-muted-foreground/70 truncate">
+                                      {v}
+                                    </label>
+                                    <Input
+                                      name={`var_${v}`}
+                                      placeholder={`Value for ${v}`}
+                                      disabled={isActive}
+                                      className="h-7 text-[12px]"
+                                    />
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              <p className="text-[12px] text-muted-foreground/60">
+                                Static template — renders as-is.
+                              </p>
+                            )}
+                          </div>
+                        )}
+                      </>
                     )}
                   </div>
                 )}
               </div>
-
-              {/* Output & Accessibility */}
-              <div className="pb-2">
-                <InspectorSection title="Output" />
-                <InspectorRow label="Tagged PDF">
-                  <Switch checked={tagged} onCheckedChange={setTagged} disabled={isActive} className="scale-[0.85]" />
-                </InspectorRow>
-                <InspectorRow label="Embed Outline">
-                  <Switch checked={outline} onCheckedChange={setOutline} disabled={isActive} className="scale-[0.85]" />
-                </InspectorRow>
-                <InspectorRow label="Compression">
-                  <div className="flex items-center gap-2">
-                    <Badge variant="secondary" className="text-[9px] rounded-full px-1.5 h-4 font-medium">Pro</Badge>
-                    <Switch disabled className="scale-[0.85] opacity-40" />
-                  </div>
-                </InspectorRow>
-              </div>
-
-            </div>
+            )}
           </div>
-        </Tabs>
-      </div>
+
+          {/* ── Inspector ──────────────────────────────────────────────────── */}
+          <div className="hidden lg:flex w-[240px] shrink-0 flex-col overflow-y-auto bg-background border-l border-border">
+
+            {/* Layout */}
+            <div>
+              <InspectorSection title="Layout" />
+              <InspectorRow label="Format">
+                <Select
+                  value={format}
+                  onValueChange={setFormat}
+                  disabled={isActive || useCustomDimensions}
+                >
+                  <SelectTrigger className="h-6 w-[72px] rounded border-border/60 bg-muted/50 text-[11px] shadow-none px-2">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {PDF_FORMATS.map((f) => (
+                      <SelectItem key={f} value={f} className="text-[11px]">{f}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </InspectorRow>
+              <InspectorRow label="Width">
+                <input
+                  value={customWidth}
+                  onChange={(e) => setCustomWidth(e.target.value)}
+                  placeholder="e.g. 15cm"
+                  disabled={isActive}
+                  className={ctrl}
+                />
+              </InspectorRow>
+              <InspectorRow label="Height">
+                <input
+                  value={customHeight}
+                  onChange={(e) => setCustomHeight(e.target.value)}
+                  placeholder="e.g. 20cm"
+                  disabled={isActive}
+                  className={ctrl}
+                />
+              </InspectorRow>
+              {useCustomDimensions && (
+                <p className="px-3 pb-1 text-[10px] text-amber-600 dark:text-amber-400">
+                  Custom size overrides format
+                </p>
+              )}
+              <InspectorRow label="Scale">
+                <input
+                  value={scale}
+                  onChange={(e) => setScale(e.target.value)}
+                  placeholder="1"
+                  disabled={isActive}
+                  className={ctrl}
+                />
+              </InspectorRow>
+              <InspectorRow label="Pages">
+                <input
+                  value={pageRanges}
+                  onChange={(e) => setPageRanges(e.target.value)}
+                  placeholder="1-3, 5"
+                  disabled={isActive}
+                  className={ctrl}
+                />
+              </InspectorRow>
+              <InspectorRow label="Render delay">
+                <div className="flex items-center gap-1">
+                  <input
+                    value={waitFor}
+                    onChange={(e) => {
+                      const n = parseInt(e.target.value, 10);
+                      setWaitFor(isNaN(n) ? 0 : Math.min(10, Math.max(0, n)));
+                    }}
+                    type="number"
+                    min={0}
+                    max={10}
+                    step={1}
+                    disabled={isActive}
+                    className={cn(ctrl, "w-[52px]")}
+                  />
+                  <span className="text-[10px] text-muted-foreground/40">s</span>
+                </div>
+              </InspectorRow>
+            </div>
+
+            <div className="border-t border-border/70" />
+
+            {/* Print */}
+            <div>
+              <InspectorSection title="Print" />
+              <InspectorRow label="Landscape">
+                <Switch
+                  checked={landscape}
+                  onCheckedChange={setLandscape}
+                  disabled={isActive}
+                  className="scale-[0.75]"
+                />
+              </InspectorRow>
+              <InspectorRow label="Print background">
+                <Switch
+                  checked={printBackground}
+                  onCheckedChange={setPrintBackground}
+                  disabled={isActive}
+                  className="scale-[0.75]"
+                />
+              </InspectorRow>
+              <InspectorRow label="CSS page size">
+                <Switch
+                  checked={preferCSSPageSize}
+                  onCheckedChange={setPreferCSSPageSize}
+                  disabled={isActive}
+                  className="scale-[0.75]"
+                />
+              </InspectorRow>
+            </div>
+
+            <div className="border-t border-border/70" />
+
+            {/* Margins */}
+            <div>
+              <InspectorSection title="Margins" />
+              <div className="flex gap-1 px-3 pb-2">
+                {(Object.keys(MARGIN_PRESETS) as Array<keyof typeof MARGIN_PRESETS>).map((key) => (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => applyMarginPreset(key)}
+                    disabled={isActive}
+                    className={cn(
+                      "flex-1 rounded border py-[3px] text-[9px] capitalize transition-all",
+                      activePreset === key
+                        ? "border-primary/50 bg-primary/10 text-primary font-semibold"
+                        : "border-border/50 text-muted-foreground/50 hover:border-border hover:text-foreground",
+                      isActive && "opacity-40 pointer-events-none"
+                    )}
+                  >
+                    {key === "normal" ? "Md" : key.charAt(0).toUpperCase() + key.slice(1)}
+                  </button>
+                ))}
+              </div>
+              <div className="grid grid-cols-[14px_1fr_14px_1fr] items-center gap-x-1 gap-y-1.5 px-3 pb-3">
+                {[
+                  { l: "T", v: marginTop, s: setMarginTop },
+                  { l: "R", v: marginRight, s: setMarginRight },
+                  { l: "B", v: marginBottom, s: setMarginBottom },
+                  { l: "L", v: marginLeft, s: setMarginLeft },
+                ].map(({ l, v, s }) => (
+                  <>
+                    <span key={`${l}-l`} className="text-[9px] text-muted-foreground/40 text-center">{l}</span>
+                    <input
+                      key={`${l}-i`}
+                      value={v}
+                      onChange={(e) => s(e.target.value)}
+                      disabled={isActive}
+                      className="h-6 rounded border border-border/60 bg-muted/50 px-1.5 text-[10px] text-center focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-40 w-full"
+                    />
+                  </>
+                ))}
+              </div>
+            </div>
+
+            <div className="border-t border-border/70" />
+
+            {/* Header & Footer */}
+            <div>
+              <InspectorSection title="Header & Footer" />
+              <InspectorRow label="Enable">
+                <Switch
+                  checked={displayHeaderFooter}
+                  onCheckedChange={(v) => { setDisplayHeaderFooter(v); setShowHFHtml(v); }}
+                  disabled={isActive}
+                  className="scale-[0.75]"
+                />
+              </InspectorRow>
+              {displayHeaderFooter && (
+                <div className="px-3 pb-2 space-y-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowHFHtml((p) => !p)}
+                    className="flex items-center gap-1 text-[10px] text-muted-foreground/60 hover:text-foreground transition-colors"
+                  >
+                    <ChevronDown className={cn("h-3 w-3 transition-transform", showHFHtml && "rotate-180")} />
+                    {showHFHtml ? "Hide" : "Edit"} HTML
+                  </button>
+                  {showHFHtml && (
+                    <div className="space-y-2">
+                      {[
+                        { label: "Header", value: headerTemplate, set: setHeaderTemplate },
+                        { label: "Footer", value: footerTemplate, set: setFooterTemplate },
+                      ].map(({ label, value, set }) => (
+                        <div key={label} className="space-y-1">
+                          <p className="text-[9px] uppercase tracking-wide text-muted-foreground/40 font-semibold">
+                            {label}
+                          </p>
+                          <textarea
+                            value={value}
+                            onChange={(e) => set(e.target.value)}
+                            rows={2}
+                            disabled={isActive}
+                            className="w-full rounded border border-border/60 bg-background px-2 py-1.5 font-mono text-[10px] leading-relaxed focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-40 resize-none"
+                          />
+                        </div>
+                      ))}
+                      <p className="text-[9px] text-muted-foreground/40 leading-relaxed">
+                        Use{" "}
+                        <code className="font-mono bg-muted rounded px-0.5">.title</code>{" "}
+                        <code className="font-mono bg-muted rounded px-0.5">.pageNumber</code>{" "}
+                        <code className="font-mono bg-muted rounded px-0.5">.totalPages</code>
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div className="border-t border-border/70" />
+
+            {/* Output */}
+            <div>
+              <InspectorSection title="Output" />
+              <InspectorRow label="Tagged PDF">
+                <Switch
+                  checked={tagged}
+                  onCheckedChange={setTagged}
+                  disabled={isActive}
+                  className="scale-[0.75]"
+                />
+              </InspectorRow>
+              <InspectorRow label="Embed outline">
+                <Switch
+                  checked={outline}
+                  onCheckedChange={setOutline}
+                  disabled={isActive}
+                  className="scale-[0.75]"
+                />
+              </InspectorRow>
+              <InspectorRow label="Compression">
+                <div className="flex items-center gap-1.5">
+                  <Badge variant="secondary" className="text-[9px] rounded-full px-1.5 h-[14px] font-medium">
+                    Pro
+                  </Badge>
+                  <Switch disabled className="scale-[0.75] opacity-25" />
+                </div>
+              </InspectorRow>
+            </div>
+
+            {/* Footer */}
+            <div className="flex-1" />
+            <div className="border-t border-border/70 px-3 py-2.5">
+              <p className="text-[10px] text-muted-foreground/35 leading-relaxed">
+                Completed jobs →{" "}
+                <Link
+                  href="/app/jobs"
+                  className="hover:text-muted-foreground/70 transition-colors underline underline-offset-2"
+                >
+                  Jobs
+                </Link>
+                {" "}· links valid 24 h
+              </p>
+            </div>
+
+          </div>{/* /inspector */}
+        </div>{/* /body */}
+      </div>{/* /studio shell */}
     </form>
   );
 }

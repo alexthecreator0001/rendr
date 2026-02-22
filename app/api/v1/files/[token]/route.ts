@@ -21,7 +21,7 @@ export async function GET(
     return new NextResponse(fileBuffer, {
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": `attachment; filename="rendr-${job.id}.pdf"`,
+        "Content-Disposition": `inline; filename="rendr-${job.id}.pdf"`,
         "Content-Length": fileBuffer.length.toString(),
         "Cache-Control": "private, max-age=3600",
       },
