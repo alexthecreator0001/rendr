@@ -2,6 +2,17 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.22.0] — 2026-02-22
+### Added
+- **Image upload API** — `POST /api/uploads` (admin-only, multipart) saves images to `/data/uploads/` on the VPS and returns a URL. `GET /api/uploads/[filename]` serves the file with `Cache-Control: immutable` so Cloudflare CDN caches it automatically. Supports JPEG, PNG, WebP, GIF, SVG up to 8 MB.
+- **Template cover image upload UI** — `CoverImageField` in admin templates now has an "Upload" button alongside the URL input. Drag or click to pick a file; the field updates with the returned URL and shows a live preview.
+- **All 8 starter templates redesigned** — Rewrote every template in `lib/starter-templates.ts` with Google Fonts (Inter + Playfair Display for certificates), tighter typography, cleaner visual hierarchy, and print-appropriate spacing. Ready to showcase or sell.
+- **Docs: full rewrite** — All four docs pages rewritten with accurate, comprehensive content:
+  - `docs/page.tsx` — fixed wrong endpoint paths (`/v1/render` → `/api/v1/convert` etc.), added How It Works flow, full endpoint index, feature overview.
+  - `docs/quick-start/page.tsx` — added template workflow, PDF options section, Next Steps.
+  - `docs/api/page.tsx` — full endpoint table (16 endpoints), complete convert request body schema, job object, templates API, webhooks API with payload examples, signature verification (Node.js + Python), usage, rate limits, idempotency, error codes.
+  - `docs/templates/page.tsx` — rewritten from scratch: create/list/get/update/delete, variable syntax, example invoice template, batch rendering, idempotency keys, best practices.
+
 ## [0.21.0] — 2026-02-22
 ### Fixed
 - **Admin users crash** — `useTransition` was imported from `"next/navigation"` (incorrect); moved to `"react"` which is the correct source. This caused a client-side exception on the admin users page.

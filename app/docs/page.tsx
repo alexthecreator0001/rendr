@@ -1,78 +1,115 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Zap, BookOpen, Code2, Layers } from "lucide-react";
+import { ArrowRight, Zap, BookOpen, Code2, Layers, Webhook, BarChart2, Key } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { ImagePlaceholder } from "@/components/media/image-placeholder";
 import { Badge } from "@/components/ui/badge";
 
-export const metadata: Metadata = {
-  title: "Documentation",
-};
+export const metadata: Metadata = { title: "Documentation — Rendr" };
 
 const quickLinks = [
   {
     icon: Zap,
     title: "Quick start",
-    description: "Make your first render in 5 minutes.",
+    description: "Make your first PDF render in under 5 minutes.",
     href: "/docs/quick-start",
     badge: "Start here",
   },
   {
     icon: Code2,
     title: "API reference",
-    description: "Full endpoint docs, request/response schemas, and error codes.",
+    description: "All endpoints, request bodies, responses, and error codes.",
     href: "/docs/api",
   },
   {
     icon: Layers,
     title: "Templates",
-    description: "Store, version, and render HTML templates.",
+    description: "Store reusable HTML layouts and render with variables.",
     href: "/docs/templates",
   },
   {
     icon: BookOpen,
-    title: "Guides",
-    description: "Custom fonts, async jobs, webhook verification.",
-    href: "/docs/api#guides",
+    title: "Webhooks & async",
+    description: "Receive job events and verify HMAC signatures.",
+    href: "/docs/api#webhooks",
   },
 ];
 
-const popularEndpoints = [
-  { method: "POST", path: "/v1/render", description: "Create a render job" },
-  { method: "GET", path: "/v1/jobs/:id", description: "Get job status" },
-  { method: "GET", path: "/v1/jobs/:id/download", description: "Download the PDF" },
-  { method: "POST", path: "/v1/templates", description: "Upload a template" },
-  { method: "GET", path: "/v1/templates", description: "List templates" },
+const features = [
+  {
+    icon: Zap,
+    title: "Sync & async rendering",
+    body: "POST /api/v1/convert waits up to 8 seconds and returns a download URL immediately. For large documents, POST /api/v1/convert-async returns a job_id instantly — poll or use webhooks.",
+  },
+  {
+    icon: Layers,
+    title: "HTML templates with variables",
+    body: "Store reusable HTML layouts via the Templates API or the dashboard. Use {{variable_name}} placeholders — values are injected at render time per job.",
+  },
+  {
+    icon: Webhook,
+    title: "Webhooks",
+    body: "Register a webhook URL to receive job.completed and job.failed events. All payloads are signed with HMAC-SHA256 using your webhook secret.",
+  },
+  {
+    icon: Key,
+    title: "API key auth",
+    body: "Pass your key in Authorization: Bearer rk_live_... Only a SHA-256 hash is stored — the plaintext key is shown exactly once at creation.",
+  },
+  {
+    icon: BarChart2,
+    title: "Usage tracking",
+    body: "GET /api/v1/usage returns today, last_7_days, and last_30_days render counts for your key. Usage is also visible in the dashboard.",
+  },
+  {
+    icon: Code2,
+    title: "Full PDF control",
+    body: "Control paper size (A4, Letter, custom), margins, landscape, background printing, headers/footers, accessibility tagging, and a waitFor delay for JS-rendered pages.",
+  },
+];
+
+const endpoints = [
+  { method: "POST", path: "/api/v1/convert", description: "Synchronous render — waits up to 8 s" },
+  { method: "POST", path: "/api/v1/convert-async", description: "Async render — returns job_id immediately" },
+  { method: "GET",  path: "/api/v1/jobs/:id", description: "Poll job status and get pdf_url" },
+  { method: "GET",  path: "/api/v1/files/:token", description: "Download the rendered PDF (no auth)" },
+  { method: "GET",  path: "/api/v1/templates", description: "List your templates" },
+  { method: "POST", path: "/api/v1/templates", description: "Create a template (name + HTML)" },
+  { method: "PUT",  path: "/api/v1/templates/:id", description: "Update template name or HTML" },
+  { method: "DELETE", path: "/api/v1/templates/:id", description: "Delete a template" },
+  { method: "GET",  path: "/api/v1/webhooks", description: "List registered webhooks" },
+  { method: "POST", path: "/api/v1/webhooks", description: "Register a webhook endpoint" },
+  { method: "GET",  path: "/api/v1/usage", description: "Render counts (today / 7d / 30d)" },
+  { method: "GET",  path: "/api/v1/health", description: "Health check — no auth required" },
 ];
 
 const methodColors: Record<string, string> = {
-  GET: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
-  POST: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400",
-  DELETE: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
-  PATCH: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400",
+  GET: "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+  POST: "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
+  PUT: "bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
+  DELETE: "bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400",
 };
 
 export default function DocsPage() {
   return (
-    <div className="space-y-12">
+    <div className="space-y-14">
       {/* Header */}
       <div>
         <Badge variant="outline" className="mb-4 rounded-full text-xs">Documentation</Badge>
         <h1 className="text-3xl font-extrabold tracking-[-0.03em]">Rendr API Docs</h1>
-        <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
-          Everything you need to integrate Rendr into your stack. The API is REST-based,
-          returns JSON, and authenticates with Bearer tokens.
+        <p className="mt-3 max-w-2xl text-sm text-muted-foreground leading-relaxed">
+          Rendr converts HTML to pixel-perfect PDFs via a REST API. Send raw HTML, a public URL, or
+          a stored template — get a signed download link back. Works sync or async, with optional
+          webhooks and variable substitution.
         </p>
-        <p className="mt-1.5 text-xs text-muted-foreground">
-          Last updated: Feb 15, 2026 · API version: v1
+        <p className="mt-2 text-xs text-muted-foreground">
+          Base URL: <code className="rounded bg-muted px-1.5 py-0.5 font-mono">https://rendrpdf.com/api/v1</code>
+          &nbsp;·&nbsp; API version: v1 &nbsp;·&nbsp; Updated: Feb 2026
         </p>
       </div>
 
       {/* Quick links */}
       <div>
-        <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-muted-foreground">
-          Get started
-        </h2>
+        <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-muted-foreground">Get started</h2>
         <div className="grid gap-3 sm:grid-cols-2">
           {quickLinks.map((link) => (
             <Link key={link.href} href={link.href}>
@@ -83,11 +120,9 @@ export default function DocsPage() {
                   </div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      <p className="text-sm font-medium">{link.title}</p>
+                      <p className="text-sm font-semibold">{link.title}</p>
                       {link.badge && (
-                        <Badge variant="secondary" className="rounded-full text-[10px] px-2">
-                          {link.badge}
-                        </Badge>
+                        <Badge variant="secondary" className="rounded-full text-[10px] px-2">{link.badge}</Badge>
                       )}
                     </div>
                     <p className="mt-0.5 text-xs text-muted-foreground">{link.description}</p>
@@ -100,41 +135,56 @@ export default function DocsPage() {
         </div>
       </div>
 
-      {/* Architecture diagram */}
+      {/* How it works */}
       <div>
-        <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-muted-foreground">
-          How it fits together
-        </h2>
-        {/* intended final asset: architecture diagram showing request → job queue → renderer → storage → webhook */}
-        {/* suggested export format: SVG or PNG */}
-        {/* exact size: 680×320, aspect: ~2/1 */}
-        <ImagePlaceholder
-          label="Architecture diagram: POST /render → Job queue → Renderer → Cloud storage → Webhook delivery (680×320)"
-          aspect="2/1"
-          rounded="xl"
-          className="w-full"
-        />
-        <p className="mt-2 text-xs text-muted-foreground">
-          Render requests are processed asynchronously. Jobs are queued, rendered in isolated workers, then stored. Results are pushed via webhook.
+        <h2 className="mb-1 text-xs font-semibold uppercase tracking-widest text-muted-foreground">How it works</h2>
+        <p className="mb-5 text-xs text-muted-foreground">A render request goes through four stages:</p>
+        <div className="flex flex-wrap items-center gap-2 text-sm">
+          {["API request", "Job queued", "Chromium renders HTML", "PDF stored + webhook fired"].map((step, i, arr) => (
+            <div key={step} className="flex items-center gap-2">
+              <div className="flex items-center gap-2 rounded-lg border border-border bg-muted/40 px-3 py-2">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">{i + 1}</span>
+                <span className="text-xs font-medium">{step}</span>
+              </div>
+              {i < arr.length - 1 && <ArrowRight className="h-3.5 w-3.5 text-muted-foreground/40 shrink-0" />}
+            </div>
+          ))}
+        </div>
+        <p className="mt-4 text-xs text-muted-foreground leading-relaxed">
+          The sync endpoint (<code className="rounded bg-muted px-1 py-0.5 font-mono text-[11px]">POST /convert</code>) polls internally for up to 8 seconds and returns the PDF URL directly.
+          The async endpoint (<code className="rounded bg-muted px-1 py-0.5 font-mono text-[11px]">POST /convert-async</code>) returns a <code className="rounded bg-muted px-1 py-0.5 font-mono text-[11px]">job_id</code> immediately —
+          you poll <code className="rounded bg-muted px-1 py-0.5 font-mono text-[11px]">GET /jobs/:id</code> or configure a webhook.
         </p>
       </div>
 
-      {/* Popular endpoints */}
+      {/* Features */}
       <div>
-        <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-muted-foreground">
-          Popular endpoints
-        </h2>
+        <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-muted-foreground">What&apos;s included</h2>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {features.map((f) => (
+            <div key={f.title} className="rounded-xl border border-border p-4">
+              <div className="mb-2 flex h-7 w-7 items-center justify-center rounded-lg bg-muted">
+                <f.icon className="h-3.5 w-3.5 text-muted-foreground" />
+              </div>
+              <p className="text-sm font-semibold">{f.title}</p>
+              <p className="mt-1 text-xs text-muted-foreground leading-relaxed">{f.body}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Endpoint index */}
+      <div>
+        <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-muted-foreground">All endpoints</h2>
         <div className="overflow-hidden rounded-xl border border-border">
-          {popularEndpoints.map((ep, i) => (
+          {endpoints.map((ep, i) => (
             <Link key={ep.path} href="/docs/api">
-              <div
-                className={`flex items-center gap-3 px-4 py-3 hover:bg-muted/50 transition-colors ${i < popularEndpoints.length - 1 ? "border-b border-border" : ""}`}
-              >
-                <span className={`rounded px-1.5 py-0.5 font-mono text-[10px] font-semibold ${methodColors[ep.method]}`}>
+              <div className={`flex items-center gap-3 px-4 py-2.5 hover:bg-muted/50 transition-colors ${i < endpoints.length - 1 ? "border-b border-border" : ""}`}>
+                <span className={`shrink-0 rounded px-1.5 py-0.5 font-mono text-[10px] font-semibold ${methodColors[ep.method]}`}>
                   {ep.method}
                 </span>
                 <code className="font-mono text-xs text-foreground">{ep.path}</code>
-                <span className="ml-auto text-xs text-muted-foreground">{ep.description}</span>
+                <span className="ml-auto text-xs text-muted-foreground hidden sm:block">{ep.description}</span>
               </div>
             </Link>
           ))}

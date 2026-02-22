@@ -13,7 +13,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
   DialogTrigger, DialogFooter, DialogDescription,
 } from "@/components/ui/dialog";
-import { Plus, Pencil, Trash2, Layers, AlertTriangle, ImageIcon } from "lucide-react";
+import { Plus, Pencil, Trash2, Layers, AlertTriangle, ImageIcon, Upload } from "lucide-react";
 
 type Template = {
   id: string;
@@ -30,18 +30,62 @@ function extractVarCount(html: string): number {
 
 function CoverImageField({ defaultValue }: { defaultValue?: string | null }) {
   const [preview, setPreview] = useState(defaultValue ?? "");
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
+  async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    setUploadError(null);
+    const fd = new FormData();
+    fd.append("file", file);
+    try {
+      const res = await fetch("/api/uploads", { method: "POST", body: fd });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Upload failed");
+      setPreview(data.url);
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setUploading(false);
+      e.target.value = "";
+    }
+  }
+
   return (
     <div className="space-y-1.5">
       <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-        Cover Image URL <span className="normal-case text-muted-foreground/50">(optional)</span>
+        Cover Image <span className="normal-case text-muted-foreground/50">(optional)</span>
       </Label>
-      <Input
-        name="coverImageUrl"
-        value={preview}
-        onChange={(e) => setPreview(e.target.value)}
-        placeholder="https://…/cover.png"
-        className="rounded-xl"
-      />
+      <input type="hidden" name="coverImageUrl" value={preview} />
+      <div className="flex gap-2">
+        <Input
+          value={preview}
+          onChange={(e) => setPreview(e.target.value)}
+          placeholder="https://… or upload an image →"
+          className="rounded-xl"
+        />
+        <label className="shrink-0">
+          <input type="file" accept="image/*" className="hidden" onChange={handleFile} disabled={uploading} />
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="h-9 rounded-xl gap-1.5 cursor-pointer"
+            disabled={uploading}
+            asChild
+          >
+            <span>
+              <Upload className="h-3.5 w-3.5" />
+              {uploading ? "Uploading…" : "Upload"}
+            </span>
+          </Button>
+        </label>
+      </div>
+      {uploadError && (
+        <p className="text-xs text-destructive">{uploadError}</p>
+      )}
       {preview && (
         <div className="mt-2 overflow-hidden rounded-xl border border-border bg-muted/30" style={{ height: 120 }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
