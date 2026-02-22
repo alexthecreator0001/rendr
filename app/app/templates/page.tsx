@@ -14,7 +14,7 @@ export default async function TemplatesPage() {
   let templates = await prisma.template.findMany({
     where: { userId: session.user.id },
     orderBy: { updatedAt: "desc" },
-    select: { id: true, name: true, html: true, createdAt: true, updatedAt: true },
+    select: { id: true, name: true, html: true, coverImageUrl: true, createdAt: true, updatedAt: true },
   });
 
   // Auto-seed starter templates for users who have none (e.g. registered before seeding was added)
@@ -23,7 +23,7 @@ export default async function TemplatesPage() {
     templates = await prisma.template.findMany({
       where: { userId: session.user.id },
       orderBy: { updatedAt: "desc" },
-      select: { id: true, name: true, html: true, createdAt: true, updatedAt: true },
+      select: { id: true, name: true, html: true, coverImageUrl: true, createdAt: true, updatedAt: true },
     });
   }
 

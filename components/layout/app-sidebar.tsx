@@ -8,7 +8,7 @@ import {
   CreditCard, BookOpen, Wand2, BriefcaseBusiness,
   Settings, LogOut, MoreVertical, ExternalLink,
   Zap, ShieldCheck, Users, BarChart3, Headphones,
-  Lightbulb, MessageSquare, Users2, Bell, FileText,
+  Lightbulb, MessageSquare, Users2, Bell, FileText, ArrowRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -229,43 +229,47 @@ export function AppSidebar({ user, usage, plan, role }: AppSidebarProps) {
         {/* Usage widget — only show for app section */}
         {!onAdminSection && (
           <div className="px-3 pb-2">
-            <div className="rounded-xl border border-border/60 bg-muted/30 px-3 py-2.5 space-y-2">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1.5">
-                  <Badge
-                    variant="secondary"
-                    className="rounded-full px-1.5 py-0 text-[9px] h-4 font-medium"
-                  >
-                    {planLabel}
-                  </Badge>
-                </div>
-                <span className="font-mono text-[10px] text-muted-foreground">
-                  {usage.used}
-                  <span className="text-muted-foreground/40">/{usage.limit}</span>
+            <Link
+              href="/app/usage"
+              onClick={close}
+              className="group block rounded-xl border border-border/60 bg-muted/30 px-3.5 py-3 hover:bg-accent/50 hover:border-border transition-all duration-150"
+            >
+              {/* Plan + arrow */}
+              <div className="flex items-center justify-between mb-2.5">
+                <span className={cn(
+                  "text-[10px] font-semibold uppercase tracking-widest",
+                  usagePct >= 90 ? "text-red-400" :
+                  usagePct >= 70 ? "text-amber-400" :
+                  "text-muted-foreground"
+                )}>
+                  {planLabel} Plan
                 </span>
+                <ArrowRight className="h-3 w-3 text-muted-foreground/30 group-hover:text-muted-foreground/70 transition-colors" />
               </div>
 
-              <div className="h-[3px] w-full overflow-hidden rounded-full bg-muted">
+              {/* Big usage number */}
+              <div className="flex items-baseline gap-1 mb-0.5">
+                <span className="text-[20px] font-bold tabular-nums leading-none">{usage.used}</span>
+                <span className="text-[11px] text-muted-foreground/50 font-mono">/ {usage.limit}</span>
+              </div>
+              <p className="text-[10px] text-muted-foreground/60 mb-2.5">renders this month</p>
+
+              {/* Progress bar */}
+              <div className="h-1 w-full overflow-hidden rounded-full bg-muted">
                 <div
                   className={cn("h-full rounded-full transition-all duration-500", barColor)}
                   style={{ width: `${usagePct}%` }}
                 />
               </div>
 
-              <div className="flex items-center justify-between">
-                <p className="text-[10px] text-muted-foreground/60">renders this month</p>
-                {usagePct >= 70 && (
-                  <Link
-                    href="/app/billing"
-                    onClick={close}
-                    className="flex items-center gap-0.5 text-[10px] text-primary hover:underline underline-offset-2"
-                  >
-                    <Zap className="h-2.5 w-2.5" />
-                    Upgrade
-                  </Link>
-                )}
-              </div>
-            </div>
+              {/* Upgrade nudge */}
+              {usagePct >= 70 && (
+                <div className="mt-2 flex items-center gap-1 text-[10px] text-amber-500">
+                  <Zap className="h-3 w-3" />
+                  <span>{usagePct >= 90 ? "Almost at limit — upgrade" : "Upgrade for more renders"}</span>
+                </div>
+              )}
+            </Link>
           </div>
         )}
 

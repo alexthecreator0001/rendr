@@ -25,7 +25,7 @@ import {
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
-type Template = { id: string; name: string; html: string; createdAt: Date; updatedAt: Date };
+type Template = { id: string; name: string; html: string; coverImageUrl: string | null; createdAt: Date; updatedAt: Date };
 
 // ── Sample data for filling {{variables}} in previews ────────────────────────
 const SAMPLE: Record<string, string> = {
@@ -323,7 +323,16 @@ function TemplateCard({ t }: { t: Template }) {
 
       {/* Thumbnail area */}
       <div className="relative overflow-hidden border-b border-border/30">
-        <TemplateThumbnail html={t.html} name={t.name} />
+        {t.coverImageUrl ? (
+          <img
+            src={t.coverImageUrl}
+            alt={t.name}
+            className="w-full object-cover"
+            style={{ height: 200 }}
+          />
+        ) : (
+          <TemplateThumbnail html={t.html} name={t.name} />
+        )}
 
         {/* Hover overlay buttons — top right */}
         <div className="absolute right-2.5 top-2.5 flex items-center gap-1.5 opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-150 ease-out">

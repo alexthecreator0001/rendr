@@ -2,6 +2,12 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.23.0] — 2026-02-22
+### Fixed
+- **Template cover images not showing for users** — `coverImageUrl` was missing from the Prisma `select` in `app/app/templates/page.tsx` (both initial query and post-seed query). Also missing from the `Template` type in `templates-client.tsx`. Fixed both; `TemplateCard` now renders a cover image (when set) instead of the iframe preview thumbnail.
+### Changed
+- **Sidebar usage widget redesigned** — replaced the cramped static badge + thin progress bar with a fully clickable card linking to `/app/usage`. Shows plan name, large usage number (e.g. "42 / 500"), renders label, clean 4px progress bar, and amber "Upgrade for more renders" nudge at ≥70% usage.
+
 ## [0.22.0] — 2026-02-22
 ### Added
 - **Image upload API** — `POST /api/uploads` (admin-only, multipart) saves images to `/data/uploads/` on the VPS and returns a URL. `GET /api/uploads/[filename]` serves the file with `Cache-Control: immutable` so Cloudflare CDN caches it automatically. Supports JPEG, PNG, WebP, GIF, SVG up to 8 MB.
