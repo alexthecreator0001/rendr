@@ -90,6 +90,7 @@ export default async function BillingPage() {
     "bg-primary";
 
   return (
+    <div className="px-4 py-6 sm:px-6 sm:py-8">
     <div className="max-w-3xl space-y-8">
       {/* Header */}
       <div>
@@ -277,6 +278,7 @@ export default async function BillingPage() {
           </Button>
         </div>
       </div>
+    </div>
     </div>
   );
 }

@@ -94,7 +94,7 @@ export default async function AppOverviewPage() {
   const name = session.user.email?.split("@")[0] ?? "there";
 
   return (
-    <div className="space-y-8">
+    <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8 space-y-8">
       {/* Greeting */}
       <div>
         <h1 className="text-3xl font-bold tracking-tight">

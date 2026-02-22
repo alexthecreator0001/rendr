@@ -16,5 +16,9 @@ export default async function TemplatesPage() {
     select: { id: true, name: true, html: true, createdAt: true, updatedAt: true },
   });
 
-  return <TemplatesClient templates={templates} />;
+  return (
+    <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
+      <TemplatesClient templates={templates} />
+    </div>
+  );
 }

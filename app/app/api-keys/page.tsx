@@ -79,7 +79,7 @@ export default function ApiKeysPage() {
   }, [revokeState, load]);
 
   return (
-    <div className="space-y-6">
+    <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8 space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">API Keys</h1>

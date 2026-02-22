@@ -2,6 +2,13 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.12.1] — 2026-02-22
+### Fixed
+- **Studio full width**: removed `max-w-6xl` from the shared layout wrapper; Studio page now uses `h-full overflow-hidden` to fill its flex container — no more capped width
+- **Sidebar duplicate Settings**: Settings removed from sidebar nav (Billing group); it remains exclusively in the user footer dropdown
+- **Plan badge not showing**: added `postinstall: "prisma generate"` to package.json so the Prisma client is always regenerated after `npm install`, ensuring new schema fields (like `plan`) are picked up
+- **Usage page showing 0**: usage was querying `UsageEvent` (only written by API key requests); switched to `Job` table counting `status: "succeeded"` — consistent with sidebar widget; added monthly quota bar, success rate card, and better daily chart
+
 ## [0.12.0] — 2026-02-22
 ### Added
 - **Plan system**: `plan` field added to `User` model (`@default("starter")`); sidebar now shows the real plan badge (Starter / Growth / Pro) instead of hardcoded "Starter"; migration + seed included
