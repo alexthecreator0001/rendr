@@ -106,6 +106,58 @@ export async function updateTicketStatusAction(
   return {};
 }
 
+// ─── Admin: Notifications ────────────────────────────────────────────────────
+
+export async function createNotificationAction(
+  _: unknown,
+  formData: FormData
+): Promise<{ error?: string }> {
+  await requireAdmin();
+  const title = (formData.get("title") as string)?.trim();
+  const message = (formData.get("message") as string)?.trim();
+  const type = (formData.get("type") as string) || "info";
+
+  if (!title || title.length < 2) return { error: "Title too short." };
+  if (!message || message.length < 5) return { error: "Message too short." };
+  if (!["info", "warning", "success"].includes(type)) return { error: "Invalid type." };
+
+  await prisma.notification.create({ data: { title, message, type } });
+  revalidatePath("/admin/notifications");
+  revalidatePath("/app");
+  return {};
+}
+
+export async function toggleNotificationAction(
+  _: unknown,
+  formData: FormData
+): Promise<{ error?: string }> {
+  await requireAdmin();
+  const id = formData.get("id") as string;
+  if (!id) return { error: "Missing ID." };
+
+  const n = await prisma.notification.findUnique({ where: { id }, select: { active: true } });
+  if (!n) return { error: "Not found." };
+
+  await prisma.notification.update({ where: { id }, data: { active: !n.active } });
+  revalidatePath("/admin/notifications");
+  revalidatePath("/app");
+  return {};
+}
+
+export async function deleteNotificationAction(
+  _: unknown,
+  formData: FormData
+): Promise<{ error?: string }> {
+  await requireAdmin();
+  const id = formData.get("id") as string;
+  if (!id) return { error: "Missing ID." };
+
+  await prisma.notification.delete({ where: { id } });
+  revalidatePath("/admin/notifications");
+  revalidatePath("/app");
+  return {};
+}
+
 // ─── Admin: Feature requests ─────────────────────────────────────────────────
 
 export async function updateFeatureStatusAction(

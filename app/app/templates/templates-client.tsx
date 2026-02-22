@@ -410,6 +410,22 @@ export function TemplatesClient({ templates }: { templates: Template[] }) {
           ))}
         </div>
       )}
+
+      {/* AI templates blog banner */}
+      <div className="mt-8 rounded-2xl bg-gradient-to-br from-violet-600 to-blue-600 p-6 text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <p className="font-semibold text-white">New to templates?</p>
+          <p className="text-sm text-white/70 mt-0.5">
+            Learn how to build templates with AI — includes a ready-made ChatGPT prompt.
+          </p>
+        </div>
+        <a
+          href="/blog/how-to-create-templates"
+          className="shrink-0 rounded-lg bg-white/15 hover:bg-white/25 px-4 py-2 text-sm font-medium text-white transition-colors"
+        >
+          Read the guide →
+        </a>
+      </div>
     </div>
   );
 }

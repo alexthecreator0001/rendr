@@ -101,10 +101,14 @@ export async function registerAction(
 
   const passwordHash = await hashPassword(parsed.data.password);
 
+  const emailEnabled = !!process.env.RESEND_API_KEY;
+
   const newUser = await prisma.user.create({
     data: {
       email: parsed.data.email,
       passwordHash,
+      // Auto-verify immediately if no email service configured
+      ...(!emailEnabled ? { emailVerified: new Date() } : {}),
     },
   });
 
@@ -115,7 +119,6 @@ export async function registerAction(
   sendWelcomeEmail(newUser.email).catch(() => {});
 
   // If email is configured, create a verification code and redirect to verify page
-  const emailEnabled = !!process.env.RESEND_API_KEY;
   if (emailEnabled) {
     try {
       const code = await createVerificationCode(newUser.id);

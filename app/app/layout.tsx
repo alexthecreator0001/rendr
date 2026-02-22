@@ -33,9 +33,14 @@ export default async function AppLayout({
     }),
     prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { plan: true, role: true },
+      select: { plan: true, role: true, emailVerified: true },
     }),
   ]);
+
+  // DB-checked verification guard — cannot be bypassed via JWT
+  if (!user?.emailVerified && process.env.RESEND_API_KEY) {
+    redirect("/verify-email");
+  }
 
   const plan = user?.plan ?? "starter";
   const role = user?.role ?? "user";

@@ -3,6 +3,7 @@ import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
 import { ImagePlaceholder } from "@/components/media/image-placeholder";
 import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Blog",
@@ -10,6 +11,15 @@ export const metadata: Metadata = {
 
 const posts = [
   {
+    slug: "how-to-create-templates",
+    title: "How to create PDF templates with AI",
+    date: "Feb 22, 2026",
+    tag: "Guide",
+    excerpt:
+      "Build professional Rendr HTML templates in seconds using ChatGPT — includes a ready-made prompt you can copy and paste.",
+  },
+  {
+    slug: null,
     title: "Why we built Rendr instead of using headless Chrome",
     date: "Feb 12, 2026",
     tag: "Engineering",
@@ -17,6 +27,7 @@ const posts = [
       "The short version: we got tired of babysitting Puppeteer in production. Here's what we built instead.",
   },
   {
+    slug: null,
     title: "Rendering 10,000 invoices a day without breaking a sweat",
     date: "Jan 28, 2026",
     tag: "Case study",
@@ -24,6 +35,7 @@ const posts = [
       "How Acme Internal automated their entire billing workflow using Rendr's async job queue.",
   },
   {
+    slug: null,
     title: "Custom fonts in PDFs: a surprisingly tricky problem",
     date: "Jan 14, 2026",
     tag: "Deep dive",
@@ -50,9 +62,6 @@ export default function BlogPage() {
               className="flex flex-col gap-4 sm:flex-row sm:gap-8 border-b border-border pb-8"
             >
               {/* Cover image placeholder */}
-              {/* intended final asset: blog post cover illustration */}
-              {/* suggested export format: PNG */}
-              {/* exact size: 320×200, aspect: 8/5 */}
               <ImagePlaceholder
                 label={`Blog cover: "${post.title}"`}
                 width={320}
@@ -66,12 +75,25 @@ export default function BlogPage() {
                   <Badge variant="outline" className="rounded-full text-xs">{post.tag}</Badge>
                   <span className="text-xs text-muted-foreground">{post.date}</span>
                 </div>
-                <h2 className="mb-2 text-lg font-semibold leading-snug hover:text-primary cursor-pointer transition-colors">
-                  {post.title}
-                </h2>
+                {post.slug ? (
+                  <Link href={`/blog/${post.slug}`}>
+                    <h2 className="mb-2 text-lg font-semibold leading-snug hover:text-primary transition-colors">
+                      {post.title}
+                    </h2>
+                  </Link>
+                ) : (
+                  <h2 className="mb-2 text-lg font-semibold leading-snug text-muted-foreground cursor-default">
+                    {post.title}
+                  </h2>
+                )}
                 <p className="text-sm text-muted-foreground leading-relaxed">
                   {post.excerpt}
                 </p>
+                {post.slug && (
+                  <Link href={`/blog/${post.slug}`} className="mt-2 text-xs text-primary hover:underline">
+                    Read more →
+                  </Link>
+                )}
               </div>
             </article>
           ))}

@@ -97,3 +97,56 @@ export async function deleteUserAction(
   revalidatePath("/admin/users");
   return {};
 }
+
+// ─── Admin: Template management ───────────────────────────────────────────────
+
+export async function createAdminTemplateAction(
+  _: unknown,
+  formData: FormData
+): Promise<{ error?: string }> {
+  await requireAdmin();
+  const userId = formData.get("userId") as string;
+  const name = (formData.get("name") as string)?.trim();
+  const html = (formData.get("html") as string)?.trim();
+
+  if (!userId) return { error: "Select a user." };
+  if (!name || name.length < 2) return { error: "Name too short." };
+  if (!html) return { error: "HTML is required." };
+
+  await prisma.template.create({ data: { userId, name, html } });
+  revalidatePath("/admin/templates");
+  return {};
+}
+
+export async function updateAdminTemplateAction(
+  _: unknown,
+  formData: FormData
+): Promise<{ error?: string }> {
+  await requireAdmin();
+  const id = formData.get("id") as string;
+  const name = (formData.get("name") as string)?.trim();
+  const html = (formData.get("html") as string)?.trim();
+
+  if (!id) return { error: "Missing template ID." };
+  if (!name || name.length < 2) return { error: "Name too short." };
+  if (!html) return { error: "HTML is required." };
+
+  await prisma.template.update({ where: { id }, data: { name, html } });
+  revalidatePath("/admin/templates");
+  revalidatePath("/app/templates");
+  return {};
+}
+
+export async function deleteAdminTemplateAction(
+  _: unknown,
+  formData: FormData
+): Promise<{ error?: string }> {
+  await requireAdmin();
+  const id = formData.get("id") as string;
+  if (!id) return { error: "Missing template ID." };
+
+  await prisma.template.delete({ where: { id } });
+  revalidatePath("/admin/templates");
+  revalidatePath("/app/templates");
+  return {};
+}

@@ -17,6 +17,11 @@ function StatusPill({ status }: { status: string }) {
   );
 }
 
+function formatDuration(ms: number): string {
+  if (ms < 1000) return `${ms}ms`;
+  return `${(ms / 1000).toFixed(1)}s`;
+}
+
 const VALID_STATUSES = ["queued", "processing", "succeeded", "failed"] as const;
 
 export default async function JobsPage({
@@ -31,30 +36,112 @@ export default async function JobsPage({
   const { status: rawStatus } = await searchParams;
   const statusFilter = VALID_STATUSES.find((s) => s === rawStatus);
 
-  const jobs = await prisma.job.findMany({
-    where: {
-      userId,
-      ...(statusFilter ? { status: statusFilter as JobStatus } : {}),
-    },
-    orderBy: { createdAt: "desc" },
-    take: 100,
-    select: {
-      id: true,
-      status: true,
-      inputType: true,
-      createdAt: true,
-      downloadToken: true,
-      errorMessage: true,
-    },
-  });
+  const fourteenDaysAgo = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000);
+
+  const [jobs, allStats, last14Jobs] = await Promise.all([
+    prisma.job.findMany({
+      where: {
+        userId,
+        ...(statusFilter ? { status: statusFilter as JobStatus } : {}),
+      },
+      orderBy: { createdAt: "desc" },
+      take: 100,
+      select: {
+        id: true,
+        status: true,
+        inputType: true,
+        createdAt: true,
+        updatedAt: true,
+        downloadToken: true,
+        errorMessage: true,
+      },
+    }),
+    prisma.job.findMany({
+      where: { userId },
+      select: { status: true, createdAt: true, updatedAt: true },
+    }),
+    prisma.job.findMany({
+      where: { userId, createdAt: { gte: fourteenDaysAgo } },
+      select: { createdAt: true },
+    }),
+  ]);
+
+  // Compute stats
+  const totalAll = allStats.length;
+  const succeededAll = allStats.filter((j) => j.status === "succeeded").length;
+  const successRate = totalAll > 0 ? Math.round((succeededAll / totalAll) * 100) : 100;
+
+  const succeededWithTime = allStats.filter((j) => j.status === "succeeded");
+  const avgMs = succeededWithTime.length > 0
+    ? Math.round(
+        succeededWithTime.reduce((sum, j) => {
+          return sum + (new Date(j.updatedAt).getTime() - new Date(j.createdAt).getTime());
+        }, 0) / succeededWithTime.length
+      )
+    : 0;
+
+  // Build 14-day chart data
+  const now = new Date();
+  const dayMap = new Map<string, number>();
+  for (let i = 13; i >= 0; i--) {
+    const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+    const key = `${d.getMonth() + 1}/${d.getDate()}`;
+    dayMap.set(key, 0);
+  }
+  for (const job of last14Jobs) {
+    const d = new Date(job.createdAt);
+    const key = `${d.getMonth() + 1}/${d.getDate()}`;
+    if (dayMap.has(key)) dayMap.set(key, (dayMap.get(key) ?? 0) + 1);
+  }
+  const chartData = Array.from(dayMap.entries()).map(([label, count]) => ({ label, count }));
+  const chartMax = Math.max(...chartData.map((d) => d.count), 1);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8 space-y-6">
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Jobs</h1>
-          <p className="text-sm text-muted-foreground mt-1">All your PDF render jobs.</p>
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight">Jobs</h1>
+        <p className="text-sm text-muted-foreground mt-1">All your PDF render jobs.</p>
+      </div>
+
+      {/* Stat cards */}
+      <div className="grid gap-4 sm:grid-cols-3">
+        <div className="rounded-2xl border border-border bg-card p-5">
+          <p className="text-sm text-muted-foreground mb-1">Total jobs</p>
+          <p className="text-3xl font-bold tracking-tight">{totalAll}</p>
         </div>
+        <div className="rounded-2xl border border-border bg-card p-5">
+          <p className="text-sm text-muted-foreground mb-1">Avg render time</p>
+          <p className="text-3xl font-bold tracking-tight">{avgMs > 0 ? formatDuration(avgMs) : "—"}</p>
+          <p className="text-xs text-muted-foreground mt-1">succeeded jobs only</p>
+        </div>
+        <div className="rounded-2xl border border-border bg-card p-5">
+          <p className="text-sm text-muted-foreground mb-1">Success rate</p>
+          <p className="text-3xl font-bold tracking-tight">{successRate}%</p>
+          <p className="text-xs text-muted-foreground mt-1">{succeededAll} of {totalAll}</p>
+        </div>
+      </div>
+
+      {/* 14-day activity chart */}
+      <div className="rounded-2xl border border-border bg-card p-5">
+        <p className="text-sm font-semibold mb-4">Activity — last 14 days</p>
+        <div className="flex items-end gap-1 h-20">
+          {chartData.map((d) => (
+            <div key={d.label} className="flex-1 flex flex-col items-center gap-1">
+              <div
+                className="w-full rounded-t-sm bg-primary/70 transition-all duration-500 min-h-[2px]"
+                style={{ height: `${Math.max((d.count / chartMax) * 72, d.count > 0 ? 4 : 2)}px` }}
+                title={`${d.count} job${d.count !== 1 ? "s" : ""}`}
+              />
+              <span className="text-[9px] text-muted-foreground tabular-nums leading-none">
+                {d.label.split("/")[1]}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Filter tabs */}
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <div className="flex gap-2 flex-wrap">
           {([undefined, "queued", "processing", "succeeded", "failed"] as const).map((s) => (
             <a

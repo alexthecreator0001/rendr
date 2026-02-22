@@ -2,6 +2,18 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.19.0] — 2026-02-22
+### Added
+- **Fix: Email verification bypass** — `registerAction` now sets `emailVerified: new Date()` when no email service is configured, so `emailVerified` is never null for those accounts. `app/app/layout.tsx` adds a DB-checked redirect to `/verify-email` if `emailVerified` is null and `RESEND_API_KEY` is set — cannot be bypassed via JWT.
+- **Teams** — Full team collaboration system. New models: `Team`, `TeamMember`, `TeamInvite`. Users can create teams, generate 7-day invite links, accept invites, remove members, leave teams, or delete teams. Team templates are shared across all members. New pages: `/app/teams`, `/app/teams/[teamId]`, `/invite/[token]` (public). Teams nav item added to sidebar. Server actions in `app/actions/teams.ts`.
+- **Admin Notifications** — Admins can post banner announcements (info/warning/success types) that appear at the top of the user dashboard. New model: `Notification`. Admin page: `/admin/notifications`. Actions: `createNotificationAction`, `toggleNotificationAction`, `deleteNotificationAction` in `app/actions/feedback.ts`. Notifications and Templates added to admin sidebar.
+- **Dashboard chart** — "Activity — last 7 days" CSS bar chart added below stats section on the overview page.
+- **Jobs chart + stats** — Jobs page now shows 3 stat cards (total jobs, avg render time, success rate) and a 14-day activity bar chart above the table.
+- **Templates AI banner** — Bottom of templates page shows a gradient banner linking to the new blog post about creating templates with AI.
+- **Blog post: How to create PDF templates with AI** — Full guide at `/blog/how-to-create-templates` covering what templates are, manual creation tips, step-by-step AI workflow, a ready-made ChatGPT prompt (with copy button), common variable patterns for 4 document types, and Rendr Studio testing. Blog listing page updated with the new post linked.
+- **Admin: Manage all templates** — New admin page at `/admin/templates` with paginated table of all templates across all users (with user email, team, variable count, job count). Admins can create templates assigned to any user, edit name+HTML, and delete. Actions: `createAdminTemplateAction`, `updateAdminTemplateAction`, `deleteAdminTemplateAction` in `app/admin/_actions.ts`.
+- **Prisma migration** `20260222000003_teams_notifications` — adds `Team`, `TeamMember`, `TeamInvite`, `Notification` tables and `teamId` to `Template`.
+
 ## [0.18.0] — 2026-02-22
 ### Added
 - **Full admin panel rebuild**: unified sidebar — same `AppSidebar` for both app and admin sections. When on `/admin/**` routes, sidebar expands to show all admin sub-items with red accent (Overview, Users, Subscriptions, Jobs, Support, Features). Single "Admin" collapsed link shown on app pages.

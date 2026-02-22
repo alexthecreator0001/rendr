@@ -8,7 +8,7 @@ import {
   CreditCard, BookOpen, Wand2, BriefcaseBusiness,
   Settings, LogOut, MoreVertical, ExternalLink,
   Zap, ShieldCheck, Users, BarChart3, Headphones,
-  Lightbulb, MessageSquare,
+  Lightbulb, MessageSquare, Users2, Bell,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -32,6 +32,7 @@ const navGroups = [
     { href: "/app/api-keys",  label: "API Keys",   icon: Key },
     { href: "/app/templates", label: "Templates",  icon: Layers },
     { href: "/app/webhooks",  label: "Webhooks",   icon: Webhook },
+    { href: "/app/teams",     label: "Teams",      icon: Users2 },
   ],
   [
     { href: "/app/support",   label: "Support",         icon: Headphones },
@@ -43,12 +44,14 @@ const navGroups = [
 ] as const;
 
 const adminNavItems = [
-  { href: "/admin",               label: "Overview",       icon: BarChart3, exact: true },
-  { href: "/admin/users",         label: "Users",          icon: Users },
-  { href: "/admin/subscriptions", label: "Subscriptions",  icon: CreditCard },
-  { href: "/admin/jobs",          label: "Jobs",           icon: BriefcaseBusiness },
-  { href: "/admin/support",       label: "Support",        icon: MessageSquare },
-  { href: "/admin/features",      label: "Features",       icon: Lightbulb },
+  { href: "/admin",                   label: "Overview",       icon: BarChart3, exact: true },
+  { href: "/admin/users",             label: "Users",          icon: Users },
+  { href: "/admin/subscriptions",     label: "Subscriptions",  icon: CreditCard },
+  { href: "/admin/jobs",              label: "Jobs",           icon: BriefcaseBusiness },
+  { href: "/admin/support",           label: "Support",        icon: MessageSquare },
+  { href: "/admin/features",          label: "Features",       icon: Lightbulb },
+  { href: "/admin/notifications",     label: "Notifications",  icon: Bell },
+  { href: "/admin/templates",         label: "Templates",      icon: Layers },
 ] as const;
 
 const PLAN_LABELS: Record<string, string> = {
