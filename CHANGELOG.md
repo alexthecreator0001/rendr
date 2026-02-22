@@ -2,6 +2,14 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.14.0] — 2026-02-22
+### Added
+- **ASCII rain hero**: animated canvas background with perspective binary character columns (0, 1, ·) inspired by Synk design; pure black `bg-black` section; columns brighter/larger at edges, dimmer/smaller at center for depth illusion; radial vignette overlay keeps center readable
+- **Code showcase section**: standalone macOS terminal card between hero and trust row with Node.js/cURL/Python tab switcher and response strip; extracted from old split-hero
+- **Backup branch**: `backup/landing-v0.13.0` preserves previous landing page in git
+### Changed
+- **Hero**: fully redesigned — pure black background, full-viewport centered layout, XL headline (up to 7rem), two CTAs (white primary + bordered ghost), all-caps install command, bottom gradient bridges to zinc-950 sections; removed split-column layout; no longer a client component (AsciiRain handles interactivity)
+
 ## [0.13.0] — 2026-02-22
 ### Added
 - **Testimonials section**: three developer testimonials on the landing page with star ratings, quotes, and gradient avatar initials

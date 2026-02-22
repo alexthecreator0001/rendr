@@ -12,6 +12,7 @@ import { ComparisonTable } from "@/components/marketing/comparison-table";
 import { PricingCards } from "@/components/marketing/pricing-cards";
 import { FaqSection } from "@/components/marketing/faq-section";
 import { CtaSection } from "@/components/marketing/cta-section";
+import { CodeShowcase } from "@/components/marketing/code-showcase";
 
 export const metadata: Metadata = {
   title: "Rendr — HTML to PDF API",
@@ -24,6 +25,7 @@ export default async function LandingPage() {
   return (
     <>
       <Hero />
+      <CodeShowcase />
       <TrustRow />
       <PainPoints />
       <FeaturesGrid />
