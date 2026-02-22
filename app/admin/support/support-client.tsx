@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter, useTransition } from "react";
+import { useRouter, useTransition } from "next/navigation";
 import { updateTicketStatusAction } from "@/app/actions/feedback";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,

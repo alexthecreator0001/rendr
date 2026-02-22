@@ -13,26 +13,21 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
   DialogTrigger, DialogFooter, DialogDescription,
 } from "@/components/ui/dialog";
-import { Plus, Pencil, Trash2, Layers, ChevronLeft, ChevronRight, AlertTriangle } from "lucide-react";
-import Link from "next/link";
+import { Plus, Pencil, Trash2, Layers, AlertTriangle } from "lucide-react";
 
 type Template = {
   id: string;
   name: string;
   html: string;
   createdAt: Date;
-  user: { email: string };
-  team: { name: string } | null;
-  _count: { jobs: number };
+  updatedAt: Date;
 };
-
-type User = { id: string; email: string };
 
 function extractVarCount(html: string): number {
   return new Set([...html.matchAll(/\{\{\s*(\w+)\s*\}\}/g)].map((m) => m[1])).size;
 }
 
-function CreateDialog({ users }: { users: User[] }) {
+function CreateDialog({ adminUserId }: { adminUserId: string }) {
   const [open, setOpen] = useState(false);
   const [state, action, pending] = useActionState(createAdminTemplateAction, null);
 
@@ -40,13 +35,13 @@ function CreateDialog({ users }: { users: User[] }) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button size="sm" className="gap-1.5 rounded-lg">
-          <Plus className="h-4 w-4" /> New template
+          <Plus className="h-4 w-4" /> New default template
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-2xl rounded-2xl">
         <DialogHeader>
-          <DialogTitle>Create template</DialogTitle>
-          <DialogDescription>Assign a new template to any user.</DialogDescription>
+          <DialogTitle>Create default template</DialogTitle>
+          <DialogDescription>This template will be added to your admin account and can be seeded to new users.</DialogDescription>
         </DialogHeader>
         <form action={action} className="space-y-4 pt-1">
           {state?.error && (
@@ -54,19 +49,8 @@ function CreateDialog({ users }: { users: User[] }) {
               <AlertTriangle className="h-4 w-4 shrink-0" />{state.error}
             </div>
           )}
-          <div className="space-y-1.5">
-            <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">User</Label>
-            <select
-              name="userId"
-              required
-              className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-            >
-              <option value="">Select a user…</option>
-              {users.map((u) => (
-                <option key={u.id} value={u.id}>{u.email}</option>
-              ))}
-            </select>
-          </div>
+          {/* Hidden: assign to the admin's own account */}
+          <input type="hidden" name="userId" value={adminUserId} />
           <div className="space-y-1.5">
             <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Name</Label>
             <Input name="name" placeholder="Invoice, Certificate…" required className="rounded-xl" />
@@ -75,7 +59,7 @@ function CreateDialog({ users }: { users: User[] }) {
             <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">HTML</Label>
             <textarea
               name="html"
-              rows={12}
+              rows={14}
               className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 font-mono text-xs leading-relaxed placeholder:text-muted-foreground/30 focus:outline-none focus:ring-2 focus:ring-ring resize-none"
               placeholder={"<!DOCTYPE html>\n<html>\n  <body>\n    <h1>{{title}}</h1>\n  </body>\n</html>"}
               required
@@ -100,17 +84,14 @@ function EditDialog({ template }: { template: Template }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <button
-          title="Edit"
-          className="flex h-7 w-7 items-center justify-center rounded-lg border border-border text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-        >
-          <Pencil className="h-3.5 w-3.5" />
-        </button>
+        <Button variant="outline" size="sm" className="gap-1.5 rounded-lg h-8">
+          <Pencil className="h-3.5 w-3.5" /> Edit
+        </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl rounded-2xl">
+      <DialogContent className="max-w-3xl rounded-2xl">
         <DialogHeader>
-          <DialogTitle>Edit template</DialogTitle>
-          <DialogDescription>Owner: {template.user.email}</DialogDescription>
+          <DialogTitle>Edit — {template.name}</DialogTitle>
+          <DialogDescription>Changes affect this template only. Existing user copies are not updated.</DialogDescription>
         </DialogHeader>
         <form action={action} className="space-y-4 pt-1">
           {state?.error && (
@@ -127,7 +108,7 @@ function EditDialog({ template }: { template: Template }) {
             <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">HTML</Label>
             <textarea
               name="html"
-              rows={12}
+              rows={18}
               defaultValue={template.html}
               className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 font-mono text-xs leading-relaxed focus:outline-none focus:ring-2 focus:ring-ring resize-none"
               required
@@ -150,39 +131,37 @@ function DeleteButton({ id }: { id: string }) {
   return (
     <form action={action}>
       <input type="hidden" name="id" value={id} />
-      <button
+      <Button
         type="submit"
+        variant="ghost"
+        size="sm"
         disabled={pending}
-        title="Delete"
-        className="flex h-7 w-7 items-center justify-center rounded-lg border border-border text-muted-foreground hover:text-destructive hover:border-destructive/30 transition-colors"
+        className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
+        title="Delete template"
       >
         <Trash2 className="h-3.5 w-3.5" />
-      </button>
+      </Button>
     </form>
   );
 }
 
 export function AdminTemplatesClient({
   templates,
-  users,
-  page,
-  totalPages,
-  total,
+  adminUserId,
 }: {
   templates: Template[];
-  users: User[];
-  page: number;
-  totalPages: number;
-  total: number;
+  adminUserId: string;
 }) {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Templates</h1>
-          <p className="mt-1 text-sm text-muted-foreground">{total} total templates across all users.</p>
+          <h1 className="text-2xl font-bold tracking-tight">Default Templates</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Manage your canonical templates. These are the templates shown in the admin account and used as the basis for new user onboarding.
+          </p>
         </div>
-        <CreateDialog users={users} />
+        <CreateDialog adminUserId={adminUserId} />
       </div>
 
       {templates.length === 0 ? (
@@ -190,69 +169,39 @@ export function AdminTemplatesClient({
           <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-3xl bg-muted/50">
             <Layers className="h-8 w-8 text-muted-foreground/25" />
           </div>
-          <p className="font-semibold text-sm">No templates found</p>
+          <p className="font-semibold text-sm">No templates yet</p>
+          <p className="mt-1.5 max-w-[280px] text-xs text-muted-foreground">
+            Create default templates here — they live in your admin account and serve as your canonical library.
+          </p>
+          <div className="mt-6">
+            <CreateDialog adminUserId={adminUserId} />
+          </div>
         </div>
       ) : (
-        <div className="rounded-2xl border border-border overflow-hidden overflow-x-auto">
-          <table className="w-full text-sm min-w-[600px]">
-            <thead className="bg-muted/40">
-              <tr>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide">Name</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide">User</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide hidden md:table-cell">Team</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide hidden sm:table-cell">Vars</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide hidden sm:table-cell">Jobs</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide hidden lg:table-cell">Created</th>
-                <th className="px-4 py-3" />
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {templates.map((t) => (
-                <tr key={t.id} className="hover:bg-muted/30 transition-colors">
-                  <td className="px-4 py-3 font-medium max-w-[200px] truncate">{t.name}</td>
-                  <td className="px-4 py-3 text-xs text-muted-foreground max-w-[160px] truncate">{t.user.email}</td>
-                  <td className="px-4 py-3 text-xs text-muted-foreground hidden md:table-cell">
-                    {t.team ? t.team.name : <span className="text-muted-foreground/40">—</span>}
-                  </td>
-                  <td className="px-4 py-3 text-xs hidden sm:table-cell">{extractVarCount(t.html)}</td>
-                  <td className="px-4 py-3 text-xs hidden sm:table-cell">{t._count.jobs}</td>
-                  <td className="px-4 py-3 text-xs text-muted-foreground hidden lg:table-cell">
-                    {new Date(t.createdAt).toLocaleDateString()}
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center justify-end gap-1.5">
-                      <EditDialog template={t} />
-                      <DeleteButton id={t.id} />
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between">
-          <p className="text-xs text-muted-foreground">Page {page} of {totalPages}</p>
-          <div className="flex gap-1.5">
-            {page > 1 && (
-              <Link
-                href={`/admin/templates?page=${page - 1}`}
-                className="flex h-7 w-7 items-center justify-center rounded-lg border border-border text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <ChevronLeft className="h-3.5 w-3.5" />
-              </Link>
-            )}
-            {page < totalPages && (
-              <Link
-                href={`/admin/templates?page=${page + 1}`}
-                className="flex h-7 w-7 items-center justify-center rounded-lg border border-border text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <ChevronRight className="h-3.5 w-3.5" />
-              </Link>
-            )}
+        <div className="rounded-2xl border border-border bg-card overflow-hidden">
+          <div className="px-5 py-3 border-b border-border bg-muted/30">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{templates.length} template{templates.length !== 1 ? "s" : ""}</p>
+          </div>
+          <div className="divide-y divide-border">
+            {templates.map((t) => (
+              <div key={t.id} className="flex items-center gap-4 px-5 py-4">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-violet-500/10 text-violet-600 dark:text-violet-400">
+                  <Layers className="h-4 w-4" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="font-semibold text-sm">{t.name}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {extractVarCount(t.html)} variable{extractVarCount(t.html) !== 1 ? "s" : ""}
+                    {" · "}
+                    Updated {new Date(t.updatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <EditDialog template={t} />
+                  <DeleteButton id={t.id} />
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       )}

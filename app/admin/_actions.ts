@@ -150,3 +150,127 @@ export async function deleteAdminTemplateAction(
   revalidatePath("/app/templates");
   return {};
 }
+
+// ─── Admin: Blog management ───────────────────────────────────────────────────
+
+function slugify(title: string): string {
+  return title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 80);
+}
+
+export async function createBlogPostAction(
+  _: unknown,
+  formData: FormData
+): Promise<{ error?: string }> {
+  await requireAdmin();
+  const title = (formData.get("title") as string)?.trim();
+  const excerpt = (formData.get("excerpt") as string)?.trim();
+  const content = (formData.get("content") as string)?.trim();
+  const tag = (formData.get("tag") as string)?.trim() || "Engineering";
+  const published = formData.get("published") === "true";
+
+  if (!title || title.length < 3) return { error: "Title too short." };
+  if (!excerpt) return { error: "Excerpt is required." };
+  if (!content) return { error: "Content is required." };
+
+  const baseSlug = slugify(title);
+  let slug = baseSlug;
+  let counter = 1;
+  while (await prisma.blogPost.findUnique({ where: { slug } })) {
+    slug = `${baseSlug}-${counter++}`;
+  }
+
+  await prisma.blogPost.create({
+    data: {
+      slug,
+      title,
+      excerpt,
+      content,
+      tag,
+      published,
+      publishedAt: published ? new Date() : null,
+    },
+  });
+
+  revalidatePath("/admin/blog");
+  revalidatePath("/blog");
+  return {};
+}
+
+export async function updateBlogPostAction(
+  _: unknown,
+  formData: FormData
+): Promise<{ error?: string }> {
+  await requireAdmin();
+  const id = formData.get("id") as string;
+  const title = (formData.get("title") as string)?.trim();
+  const excerpt = (formData.get("excerpt") as string)?.trim();
+  const content = (formData.get("content") as string)?.trim();
+  const tag = (formData.get("tag") as string)?.trim() || "Engineering";
+  const published = formData.get("published") === "true";
+
+  if (!id) return { error: "Missing post ID." };
+  if (!title || title.length < 3) return { error: "Title too short." };
+  if (!excerpt) return { error: "Excerpt is required." };
+  if (!content) return { error: "Content is required." };
+
+  const existing = await prisma.blogPost.findUnique({ where: { id }, select: { published: true, publishedAt: true } });
+  if (!existing) return { error: "Post not found." };
+
+  await prisma.blogPost.update({
+    where: { id },
+    data: {
+      title,
+      excerpt,
+      content,
+      tag,
+      published,
+      publishedAt: published && !existing.publishedAt ? new Date() : existing.publishedAt,
+    },
+  });
+
+  revalidatePath("/admin/blog");
+  revalidatePath("/blog");
+  return {};
+}
+
+export async function deleteBlogPostAction(
+  _: unknown,
+  formData: FormData
+): Promise<{ error?: string }> {
+  await requireAdmin();
+  const id = formData.get("id") as string;
+  if (!id) return { error: "Missing post ID." };
+
+  await prisma.blogPost.delete({ where: { id } });
+  revalidatePath("/admin/blog");
+  revalidatePath("/blog");
+  return {};
+}
+
+export async function toggleBlogPublishedAction(
+  _: unknown,
+  formData: FormData
+): Promise<{ error?: string }> {
+  await requireAdmin();
+  const id = formData.get("id") as string;
+  if (!id) return { error: "Missing post ID." };
+
+  const post = await prisma.blogPost.findUnique({ where: { id }, select: { published: true, publishedAt: true } });
+  if (!post) return { error: "Post not found." };
+
+  await prisma.blogPost.update({
+    where: { id },
+    data: {
+      published: !post.published,
+      publishedAt: !post.published && !post.publishedAt ? new Date() : post.publishedAt,
+    },
+  });
+
+  revalidatePath("/admin/blog");
+  revalidatePath("/blog");
+  return {};
+}

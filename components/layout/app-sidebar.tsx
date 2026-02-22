@@ -8,7 +8,7 @@ import {
   CreditCard, BookOpen, Wand2, BriefcaseBusiness,
   Settings, LogOut, MoreVertical, ExternalLink,
   Zap, ShieldCheck, Users, BarChart3, Headphones,
-  Lightbulb, MessageSquare, Users2, Bell,
+  Lightbulb, MessageSquare, Users2, Bell, FileText,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -52,6 +52,7 @@ const adminNavItems = [
   { href: "/admin/features",          label: "Features",       icon: Lightbulb },
   { href: "/admin/notifications",     label: "Notifications",  icon: Bell },
   { href: "/admin/templates",         label: "Templates",      icon: Layers },
+  { href: "/admin/blog",              label: "Blog",           icon: FileText },
 ] as const;
 
 const PLAN_LABELS: Record<string, string> = {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter, useTransition } from "react";
+import { useRouter, useTransition } from "next/navigation";
 import { Search, ChevronLeft, ChevronRight, Shield, Trash2, CheckCircle, Ban, ShieldOff } from "lucide-react";
 import { promoteUserAction, changePlanAction, deleteUserAction, banUserAction, unbanUserAction } from "../_actions";
 import { Button } from "@/components/ui/button";

@@ -4,13 +4,9 @@ import { prisma } from "@/lib/db";
 import { redirect } from "next/navigation";
 import { AdminTemplatesClient } from "./templates-client";
 
-export const metadata: Metadata = { title: "Templates — Admin" };
+export const metadata: Metadata = { title: "Default Templates — Admin" };
 
-export default async function AdminTemplatesPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ page?: string }>;
-}) {
+export default async function AdminTemplatesPage() {
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
 
@@ -20,40 +16,16 @@ export default async function AdminTemplatesPage({
   });
   if (user?.role !== "admin") redirect("/app");
 
-  const { page: rawPage } = await searchParams;
-  const page = Math.max(1, parseInt(rawPage ?? "1", 10) || 1);
-  const pageSize = 25;
-
-  const [templates, total, users] = await Promise.all([
-    prisma.template.findMany({
-      orderBy: { createdAt: "desc" },
-      skip: (page - 1) * pageSize,
-      take: pageSize,
-      include: {
-        user: { select: { email: true } },
-        team: { select: { name: true } },
-        _count: { select: { jobs: true } },
-      },
-    }),
-    prisma.template.count(),
-    prisma.user.findMany({
-      select: { id: true, email: true },
-      orderBy: { email: "asc" },
-      take: 200,
-    }),
-  ]);
-
-  const totalPages = Math.ceil(total / pageSize);
+  // Show only the admin's own templates — these serve as the canonical defaults
+  const templates = await prisma.template.findMany({
+    where: { userId: session.user.id },
+    orderBy: { updatedAt: "desc" },
+    select: { id: true, name: true, html: true, createdAt: true, updatedAt: true },
+  });
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
-      <AdminTemplatesClient
-        templates={templates}
-        users={users}
-        page={page}
-        totalPages={totalPages}
-        total={total}
-      />
+      <AdminTemplatesClient templates={templates} adminUserId={session.user.id} />
     </div>
   );
 }

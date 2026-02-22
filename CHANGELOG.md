@@ -2,6 +2,19 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.20.0] — 2026-02-22
+### Added
+- **Admin: Blog management** — New page at `/admin/blog` for creating, editing, publishing/unpublishing, and deleting blog posts. Posts stored in DB (`BlogPost` model). Slug auto-generated from title with uniqueness handling. Supports tag, excerpt, markdown content, and draft/published status. Blog nav item added to admin sidebar.
+- **Blog listing: DB-driven** — Public blog at `/blog` now fetches published posts from the database instead of hardcoded array. Shows empty state if no posts exist.
+- **Blog post pages: DB-driven** — `/blog/[slug]` now fetches post content from DB and renders it with a built-in markdown renderer (headings, paragraphs, lists, code blocks, inline bold/code). Falls back to `notFound()` for missing/unpublished slugs. Special ChatGPT prompt copy box shown on `how-to-create-templates` post if it exists in DB.
+- **Prisma migration** `20260222000004_blog_posts` — adds `BlogPost` table.
+### Fixed
+- **Admin: Users page** — `useRouter` incorrectly imported from `"react"` instead of `"next/navigation"`, causing runtime crash. Fixed in `users-client.tsx`, `features-client.tsx`, `support-client.tsx`.
+- **Support + Feature Requests pages** — Content was left-aligned instead of centered. Added `mx-auto` to container classes in both client components.
+- **Docs logo** — Docs sidebar was using old `logo.svg dark:invert` pattern. Fixed to `logo-white.svg invert dark:invert-0` matching the app sidebar convention.
+- **Admin templates page** — Now shows only the admin's own templates (default templates), not all users' templates. Repurposed as "Default Templates" manager.
+- **Verify-email: "Skip for now"** — Removed the bypass link that allowed unauthenticated access to `/app` without completing email verification.
+
 ## [0.19.0] — 2026-02-22
 ### Added
 - **Fix: Email verification bypass** — `registerAction` now sets `emailVerified: new Date()` when no email service is configured, so `emailVerified` is never null for those accounts. `app/app/layout.tsx` adds a DB-checked redirect to `/verify-email` if `emailVerified` is null and `RESEND_API_KEY` is set — cannot be bypassed via JWT.

@@ -1,50 +1,38 @@
 import type { Metadata } from "next";
 import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
-import { ImagePlaceholder } from "@/components/media/image-placeholder";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
+import { prisma } from "@/lib/db";
+import { FileText } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Blog",
 };
 
-const posts = [
-  {
-    slug: "how-to-create-templates",
-    title: "How to create PDF templates with AI",
-    date: "Feb 22, 2026",
-    tag: "Guide",
-    excerpt:
-      "Build professional Rendr HTML templates in seconds using ChatGPT — includes a ready-made prompt you can copy and paste.",
-  },
-  {
-    slug: null,
-    title: "Why we built Rendr instead of using headless Chrome",
-    date: "Feb 12, 2026",
-    tag: "Engineering",
-    excerpt:
-      "The short version: we got tired of babysitting Puppeteer in production. Here's what we built instead.",
-  },
-  {
-    slug: null,
-    title: "Rendering 10,000 invoices a day without breaking a sweat",
-    date: "Jan 28, 2026",
-    tag: "Case study",
-    excerpt:
-      "How Acme Internal automated their entire billing workflow using Rendr's async job queue.",
-  },
-  {
-    slug: null,
-    title: "Custom fonts in PDFs: a surprisingly tricky problem",
-    date: "Jan 14, 2026",
-    tag: "Deep dive",
-    excerpt:
-      "Font subsetting, embedding, and why your Arial might not look like Arial in a PDF.",
-  },
-];
+export const dynamic = "force-dynamic";
 
-export default function BlogPage() {
+export default async function BlogPage() {
+  const posts = await prisma.blogPost.findMany({
+    where: { published: true },
+    orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
+    select: {
+      slug: true,
+      title: true,
+      excerpt: true,
+      tag: true,
+      publishedAt: true,
+      createdAt: true,
+    },
+  });
+
+  const formatDate = (date: Date | null) =>
+    (date ?? new Date()).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+
   return (
     <Section size="lg">
       <Container>
@@ -55,49 +43,52 @@ export default function BlogPage() {
           </p>
         </div>
 
-        <div className="space-y-8">
-          {posts.map((post) => (
-            <article
-              key={post.title}
-              className="flex flex-col gap-4 sm:flex-row sm:gap-8 border-b border-border pb-8"
-            >
-              {/* Cover image placeholder */}
-              <ImagePlaceholder
-                label={`Blog cover: "${post.title}"`}
-                width={320}
-                height={200}
-                aspect="8/5"
-                rounded="xl"
-                className="shrink-0 sm:w-64"
-              />
-              <div className="flex flex-col justify-center">
-                <div className="mb-2 flex items-center gap-2">
-                  <Badge variant="outline" className="rounded-full text-xs">{post.tag}</Badge>
-                  <span className="text-xs text-muted-foreground">{post.date}</span>
-                </div>
-                {post.slug ? (
+        {posts.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-24 text-center">
+            <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-3xl bg-muted/50">
+              <FileText className="h-8 w-8 text-muted-foreground/25" />
+            </div>
+            <p className="font-semibold text-sm">No posts yet</p>
+            <p className="mt-1.5 max-w-[260px] text-xs text-muted-foreground">
+              Check back soon — articles are on the way.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-8">
+            {posts.map((post) => (
+              <article
+                key={post.slug}
+                className="flex flex-col gap-4 sm:flex-row sm:gap-8 border-b border-border pb-8"
+              >
+                {/* Tag + date row */}
+                <div className="flex flex-col justify-center sm:flex-1">
+                  <div className="mb-2 flex items-center gap-2">
+                    <Badge variant="outline" className="rounded-full text-xs">
+                      {post.tag}
+                    </Badge>
+                    <span className="text-xs text-muted-foreground">
+                      {formatDate(post.publishedAt ?? post.createdAt)}
+                    </span>
+                  </div>
                   <Link href={`/blog/${post.slug}`}>
                     <h2 className="mb-2 text-lg font-semibold leading-snug hover:text-primary transition-colors">
                       {post.title}
                     </h2>
                   </Link>
-                ) : (
-                  <h2 className="mb-2 text-lg font-semibold leading-snug text-muted-foreground cursor-default">
-                    {post.title}
-                  </h2>
-                )}
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {post.excerpt}
-                </p>
-                {post.slug && (
-                  <Link href={`/blog/${post.slug}`} className="mt-2 text-xs text-primary hover:underline">
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {post.excerpt}
+                  </p>
+                  <Link
+                    href={`/blog/${post.slug}`}
+                    className="mt-2 text-xs text-primary hover:underline"
+                  >
                     Read more →
                   </Link>
-                )}
-              </div>
-            </article>
-          ))}
-        </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
 
         <div className="mt-12 rounded-xl border border-dashed border-border py-10 text-center">
           <p className="text-sm text-muted-foreground">

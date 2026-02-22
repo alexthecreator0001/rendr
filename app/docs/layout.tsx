@@ -13,7 +13,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
       <header className="sticky top-0 z-40 flex h-14 items-center border-b border-border bg-background/90 px-4 backdrop-blur-xl sm:px-6">
         <div className="flex w-full items-center gap-4">
           <Link href="/" className="flex items-center shrink-0">
-            <img src="/logo.svg" alt="Rendr" className="h-4 w-auto dark:invert" />
+            <img src="/logo-white.svg" alt="Rendr" className="h-4 w-auto invert dark:invert-0" />
           </Link>
           <span className="text-border text-lg font-light">/</span>
           <Link href="/docs" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
