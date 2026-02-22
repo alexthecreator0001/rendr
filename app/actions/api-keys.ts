@@ -6,6 +6,7 @@ import { generateApiKey } from "@/lib/api-key";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { sendApiKeyCreatedEmail } from "@/lib/email";
 
 async function getSession() {
   const session = await auth();
@@ -38,6 +39,10 @@ export async function createApiKeyAction(
       keyPrefix,
     },
   });
+
+  // Send notification email in background
+  const user = await prisma.user.findUnique({ where: { id: session.user.id }, select: { email: true } });
+  if (user) sendApiKeyCreatedEmail(user.email, parsed.data.name, keyPrefix).catch(() => {});
 
   revalidatePath("/app/api-keys");
   return { key, id: apiKey.id };

@@ -8,17 +8,30 @@ datasource db {
 }
 
 model User {
-  id           String   @id @default(cuid())
-  email        String   @unique
-  passwordHash String
-  plan         String   @default("starter")
-  createdAt    DateTime @default(now())
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String
+  plan          String    @default("starter")
+  role          String    @default("user")   // "user" | "admin"
+  emailVerified DateTime?
+  createdAt     DateTime  @default(now())
 
-  apiKeys     ApiKey[]
-  jobs        Job[]
-  templates   Template[]
-  webhooks    Webhook[]
-  usageEvents UsageEvent[]
+  apiKeys            ApiKey[]
+  jobs               Job[]
+  templates          Template[]
+  webhooks           Webhook[]
+  usageEvents        UsageEvent[]
+  verificationTokens VerificationToken[]
+}
+
+model VerificationToken {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique @default(cuid())
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model ApiKey {

@@ -4,8 +4,10 @@ import { signIn, signOut } from "@/auth";
 import { prisma } from "@/lib/db";
 import { hashPassword, verifyPassword } from "@/lib/auth-utils";
 import { seedStarterTemplates } from "@/lib/starter-templates";
+import { sendWelcomeEmail, sendVerificationEmail } from "@/lib/email";
 import { z } from "zod";
 import { AuthError } from "next-auth";
+import { auth } from "@/auth";
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -84,6 +86,16 @@ export async function registerAction(
 
   // Seed starter templates in the background — don't block registration
   seedStarterTemplates(newUser.id, prisma).catch(() => {});
+
+  // Send welcome + verification emails in the background
+  const verificationToken = await prisma.verificationToken.create({
+    data: {
+      userId: newUser.id,
+      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24h
+    },
+  });
+  sendWelcomeEmail(newUser.email).catch(() => {});
+  sendVerificationEmail(newUser.email, verificationToken.token).catch(() => {});
 
   // Sign the new user in immediately and redirect to the dashboard.
   // redirectTo is the NextAuth v5 server-action API.

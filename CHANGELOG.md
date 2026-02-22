@@ -2,6 +2,21 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.15.0] — 2026-02-22
+### Added
+- **Admin dashboard** (`/admin`): 3-layer protected (middleware JWT + DB re-check on every page). Overview with 4 stat cards + recent users/jobs tables. Users page with search, pagination, promote/demote admin, change plan, delete user. Jobs page with status filter, pagination, duration display.
+- **Admin sidebar** (`components/layout/admin-sidebar.tsx`): minimal sidebar matching app design with back-to-app link
+- **Role-based access control**: `User.role` field (default `"user"`), included in JWT and session. Middleware blocks `/admin/**` for non-admins, silently redirects to `/app`.
+- **Email verification**: `User.emailVerified` field + `VerificationToken` model. Token created on registration, expires in 24h. `/verify-email?token=` page verifies and marks user.
+- **Resend integration** (`lib/email.ts`): welcome email, verification email, API key created notification, password reset (ready for future use). All silently skip if `RESEND_API_KEY` not set.
+- **Migration** `20260222000001_add_role_email_verified`: SQL adds `role`, `emailVerified` to User and creates `VerificationToken` table
+### Changed
+- `auth.ts`: includes `role` and `emailVerified` in JWT token and session
+- `middleware.ts`: added `/admin/:path*` to matcher with admin role check
+- `app/actions/auth.ts`: on register, creates verification token and sends welcome + verification emails
+- `app/actions/api-keys.ts`: sends API key created notification email after creation
+- `.env.example`: added `RESEND_API_KEY` and `RESEND_FROM` vars
+
 ## [0.14.2] — 2026-02-22
 ### Changed
 - **Hero**: restored v0.13.0 split-column layout (text left, macOS terminal right); removed ASCII canvas and standalone CodeShowcase section
