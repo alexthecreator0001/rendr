@@ -7,18 +7,38 @@ const BASE = "https://rendrpdf.com/api/v1";
 const convertBody = `{
   "input": {
     "type": "html" | "url" | "template",
-    "content": "<h1>Hello {{name}}</h1>",    // for type: html
-    "url": "https://example.com/page",        // for type: url
-    "template_id": "clxyz123...",             // for type: template
-    "variables": { "name": "World" }          // {{var}} substitution
+    "content": "<h1>Hello {{name}}</h1>",     // for type: html or url
+    "template_id": "clxyz123..."              // for type: template
   },
+  "variables": { "name": "World" },           // {{var}} substitution
   "options": {
-    "format": "A4",
+    // Paper size — use format OR custom width/height
+    "format": "A4",                           // A4 | Letter | Legal | Tabloid | A3 | A5 | A6
+    "width": "21cm",                          // overrides format when set
+    "height": "29.7cm",
+
+    "landscape": false,
+    "printBackground": true,
+    "preferCSSPageSize": false,
+    "scale": 1,                               // 0.1–2
+
+    "pageRanges": "1-3, 5",                   // subset of pages
+
     "margin": {
-      "top": "20mm", "bottom": "20mm",
-      "left": "15mm", "right": "15mm"
-    }
+      "top": "20mm", "right": "15mm",
+      "bottom": "20mm", "left": "15mm"
+    },
+
+    "displayHeaderFooter": false,
+    "headerTemplate": "<div style='font-size:10px'><span class='title'></span></div>",
+    "footerTemplate": "<div style='font-size:10px;text-align:center'><span class='pageNumber'></span>/<span class='totalPages'></span></div>",
+
+    "tagged": false,                          // PDF/UA accessibility tagging
+    "outline": false,                         // embed document outline
+
+    "waitFor": 0                              // seconds to wait before capture (0–10)
   },
+  "webhook_url": "https://your-site.com/hooks/rendr",
   "idempotency_key": "invoice-1234"
 }`;
 

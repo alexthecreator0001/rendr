@@ -51,6 +51,15 @@ export async function processJob(jobId: string): Promise<void> {
       throw new Error(`Unknown input type: ${job.inputType}`)
     }
 
+    // Optional render delay (wait for JS/animations to settle)
+    const waitForMs =
+      typeof opts.waitFor === "number"
+        ? Math.min(Math.max(opts.waitFor, 0), 10) * 1000
+        : 0
+    if (waitForMs > 0) {
+      await page.waitForTimeout(waitForMs)
+    }
+
     // Build Playwright PDF options from stored optionsJson
     const hasCustomDimensions = !!(opts.width || opts.height)
     const scale = typeof opts.scale === "number" ? opts.scale : 1
@@ -92,6 +101,14 @@ export async function processJob(jobId: string): Promise<void> {
     await context.close()
     await browser.close()
     browser = undefined
+
+    // Enforce 2 MB export limit for Starter plan
+    const MAX_BYTES = 2 * 1024 * 1024
+    if (pdfBuffer.length > MAX_BYTES) {
+      throw new Error(
+        `PDF size (${(pdfBuffer.length / 1024 / 1024).toFixed(1)} MB) exceeds the 2 MB export limit on the Starter plan. Upgrade to Pro for unlimited file sizes.`
+      )
+    }
 
     const { path: resultPath } = await saveFile(job.id, Buffer.from(pdfBuffer))
     const downloadToken = crypto.randomBytes(32).toString("base64url")

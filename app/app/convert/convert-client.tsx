@@ -108,6 +108,7 @@ export function ConvertClient({ templates }: { templates: ConvertTemplate[] }) {
   );
   const [tagged, setTagged] = useState(false);
   const [outline, setOutline] = useState(false);
+  const [waitFor, setWaitFor] = useState(0);
 
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -168,7 +169,7 @@ export function ConvertClient({ templates }: { templates: ConvertTemplate[] }) {
 
   const tinyInput = cn(
     "h-6 w-[72px] rounded-md border border-border/50 bg-muted/40 px-2",
-    "text-[11px] font-mono text-right tabular-nums",
+    "text-[11px] text-right tabular-nums",
     "focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-50"
   );
 
@@ -193,6 +194,7 @@ export function ConvertClient({ templates }: { templates: ConvertTemplate[] }) {
       <input type="hidden" name="footerTemplate" value={footerTemplate} />
       <input type="hidden" name="tagged" value={String(tagged)} />
       <input type="hidden" name="outline" value={String(outline)} />
+      <input type="hidden" name="waitFor" value={String(waitFor)} />
 
       {/* ── Unified panel ───────────────────────────────────────────── */}
       <div className="overflow-hidden rounded-2xl border border-border/70 bg-card shadow-[0_1px_4px_rgba(0,0,0,0.06)] dark:shadow-[0_1px_4px_rgba(0,0,0,0.3)]">
@@ -253,6 +255,33 @@ export function ConvertClient({ templates }: { templates: ConvertTemplate[] }) {
 
             {/* ── Left: input ──────────────────────────────────────── */}
             <div className="flex flex-1 flex-col min-w-0">
+              {/* PDF preview replaces input area when render is done */}
+              {phase === "done" && jobResult?.downloadUrl ? (
+                <div className="flex-1 flex flex-col p-3">
+                  <div
+                    className="flex flex-col overflow-hidden rounded-xl border border-border/50"
+                    style={{ minHeight: 400 }}
+                  >
+                    <div className="flex items-center justify-between px-3.5 py-2.5 border-b border-border/40 bg-muted/30 shrink-0">
+                      <span className="text-[11px] font-medium text-muted-foreground">PDF Preview</span>
+                      <a
+                        href={jobResult.downloadUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-[10px] text-primary hover:underline underline-offset-2"
+                      >
+                        Open in new tab ↗
+                      </a>
+                    </div>
+                    <iframe
+                      src={jobResult.downloadUrl}
+                      className="flex-1 w-full border-0"
+                      title="PDF Preview"
+                      style={{ minHeight: 360 }}
+                    />
+                  </div>
+                </div>
+              ) : (
               <div className="flex-1 p-5">
 
                 {/* URL */}
@@ -376,6 +405,7 @@ export function ConvertClient({ templates }: { templates: ConvertTemplate[] }) {
                   )}
                 </TabsContent>
               </div>
+              )}
 
               {/* Generate button row */}
               <div className="flex items-center justify-between border-t border-border/60 px-5 py-3.5 bg-muted/10">
@@ -489,6 +519,24 @@ export function ConvertClient({ templates }: { templates: ConvertTemplate[] }) {
                     className={tinyInput}
                   />
                 </InspectorRow>
+                <InspectorRow label="Render delay">
+                  <div className="flex items-center gap-1">
+                    <input
+                      value={waitFor}
+                      onChange={(e) => {
+                        const n = parseInt(e.target.value, 10);
+                        setWaitFor(isNaN(n) ? 0 : Math.min(10, Math.max(0, n)));
+                      }}
+                      type="number"
+                      min={0}
+                      max={10}
+                      step={1}
+                      disabled={isActive}
+                      className={tinyInput}
+                    />
+                    <span className="text-[10px] text-muted-foreground/50">s</span>
+                  </div>
+                </InspectorRow>
               </div>
 
               {/* Print Production */}
@@ -543,7 +591,7 @@ export function ConvertClient({ templates }: { templates: ConvertTemplate[] }) {
                         value={v}
                         onChange={(e) => s(e.target.value)}
                         disabled={isActive}
-                        className="h-6 rounded-md border border-border/50 bg-muted/40 px-1.5 text-[10px] font-mono text-center focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-50 w-full"
+                        className="h-6 rounded-md border border-border/50 bg-muted/40 px-1.5 text-[10px] text-center focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-50 w-full"
                       />
                     </>
                   ))}

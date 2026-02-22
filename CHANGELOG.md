@@ -2,6 +2,18 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.10.0] — 2026-02-22
+### Added
+- **PDF preview in Studio**: when a render completes, the left panel shows an inline iframe preview of the PDF before download; "Open in new tab ↗" link also available
+- **Render delay option**: new "Render delay" inspector row (0–10 s) lets pages fully load before capture; passed through `optionsJson.waitFor` → `page.waitForTimeout()` in worker
+- **2 MB export limit**: `worker/processor.ts` now checks PDF size after generation and fails the job with a clear error if it exceeds 2 MB (Starter plan)
+- **Explicit API options schema**: `app/api/v1/convert/route.ts` now validates all PDF options (format, landscape, scale, pageRanges, margin, headers/footers, tagged, outline, waitFor) instead of a passthrough `z.record(z.unknown())`
+### Changed
+- **Studio font fix**: removed `font-mono` from inspector number/dimension inputs (scale, page ranges, margin fields, render delay); mono font now only used for actual code areas (URL input, HTML textarea, header/footer HTML templates)
+- **Docs API reference**: `convertBody` example updated to document all supported options fields
+### Fixed
+- Studio inspector inputs no longer mix two font families; all controls use system font, code areas use JetBrains Mono
+
 ## [0.9.0] — 2026-02-21
 ### Added
 - **Logo update**: sidebar now uses `logo-white.svg` with `invert dark:invert-0` — black in light mode, white in dark mode

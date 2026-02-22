@@ -61,6 +61,9 @@ export async function convertUrlAction(
   const tagged = parseBoolean(formData.get("tagged"), false);
   const outline = parseBoolean(formData.get("outline"), false);
 
+  // ── Render delay ────────────────────────────────────────
+  const waitFor = Math.min(Math.max(parseNumber(formData.get("waitFor"), 0), 0), 10);
+
   const pdfOptions = {
     // Paper size
     ...(customWidth || customHeight
@@ -76,6 +79,7 @@ export async function convertUrlAction(
     margin,
     tagged,
     outline,
+    waitFor,
   };
 
   let jobData: Parameters<typeof prisma.job.create>[0]["data"];
