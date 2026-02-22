@@ -167,8 +167,8 @@ export default async function AppOverviewPage() {
             </Link>
           </div>
         ) : (
-          <div className="overflow-hidden rounded-2xl border border-border">
-            <table className="w-full text-sm">
+          <div className="overflow-hidden overflow-x-auto rounded-2xl border border-border">
+            <table className="w-full text-sm min-w-[480px]">
               <thead className="bg-muted/40">
                 <tr>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide">Job ID</th>

@@ -42,3 +42,10 @@ next-env.d.ts
 
 # claude
 .claude/
+
+# playwright mcp artifacts
+.playwright-mcp/
+
+# debug screenshots
+studio-current.png
+studio-wide.png

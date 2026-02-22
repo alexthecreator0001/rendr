@@ -49,7 +49,7 @@ export default async function JobsPage({
   });
 
   return (
-    <div className="p-6 lg:p-8 space-y-6">
+    <div className="space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Jobs</h1>
@@ -79,8 +79,8 @@ export default async function JobsPage({
           </p>
         </div>
       ) : (
-        <div className="rounded-xl border border-border overflow-hidden">
-          <table className="w-full text-sm">
+        <div className="rounded-xl border border-border overflow-hidden overflow-x-auto">
+          <table className="w-full text-sm min-w-[500px]">
             <thead className="bg-muted/40">
               <tr>
                 <th className="px-4 py-3 text-left font-medium text-muted-foreground">Job ID</th>

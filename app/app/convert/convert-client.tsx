@@ -11,7 +11,8 @@ import {
 } from "@/components/ui/select";
 import {
   Loader2, Download, CheckCircle2, XCircle,
-  AlertTriangle, FileCode, Braces, Plus, ChevronDown, Zap,
+  AlertTriangle, FileCode, Braces, Plus, ChevronDown,
+  Zap, Globe, PanelRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -72,6 +73,7 @@ export function ConvertClient({ templates }: { templates: ConvertTemplate[] }) {
   const [elapsed, setElapsed] = useState(0);
   const [slowWarning, setSlowWarning] = useState(false);
   const [showHFHtml, setShowHFHtml] = useState(false);
+  const [inspectorOpen, setInspectorOpen] = useState(true);
 
   // Template state
   const [selectedTemplateId, setSelectedTemplateId] = useState("");
@@ -201,118 +203,137 @@ export function ConvertClient({ templates }: { templates: ConvertTemplate[] }) {
       <input type="hidden" name="waitFor" value={String(waitFor)} />
 
       {/* ── Studio shell ─────────────────────────────────────────────────────── */}
-      <div className="flex flex-col flex-1 overflow-hidden bg-background border-r border-b border-border">
+      <div className="flex flex-1 overflow-hidden">
 
-        {/* ── Toolbar ──────────────────────────────────────────────────────── */}
-        <div className="flex h-10 items-stretch border-b border-border shrink-0 bg-background">
+        {/* ── Left panel (toolbar + canvas) ─────────────────────────────────── */}
+        <div className="flex flex-col flex-1 min-w-0 overflow-hidden bg-background">
 
-          {/* Mode tabs */}
-          <div className="flex items-stretch border-r border-border">
-            {MODES.map(({ id, label }) => (
+          {/* ── Toolbar ──────────────────────────────────────────────────────── */}
+          <div className="flex h-10 items-stretch border-b border-border shrink-0 bg-background">
+
+            {/* Mode tabs */}
+            <div className="flex items-stretch border-r border-border">
+              {MODES.map(({ id, label }) => (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => { setMode(id); reset(); }}
+                  className={cn(
+                    "relative flex items-center gap-1.5 px-4 text-[12px] font-medium transition-colors select-none",
+                    mode === id
+                      ? "text-foreground"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  {label}
+                  {id === "template" && templates.length > 0 && (
+                    <span className="text-[10px] text-muted-foreground/50 font-normal tabular-nums">
+                      {templates.length}
+                    </span>
+                  )}
+                  {mode === id && (
+                    <span className="absolute bottom-0 inset-x-0 h-[2px] bg-foreground rounded-t-sm" />
+                  )}
+                </button>
+              ))}
+            </div>
+
+            {/* Status — center */}
+            <div className="flex-1 flex items-center justify-center px-4 min-w-0">
+              {isActive && (
+                <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                  <Loader2 className="h-3 w-3 animate-spin shrink-0" />
+                  {phase === "submitting" ? "Queuing…" : `Rendering · ${elapsed}s`}
+                </span>
+              )}
+              {phase === "done" && (
+                <span className="flex items-center gap-1.5 text-[11px] text-emerald-600 dark:text-emerald-400">
+                  <CheckCircle2 className="h-3 w-3 shrink-0" />
+                  Rendered in {elapsed}s
+                </span>
+              )}
+              {phase === "failed" && (
+                <span className="flex items-center gap-1.5 text-[11px] text-destructive min-w-0">
+                  <XCircle className="h-3 w-3 shrink-0" />
+                  <span className="truncate">{errorText}</span>
+                </span>
+              )}
+            </div>
+
+            {/* Right actions */}
+            <div className="flex items-center gap-2 px-3 border-l border-border shrink-0">
+              {phase !== "idle" && !isActive && (
+                <button
+                  type="button"
+                  onClick={reset}
+                  className="text-[11px] text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  New render
+                </button>
+              )}
+              {phase === "done" && jobResult?.downloadUrl ? (
+                <Button
+                  asChild
+                  size="sm"
+                  variant="secondary"
+                  className="h-7 gap-1.5 rounded-md text-[12px] px-3"
+                >
+                  <a href={jobResult.downloadUrl} download target="_blank" rel="noreferrer">
+                    <Download className="h-3 w-3" />
+                    Download
+                  </a>
+                </Button>
+              ) : (
+                <Button
+                  type="submit"
+                  size="sm"
+                  disabled={isActive || (mode === "template" && !selectedTemplateId)}
+                  className="h-7 gap-1.5 rounded-md text-[12px] px-3"
+                >
+                  {isActive
+                    ? <Loader2 className="h-3 w-3 animate-spin" />
+                    : <Zap className="h-3 w-3" />
+                  }
+                  Generate
+                </Button>
+              )}
+
+              {/* Inspector toggle */}
               <button
-                key={id}
                 type="button"
-                onClick={() => { setMode(id); reset(); }}
+                onClick={() => setInspectorOpen((p) => !p)}
+                title={inspectorOpen ? "Hide inspector" : "Show inspector"}
                 className={cn(
-                  "relative flex items-center gap-1.5 px-4 text-[12px] font-medium transition-colors select-none",
-                  mode === id
-                    ? "text-foreground"
-                    : "text-muted-foreground hover:text-foreground"
+                  "flex h-6 w-6 items-center justify-center rounded transition-colors",
+                  inspectorOpen
+                    ? "bg-accent text-foreground"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent/60"
                 )}
               >
-                {label}
-                {id === "template" && templates.length > 0 && (
-                  <span className="text-[10px] text-muted-foreground/50 font-normal tabular-nums">
-                    {templates.length}
-                  </span>
-                )}
-                {mode === id && (
-                  <span className="absolute bottom-0 inset-x-0 h-[2px] bg-foreground rounded-t-sm" />
-                )}
+                <PanelRight className="h-3.5 w-3.5" />
               </button>
-            ))}
+            </div>
           </div>
 
-          {/* Status — center */}
-          <div className="flex-1 flex items-center justify-center px-4 min-w-0">
-            {isActive && (
-              <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                <Loader2 className="h-3 w-3 animate-spin shrink-0" />
-                {phase === "submitting" ? "Queuing…" : `Rendering · ${elapsed}s`}
-              </span>
-            )}
-            {phase === "done" && (
-              <span className="flex items-center gap-1.5 text-[11px] text-emerald-600 dark:text-emerald-400">
-                <CheckCircle2 className="h-3 w-3 shrink-0" />
-                Rendered in {elapsed}s
-              </span>
-            )}
-            {phase === "failed" && (
-              <span className="flex items-center gap-1.5 text-[11px] text-destructive min-w-0">
-                <XCircle className="h-3 w-3 shrink-0" />
-                <span className="truncate">{errorText}</span>
-              </span>
-            )}
-          </div>
+          {/* Slow warning */}
+          {slowWarning && (
+            <div className="flex items-center gap-2 px-4 py-1.5 bg-amber-50 dark:bg-amber-950/20 border-b border-amber-200 dark:border-amber-900/50 text-[11px] text-amber-700 dark:text-amber-400 shrink-0">
+              <AlertTriangle className="h-3 w-3 shrink-0" />
+              Worker may be offline — check <code className="font-mono">pm2 list</code>
+            </div>
+          )}
 
-          {/* Right actions */}
-          <div className="flex items-center gap-2 px-3 border-l border-border shrink-0">
-            {phase !== "idle" && !isActive && (
-              <button
-                type="button"
-                onClick={reset}
-                className="text-[11px] text-muted-foreground hover:text-foreground transition-colors"
-              >
-                New render
-              </button>
-            )}
-            {phase === "done" && jobResult?.downloadUrl ? (
-              <Button
-                asChild
-                size="sm"
-                variant="secondary"
-                className="h-7 gap-1.5 rounded-md text-[12px] px-3"
-              >
-                <a href={jobResult.downloadUrl} download target="_blank" rel="noreferrer">
-                  <Download className="h-3 w-3" />
-                  Download
-                </a>
-              </Button>
-            ) : (
-              <Button
-                type="submit"
-                size="sm"
-                disabled={isActive || (mode === "template" && !selectedTemplateId)}
-                className="h-7 gap-1.5 rounded-md text-[12px] px-3"
-              >
-                {isActive
-                  ? <Loader2 className="h-3 w-3 animate-spin" />
-                  : <Zap className="h-3 w-3" />
-                }
-                Generate
-              </Button>
-            )}
-          </div>
-        </div>
-
-        {/* Slow warning */}
-        {slowWarning && (
-          <div className="flex items-center gap-2 px-4 py-1.5 bg-amber-50 dark:bg-amber-950/20 border-b border-amber-200 dark:border-amber-900/50 text-[11px] text-amber-700 dark:text-amber-400 shrink-0">
-            <AlertTriangle className="h-3 w-3 shrink-0" />
-            Worker may be offline — check <code className="font-mono">pm2 list</code>
-          </div>
-        )}
-
-        {/* ── Body ─────────────────────────────────────────────────────────── */}
-        <div className="flex flex-1 min-h-0">
-
-          {/* ── Canvas ─────────────────────────────────────────────────────── */}
-          <div className="flex flex-1 flex-col min-w-0 bg-[#f5f5f5] dark:bg-[#141414]">
+          {/* ── Canvas ───────────────────────────────────────────────────────── */}
+          <div className={cn(
+            "flex flex-1 min-h-0 overflow-hidden",
+            // HTML mode: dark editor bg
+            mode === "html" && phase !== "done" ? "bg-[#1a1a1a]" : "bg-[#f0f0f0] dark:bg-[#161616]"
+          )}>
 
             {phase === "done" && jobResult?.downloadUrl ? (
-              /* PDF Preview */
-              <div className="flex flex-col h-full">
-                <div className="flex items-center justify-between px-4 py-2 border-b border-border/60 bg-background/60 backdrop-blur-sm shrink-0">
+              /* ── PDF Preview ── */
+              <div className="flex flex-col flex-1 min-h-0">
+                <div className="flex items-center justify-between px-4 py-2 border-b border-border/60 bg-background/80 backdrop-blur-sm shrink-0">
                   <span className="text-[11px] font-medium text-muted-foreground tracking-wide">
                     PDF Preview
                   </span>
@@ -332,149 +353,175 @@ export function ConvertClient({ templates }: { templates: ConvertTemplate[] }) {
                 />
               </div>
             ) : (
-              /* Source input */
-              <div className="flex-1 overflow-auto p-5 flex flex-col">
-
-                {/* URL */}
+              <>
+                {/* ── URL mode: centered ── */}
                 {mode === "url" && (
-                  <div className="flex flex-col gap-2.5 max-w-2xl">
-                    <label className="text-[10px] font-semibold uppercase tracking-[0.1em] text-muted-foreground/50">
-                      Page URL
-                    </label>
-                    <input
-                      name="input"
-                      type="url"
-                      placeholder="https://example.com/invoice/123"
-                      disabled={isActive}
-                      className="w-full rounded-lg border border-border bg-background px-3.5 py-2.5 text-[13px] font-mono placeholder:text-muted-foreground/25 focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-50"
-                    />
-                    <p className="text-[12px] text-muted-foreground/50">
-                      Rendr opens this URL in headless Chromium and renders it to PDF.
-                    </p>
+                  <div className="flex flex-1 items-center justify-center p-8">
+                    <div className="w-full max-w-xl space-y-5">
+                      <div className="text-center space-y-2">
+                        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-border bg-background shadow-sm">
+                          <Globe className="h-5 w-5 text-muted-foreground" />
+                        </div>
+                        <div>
+                          <h3 className="text-sm font-semibold text-foreground">Convert URL to PDF</h3>
+                          <p className="mt-0.5 text-xs text-muted-foreground">
+                            Rendr loads this URL in headless Chromium and renders it to PDF
+                          </p>
+                        </div>
+                      </div>
+                      <div className="relative">
+                        <input
+                          name="input"
+                          type="url"
+                          placeholder="https://example.com/invoice/123"
+                          disabled={isActive}
+                          autoFocus
+                          className={cn(
+                            "w-full h-12 rounded-xl border border-border bg-background",
+                            "px-4 text-sm placeholder:text-muted-foreground/40",
+                            "shadow-sm focus:outline-none focus:ring-2 focus:ring-ring",
+                            "disabled:opacity-50 transition-shadow"
+                          )}
+                        />
+                      </div>
+                      <p className="text-center text-[11px] text-muted-foreground/50">
+                        Configure format, margins, and other options in the inspector →
+                      </p>
+                    </div>
                   </div>
                 )}
 
-                {/* HTML */}
+                {/* ── HTML mode: full code editor ── */}
                 {mode === "html" && (
-                  <div className="flex flex-col gap-2.5 flex-1 min-h-0">
-                    <label className="text-[10px] font-semibold uppercase tracking-[0.1em] text-muted-foreground/50">
-                      HTML Source
-                    </label>
+                  <div className="flex flex-col flex-1 min-h-0">
+                    {/* Editor title bar */}
+                    <div className="flex items-center gap-3 px-4 h-9 border-b border-white/5 bg-[#1a1a1a] shrink-0">
+                      <div className="flex gap-1.5">
+                        <span className="block h-3 w-3 rounded-full bg-red-500/60" />
+                        <span className="block h-3 w-3 rounded-full bg-amber-500/60" />
+                        <span className="block h-3 w-3 rounded-full bg-green-500/60" />
+                      </div>
+                      <span className="font-mono text-[11px] text-white/25">document.html</span>
+                    </div>
                     <textarea
                       name="input"
-                      placeholder={"<!DOCTYPE html>\n<html>\n  <body>\n    <h1>Hello, PDF</h1>\n  </body>\n</html>"}
+                      placeholder={"<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  <style>\n    body { font-family: sans-serif; padding: 40px; }\n    h1 { color: #111; }\n  </style>\n</head>\n<body>\n  <h1>Hello, PDF</h1>\n  <p>This is your document.</p>\n</body>\n</html>"}
                       disabled={isActive}
-                      className="flex-1 w-full min-h-[320px] rounded-lg border border-border bg-background px-3.5 py-3 font-mono text-xs leading-relaxed placeholder:text-muted-foreground/25 focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-50 resize-none"
+                      className="flex-1 w-full bg-[#1a1a1a] text-[#d4d4d4] font-mono text-[12.5px] leading-[1.65] px-6 py-5 focus:outline-none disabled:opacity-50 resize-none placeholder:text-[#444]"
                     />
                   </div>
                 )}
 
-                {/* Template */}
+                {/* ── Template mode ── */}
                 {mode === "template" && (
-                  <div className="flex flex-col gap-3 max-w-xl">
-                    {templates.length === 0 ? (
-                      <div className="flex flex-col items-center justify-center py-24 text-center">
-                        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-muted/60">
-                          <FileCode className="h-6 w-6 text-muted-foreground/30" />
-                        </div>
-                        <p className="text-[13px] font-semibold">No templates yet</p>
-                        <p className="mt-1 text-[12px] text-muted-foreground/70">
-                          Create one to get started.
-                        </p>
-                        <Button asChild size="sm" variant="outline" className="mt-4 gap-1.5 rounded-lg">
-                          <Link href="/app/templates">
-                            <Plus className="h-3.5 w-3.5" /> New template
-                          </Link>
-                        </Button>
-                      </div>
-                    ) : (
-                      <>
-                        <label className="text-[10px] font-semibold uppercase tracking-[0.1em] text-muted-foreground/50">
-                          Select template
-                        </label>
-                        <div className="space-y-1.5">
-                          {templates.map((t) => {
-                            const vars = extractVariables(t.html);
-                            const isSel = selectedTemplateId === t.id;
-                            return (
-                              <button
-                                key={t.id}
-                                type="button"
-                                disabled={isActive}
-                                onClick={() => setSelectedTemplateId(isSel ? "" : t.id)}
-                                className={cn(
-                                  "w-full rounded-lg border px-3.5 py-2.5 text-left transition-all",
-                                  isSel
-                                    ? "border-primary/40 bg-primary/5"
-                                    : "border-border/70 bg-background hover:border-border",
-                                  isActive && "pointer-events-none opacity-50"
-                                )}
-                              >
-                                <div className="flex items-center justify-between gap-2">
-                                  <div className="flex items-center gap-2 min-w-0">
-                                    <FileCode className={cn("h-3.5 w-3.5 shrink-0", isSel ? "text-primary" : "text-muted-foreground")} />
-                                    <span className="text-[13px] font-medium truncate">{t.name}</span>
-                                  </div>
-                                  {vars.length > 0 && (
-                                    <span className="text-[11px] text-muted-foreground/60 shrink-0">
-                                      {vars.length} var{vars.length !== 1 ? "s" : ""}
-                                    </span>
-                                  )}
-                                </div>
-                                {isSel && vars.length > 0 && (
-                                  <div className="mt-1.5 flex flex-wrap gap-1">
-                                    {vars.map((v) => (
-                                      <span key={v} className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 font-mono text-[10px] text-primary">
-                                        <Braces className="h-2.5 w-2.5" />{v}
-                                      </span>
-                                    ))}
-                                  </div>
-                                )}
-                              </button>
-                            );
-                          })}
-                        </div>
-
-                        {selectedTemplate && (
-                          <div className="rounded-lg border border-border bg-background px-3.5 py-3">
-                            <input type="hidden" name="templateId" value={selectedTemplateId} />
-                            <input type="hidden" name="variableKeys" value={templateVars.join(",")} />
-                            {templateVars.length > 0 ? (
-                              <div className="space-y-2.5">
-                                <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-muted-foreground/50">
-                                  Variables
-                                </p>
-                                {templateVars.map((v) => (
-                                  <div key={v} className="flex items-center gap-3">
-                                    <label className="w-24 shrink-0 font-mono text-[11px] text-muted-foreground/70 truncate">
-                                      {v}
-                                    </label>
-                                    <Input
-                                      name={`var_${v}`}
-                                      placeholder={`Value for ${v}`}
-                                      disabled={isActive}
-                                      className="h-7 text-[12px]"
-                                    />
-                                  </div>
-                                ))}
-                              </div>
-                            ) : (
-                              <p className="text-[12px] text-muted-foreground/60">
-                                Static template — renders as-is.
-                              </p>
-                            )}
+                  <div className="flex flex-1 overflow-y-auto p-6">
+                    <div className="w-full max-w-xl mx-auto">
+                      {templates.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center h-full min-h-[300px] text-center">
+                          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-background/80 border border-border">
+                            <FileCode className="h-5 w-5 text-muted-foreground/40" />
                           </div>
-                        )}
-                      </>
-                    )}
+                          <p className="text-sm font-semibold text-foreground">No templates yet</p>
+                          <p className="mt-1 text-xs text-muted-foreground/70">
+                            Create one on the Templates page.
+                          </p>
+                          <Button asChild size="sm" variant="outline" className="mt-4 gap-1.5 rounded-lg bg-background">
+                            <Link href="/app/templates">
+                              <Plus className="h-3.5 w-3.5" /> New template
+                            </Link>
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-muted-foreground/50">
+                            Select template
+                          </p>
+                          <div className="space-y-1.5">
+                            {templates.map((t) => {
+                              const vars = extractVariables(t.html);
+                              const isSel = selectedTemplateId === t.id;
+                              return (
+                                <button
+                                  key={t.id}
+                                  type="button"
+                                  disabled={isActive}
+                                  onClick={() => setSelectedTemplateId(isSel ? "" : t.id)}
+                                  className={cn(
+                                    "w-full rounded-xl border px-4 py-3 text-left transition-all bg-background",
+                                    isSel
+                                      ? "border-primary/40 bg-primary/5"
+                                      : "border-border/70 hover:border-border",
+                                    isActive && "pointer-events-none opacity-50"
+                                  )}
+                                >
+                                  <div className="flex items-center justify-between gap-2">
+                                    <div className="flex items-center gap-2 min-w-0">
+                                      <FileCode className={cn("h-3.5 w-3.5 shrink-0", isSel ? "text-primary" : "text-muted-foreground")} />
+                                      <span className="text-[13px] font-medium truncate">{t.name}</span>
+                                    </div>
+                                    {vars.length > 0 && (
+                                      <span className="text-[11px] text-muted-foreground/60 shrink-0">
+                                        {vars.length} var{vars.length !== 1 ? "s" : ""}
+                                      </span>
+                                    )}
+                                  </div>
+                                  {isSel && vars.length > 0 && (
+                                    <div className="mt-2 flex flex-wrap gap-1">
+                                      {vars.map((v) => (
+                                        <span key={v} className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 font-mono text-[10px] text-primary">
+                                          <Braces className="h-2.5 w-2.5" />{v}
+                                        </span>
+                                      ))}
+                                    </div>
+                                  )}
+                                </button>
+                              );
+                            })}
+                          </div>
+
+                          {selectedTemplate && (
+                            <div className="rounded-xl border border-border bg-background px-4 py-3.5">
+                              <input type="hidden" name="templateId" value={selectedTemplateId} />
+                              <input type="hidden" name="variableKeys" value={templateVars.join(",")} />
+                              {templateVars.length > 0 ? (
+                                <div className="space-y-3">
+                                  <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-muted-foreground/50">
+                                    Variables
+                                  </p>
+                                  {templateVars.map((v) => (
+                                    <div key={v} className="flex items-center gap-3">
+                                      <label className="w-24 shrink-0 font-mono text-[11px] text-muted-foreground/70 truncate">
+                                        {v}
+                                      </label>
+                                      <Input
+                                        name={`var_${v}`}
+                                        placeholder={`Value for ${v}`}
+                                        disabled={isActive}
+                                        className="h-7 text-[12px]"
+                                      />
+                                    </div>
+                                  ))}
+                                </div>
+                              ) : (
+                                <p className="text-[12px] text-muted-foreground/60">
+                                  Static template — renders as-is.
+                                </p>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
-              </div>
+              </>
             )}
           </div>
+        </div>
 
-          {/* ── Inspector ──────────────────────────────────────────────────── */}
-          <div className="hidden lg:flex w-[240px] shrink-0 flex-col overflow-y-auto bg-background border-l border-border">
+        {/* ── Inspector ──────────────────────────────────────────────────────── */}
+        {inspectorOpen && (
+          <div className="flex w-[256px] shrink-0 flex-col overflow-y-auto bg-background border-l border-border">
 
             {/* Layout */}
             <div>
@@ -732,9 +779,9 @@ export function ConvertClient({ templates }: { templates: ConvertTemplate[] }) {
               </p>
             </div>
 
-          </div>{/* /inspector */}
-        </div>{/* /body */}
-      </div>{/* /studio shell */}
+          </div>
+        )}
+      </div>
     </form>
   );
 }

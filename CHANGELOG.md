@@ -2,6 +2,21 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.12.0] — 2026-02-22
+### Added
+- **Plan system**: `plan` field added to `User` model (`@default("starter")`); sidebar now shows the real plan badge (Starter / Growth / Pro) instead of hardcoded "Starter"; migration + seed included
+- **test@test.sk upgraded to Pro**: seed upserts the account with `plan = "pro"` and password `test1234`
+- **Mobile sidebar drawer**: sidebar is a fixed overlay drawer on mobile (< md), with back-drop dismiss; hamburger button in topbar (visible on mobile only)
+- **SidebarProvider**: React context wrapping the app layout, shared between `AppSidebar` and `AppTopbar`
+### Changed
+- **Studio redesign — URL mode**: input now centered vertically + horizontally in the canvas (no more tiny input floating in a dark void); large `h-12` input with Globe icon and descriptive copy
+- **Studio redesign — HTML mode**: full-height code editor look: dark `bg-[#1a1a1a]` background always, `text-[#d4d4d4]` text, macOS-style title bar with traffic-light dots
+- **Studio redesign — Template mode**: canvas uses the neutral light/dark background, content centered in a scrollable column
+- **Inspector**: now state-controlled (`inspectorOpen` toggle), collapsible via a `PanelRight` button in the toolbar — visible by default; collapses on any screen width
+- **Mobile-friendly layout**: layout padding responsive (`px-4 py-6 sm:px-6 sm:py-8`); Studio negative-margin escape updated to match
+- **Mobile-friendly tables**: `overflow-x-auto` + `min-w-[...]` added to Jobs, API Keys, and Overview recent-jobs tables
+- **Removed double padding**: Jobs, API Keys, Webhooks, and Usage pages no longer add their own `p-6 lg:p-8` on top of the layout padding
+
 ## [0.11.0] — 2026-02-22
 ### Added
 - **Studio full-height layout**: Studio now fills the entire viewport (minus topbar) — no more card inside a padded page; matches Figma/Linear tool aesthetic

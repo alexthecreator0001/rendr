@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import {
   Bell, Search, FileOutput, LayoutDashboard, Key,
   Layers, Webhook, BarChart2, CreditCard, BriefcaseBusiness,
-  BookOpen, Settings, LogOut,
+  BookOpen, Settings, LogOut, Menu,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { signOutAction } from "@/app/actions/auth";
+import { useSidebar } from "@/components/providers/sidebar-provider";
 import Link from "next/link";
 
 const SEARCH_ITEMS = [
@@ -38,6 +39,7 @@ export function AppTopbar({ user }: AppTopbarProps) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [pending, startTransition] = useTransition();
+  const { toggle } = useSidebar();
   const initials = user.email.slice(0, 2).toUpperCase();
 
   const filtered = query.trim()
@@ -48,8 +50,17 @@ export function AppTopbar({ user }: AppTopbarProps) {
 
   return (
     <>
-      <header className="flex h-14 items-center justify-between border-b border-border bg-background px-6">
-        <div />
+      <header className="flex h-14 items-center justify-between border-b border-border bg-background px-4 sm:px-6 shrink-0">
+        {/* Mobile hamburger */}
+        <button
+          onClick={toggle}
+          className="flex items-center justify-center h-8 w-8 rounded-lg hover:bg-accent transition-colors md:hidden"
+          aria-label="Toggle sidebar"
+        >
+          <Menu className="h-4 w-4" />
+        </button>
+
+        <div className="hidden md:block" />
 
         <div className="flex items-center gap-1.5">
           {/* Search trigger */}
@@ -84,7 +95,6 @@ export function AppTopbar({ user }: AppTopbarProps) {
             <DropdownMenuContent align="end" className="w-52">
               <DropdownMenuLabel>
                 <p className="truncate text-sm font-medium">{user.email}</p>
-                <p className="text-xs font-normal text-muted-foreground">Starter plan</p>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>

@@ -48,7 +48,7 @@ export default async function UsagePage() {
   const maxDay = Math.max(...daily.map((d) => d.count), 1);
 
   return (
-    <div className="p-6 lg:p-8 space-y-8">
+    <div className="space-y-8">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Usage</h1>
         <p className="text-sm text-muted-foreground mt-1">API usage across all your keys.</p>

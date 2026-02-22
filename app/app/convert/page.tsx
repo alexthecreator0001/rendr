@@ -15,9 +15,9 @@ export default async function ConvertPage() {
     select: { id: true, name: true, html: true },
   });
 
-  // Break out of the layout's px-6 py-8 padding so Studio fills the viewport
+  // Break out of the layout's responsive padding so Studio fills the viewport
   return (
-    <div className="-mx-6 -my-8" style={{ height: "calc(100dvh - 56px)" }}>
+    <div className="-mx-4 -my-6 sm:-mx-6 sm:-my-8" style={{ height: "calc(100dvh - 56px)" }}>
       <ConvertClient templates={templates} />
     </div>
   );

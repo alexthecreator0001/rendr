@@ -49,6 +49,22 @@ async function main() {
   await seedStarterTemplates(user.id, prisma, { force: true })
   console.log("Starter templates seeded / refreshed.")
 
+  // Ensure test account exists with pro plan
+  const testHash = await bcrypt.hash("test1234", 12)
+  const testUser = await prisma.user.upsert({
+    where: { email: "test@test.sk" },
+    update: { plan: "pro" },
+    create: {
+      email: "test@test.sk",
+      passwordHash: testHash,
+      plan: "pro",
+    },
+  })
+  console.log(`Test user: ${testUser.email} (plan: ${testUser.plan})`)
+
+  // Seed starter templates for test user
+  await seedStarterTemplates(testUser.id, prisma, { force: true })
+
   console.log("Seed complete.")
 }
 
