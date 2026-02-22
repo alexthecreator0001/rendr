@@ -125,11 +125,7 @@ export function VerifyEmailClient({ email }: { email: string }) {
       <p className="mt-6 text-center text-[12px] text-zinc-600">
         Wrong account?{" "}
         <a href="/login" className="text-zinc-400 hover:text-zinc-200 transition-colors">
-          Sign in
-        </a>
-        {" · "}
-        <a href="/app" className="text-zinc-400 hover:text-zinc-200 transition-colors">
-          Skip for now
+          Sign in with a different account
         </a>
       </p>
     </div>
