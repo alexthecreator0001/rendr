@@ -7,7 +7,8 @@ import {
   LayoutDashboard, Key, Layers, Webhook, BarChart2,
   CreditCard, BookOpen, Wand2, BriefcaseBusiness,
   Settings, LogOut, MoreVertical, ExternalLink,
-  Zap, ShieldCheck,
+  Zap, ShieldCheck, Users, BarChart3, Headphones,
+  Lightbulb, MessageSquare,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -33,8 +34,21 @@ const navGroups = [
     { href: "/app/webhooks",  label: "Webhooks",   icon: Webhook },
   ],
   [
+    { href: "/app/support",   label: "Support",         icon: Headphones },
+    { href: "/app/features",  label: "Feature Requests", icon: Lightbulb },
+  ],
+  [
     { href: "/docs",         label: "Documentation",  icon: BookOpen, external: true },
   ],
+] as const;
+
+const adminNavItems = [
+  { href: "/admin",               label: "Overview",       icon: BarChart3, exact: true },
+  { href: "/admin/users",         label: "Users",          icon: Users },
+  { href: "/admin/subscriptions", label: "Subscriptions",  icon: CreditCard },
+  { href: "/admin/jobs",          label: "Jobs",           icon: BriefcaseBusiness },
+  { href: "/admin/support",       label: "Support",        icon: MessageSquare },
+  { href: "/admin/features",      label: "Features",       icon: Lightbulb },
 ] as const;
 
 const PLAN_LABELS: Record<string, string> = {
@@ -64,6 +78,7 @@ export function AppSidebar({ user, usage, plan, role }: AppSidebarProps) {
 
   const planLabel = PLAN_LABELS[plan] ?? plan;
   const isAdmin = role === "admin";
+  const onAdminSection = pathname.startsWith("/admin");
 
   return (
     <>
@@ -96,7 +111,9 @@ export function AppSidebar({ user, usage, plan, role }: AppSidebarProps) {
         {/* Navigation */}
         <ScrollArea className="flex-1">
           <nav className="px-2.5 py-3 space-y-0.5">
-            {navGroups.map((group, gi) => (
+
+            {/* Regular app nav — hidden when in admin section */}
+            {!onAdminSection && navGroups.map((group, gi) => (
               <div key={gi}>
                 {gi > 0 && <Separator className="my-2 opacity-50" />}
                 {group.map((item) => {
@@ -138,74 +155,115 @@ export function AppSidebar({ user, usage, plan, role }: AppSidebarProps) {
               </div>
             ))}
 
-            {/* Admin link — only for admins */}
+            {/* Admin section */}
             {isAdmin && (
               <>
                 <Separator className="my-2 opacity-50" />
-                <Link
-                  href="/admin"
-                  onClick={close}
-                  className={cn(
-                    "group relative flex items-center gap-2.5 rounded-lg px-2.5 py-[7px] text-[13px] transition-all duration-100",
-                    pathname.startsWith("/admin")
-                      ? "bg-red-500/10 text-red-400 font-medium"
-                      : "text-muted-foreground hover:text-red-400 hover:bg-red-500/8"
-                  )}
-                >
-                  {pathname.startsWith("/admin") && (
-                    <span className="absolute left-0 top-1.5 bottom-1.5 w-[2.5px] rounded-full bg-red-500" />
-                  )}
-                  <ShieldCheck className={cn(
-                    "h-[15px] w-[15px] shrink-0 transition-colors",
-                    pathname.startsWith("/admin") ? "text-red-400" : "text-muted-foreground group-hover:text-red-400"
-                  )} />
-                  <span className="flex-1 truncate leading-none">Admin</span>
-                </Link>
+
+                {onAdminSection ? (
+                  /* Expanded admin nav when on admin pages */
+                  <div>
+                    <div className="flex items-center gap-1.5 px-2.5 pb-1 pt-0.5">
+                      <ShieldCheck className="h-3 w-3 text-red-400" />
+                      <span className="text-[10px] font-semibold uppercase tracking-widest text-red-400/80">
+                        Admin
+                      </span>
+                    </div>
+                    {adminNavItems.map((item) => {
+                      const isActive = (item as { exact?: boolean }).exact
+                        ? pathname === item.href
+                        : pathname.startsWith(item.href);
+                      return (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          onClick={close}
+                          className={cn(
+                            "group relative flex items-center gap-2.5 rounded-lg px-2.5 py-[7px] text-[13px] transition-all duration-100",
+                            isActive
+                              ? "bg-red-500/10 text-red-400 font-medium"
+                              : "text-muted-foreground hover:text-red-400 hover:bg-red-500/8"
+                          )}
+                        >
+                          {isActive && (
+                            <span className="absolute left-0 top-1.5 bottom-1.5 w-[2.5px] rounded-full bg-red-500" />
+                          )}
+                          <item.icon className={cn(
+                            "h-[15px] w-[15px] shrink-0 transition-colors",
+                            isActive ? "text-red-400" : "text-muted-foreground group-hover:text-red-400"
+                          )} />
+                          <span className="flex-1 truncate leading-none">{item.label}</span>
+                        </Link>
+                      );
+                    })}
+                    <Separator className="my-2 opacity-50" />
+                    <Link
+                      href="/app"
+                      onClick={close}
+                      className="group flex items-center gap-2.5 rounded-lg px-2.5 py-[7px] text-[13px] text-muted-foreground hover:text-foreground hover:bg-accent/60 transition-all duration-100"
+                    >
+                      <LayoutDashboard className="h-[15px] w-[15px] shrink-0 text-muted-foreground group-hover:text-foreground" />
+                      <span className="flex-1 truncate leading-none">Back to App</span>
+                    </Link>
+                  </div>
+                ) : (
+                  /* Collapsed admin link when on app pages */
+                  <Link
+                    href="/admin"
+                    onClick={close}
+                    className="group relative flex items-center gap-2.5 rounded-lg px-2.5 py-[7px] text-[13px] text-muted-foreground hover:text-red-400 hover:bg-red-500/8 transition-all duration-100"
+                  >
+                    <ShieldCheck className="h-[15px] w-[15px] shrink-0 text-muted-foreground group-hover:text-red-400 transition-colors" />
+                    <span className="flex-1 truncate leading-none">Admin</span>
+                  </Link>
+                )}
               </>
             )}
           </nav>
         </ScrollArea>
 
-        {/* Usage widget */}
-        <div className="px-3 pb-2">
-          <div className="rounded-xl border border-border/60 bg-muted/30 px-3 py-2.5 space-y-2">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1.5">
-                <Badge
-                  variant="secondary"
-                  className="rounded-full px-1.5 py-0 text-[9px] h-4 font-medium"
-                >
-                  {planLabel}
-                </Badge>
+        {/* Usage widget — only show for app section */}
+        {!onAdminSection && (
+          <div className="px-3 pb-2">
+            <div className="rounded-xl border border-border/60 bg-muted/30 px-3 py-2.5 space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5">
+                  <Badge
+                    variant="secondary"
+                    className="rounded-full px-1.5 py-0 text-[9px] h-4 font-medium"
+                  >
+                    {planLabel}
+                  </Badge>
+                </div>
+                <span className="font-mono text-[10px] text-muted-foreground">
+                  {usage.used}
+                  <span className="text-muted-foreground/40">/{usage.limit}</span>
+                </span>
               </div>
-              <span className="font-mono text-[10px] text-muted-foreground">
-                {usage.used}
-                <span className="text-muted-foreground/40">/{usage.limit}</span>
-              </span>
-            </div>
 
-            <div className="h-[3px] w-full overflow-hidden rounded-full bg-muted">
-              <div
-                className={cn("h-full rounded-full transition-all duration-500", barColor)}
-                style={{ width: `${usagePct}%` }}
-              />
-            </div>
+              <div className="h-[3px] w-full overflow-hidden rounded-full bg-muted">
+                <div
+                  className={cn("h-full rounded-full transition-all duration-500", barColor)}
+                  style={{ width: `${usagePct}%` }}
+                />
+              </div>
 
-            <div className="flex items-center justify-between">
-              <p className="text-[10px] text-muted-foreground/60">renders this month</p>
-              {usagePct >= 70 && (
-                <Link
-                  href="/app/billing"
-                  onClick={close}
-                  className="flex items-center gap-0.5 text-[10px] text-primary hover:underline underline-offset-2"
-                >
-                  <Zap className="h-2.5 w-2.5" />
-                  Upgrade
-                </Link>
-              )}
+              <div className="flex items-center justify-between">
+                <p className="text-[10px] text-muted-foreground/60">renders this month</p>
+                {usagePct >= 70 && (
+                  <Link
+                    href="/app/billing"
+                    onClick={close}
+                    className="flex items-center gap-0.5 text-[10px] text-primary hover:underline underline-offset-2"
+                  >
+                    <Zap className="h-2.5 w-2.5" />
+                    Upgrade
+                  </Link>
+                )}
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* User footer */}
         <div className="border-t border-border p-2.5">

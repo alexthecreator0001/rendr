@@ -28,6 +28,7 @@ export default async function AdminUsersPage({
         plan: true,
         role: true,
         emailVerified: true,
+        bannedAt: true,
         createdAt: true,
         _count: { select: { jobs: true, apiKeys: true } },
       },
@@ -40,6 +41,7 @@ export default async function AdminUsersPage({
       users={users.map((u) => ({
         ...u,
         emailVerified: u.emailVerified?.toISOString() ?? null,
+        bannedAt: u.bannedAt?.toISOString() ?? null,
         createdAt: u.createdAt.toISOString(),
       }))}
       total={total}

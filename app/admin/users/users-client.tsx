@@ -1,9 +1,8 @@
 "use client";
 
-import { useActionState, useRouter, useTransition } from "react";
-import { useEffect, useRef } from "react";
-import { Search, ChevronLeft, ChevronRight, Shield, Trash2, CheckCircle } from "lucide-react";
-import { promoteUserAction, changePlanAction, deleteUserAction } from "../_actions";
+import { useRouter, useTransition } from "react";
+import { Search, ChevronLeft, ChevronRight, Shield, Trash2, CheckCircle, Ban, ShieldOff } from "lucide-react";
+import { promoteUserAction, changePlanAction, deleteUserAction, banUserAction, unbanUserAction } from "../_actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -18,6 +17,7 @@ type User = {
   plan: string;
   role: string;
   emailVerified: string | null;
+  bannedAt: string | null;
   createdAt: string;
   _count: { jobs: number; apiKeys: number };
 };
@@ -28,24 +28,23 @@ function UserRow({ user }: { user: User }) {
   const router = useRouter();
   const [, startTransition] = useTransition();
 
-  function submit(formData: FormData) {
+  function submit(action: (a: unknown, fd: FormData) => Promise<unknown>, extra: Record<string, string>) {
     startTransition(async () => {
-      const action = formData.get("_action") as string;
-      if (action === "promote") await promoteUserAction(null, formData);
-      else if (action === "plan") await changePlanAction(null, formData);
-      else if (action === "delete") {
-        if (!confirm(`Delete ${user.email}? This cannot be undone.`)) return;
-        await deleteUserAction(null, formData);
-      }
+      const fd = new FormData();
+      fd.set("userId", user.id);
+      for (const [k, v] of Object.entries(extra)) fd.set(k, v);
+      await action(null, fd);
       router.refresh();
     });
   }
 
+  const isBanned = !!user.bannedAt;
+
   return (
-    <tr className="border-b border-border hover:bg-muted/20 transition-colors">
+    <tr className={`border-b border-border hover:bg-muted/20 transition-colors ${isBanned ? "opacity-50" : ""}`}>
       <td className="px-4 py-3">
         <div>
-          <p className="text-[13px] font-medium">{user.email}</p>
+          <p className={`text-[13px] font-medium ${isBanned ? "line-through text-muted-foreground" : ""}`}>{user.email}</p>
           <p className="text-[11px] text-muted-foreground mt-0.5">
             {new Date(user.createdAt).toLocaleDateString()}
           </p>
@@ -55,13 +54,20 @@ function UserRow({ user }: { user: User }) {
         <span className="text-[12px] text-muted-foreground capitalize">{user.plan}</span>
       </td>
       <td className="px-4 py-3">
-        {user.role === "admin" ? (
-          <span className="rounded-full border border-red-500/30 bg-red-500/10 px-2 py-0.5 text-[10px] font-semibold text-red-400">
-            admin
-          </span>
-        ) : (
-          <span className="text-[12px] text-muted-foreground">user</span>
-        )}
+        <div className="flex items-center gap-1">
+          {user.role === "admin" ? (
+            <span className="rounded-full border border-red-500/30 bg-red-500/10 px-2 py-0.5 text-[10px] font-semibold text-red-400">
+              admin
+            </span>
+          ) : (
+            <span className="text-[12px] text-muted-foreground">user</span>
+          )}
+          {isBanned && (
+            <span className="rounded-full border border-orange-500/30 bg-orange-500/10 px-2 py-0.5 text-[10px] font-semibold text-orange-400">
+              banned
+            </span>
+          )}
+        </div>
       </td>
       <td className="px-4 py-3">
         {user.emailVerified ? (
@@ -83,13 +89,7 @@ function UserRow({ user }: { user: User }) {
             {/* Role */}
             {user.role !== "admin" ? (
               <DropdownMenuItem
-                onSelect={() => {
-                  const fd = new FormData();
-                  fd.set("_action", "promote");
-                  fd.set("userId", user.id);
-                  fd.set("role", "admin");
-                  submit(fd);
-                }}
+                onSelect={() => submit(promoteUserAction, { role: "admin" })}
                 className="gap-2"
               >
                 <Shield className="h-3.5 w-3.5 text-red-400" />
@@ -97,43 +97,57 @@ function UserRow({ user }: { user: User }) {
               </DropdownMenuItem>
             ) : (
               <DropdownMenuItem
-                onSelect={() => {
-                  const fd = new FormData();
-                  fd.set("_action", "promote");
-                  fd.set("userId", user.id);
-                  fd.set("role", "user");
-                  submit(fd);
-                }}
+                onSelect={() => submit(promoteUserAction, { role: "user" })}
                 className="gap-2"
               >
-                <Shield className="h-3.5 w-3.5" />
+                <ShieldOff className="h-3.5 w-3.5" />
                 Remove admin
               </DropdownMenuItem>
             )}
+
             <DropdownMenuSeparator />
+
             {/* Plans */}
             {PLANS.filter((p) => p !== user.plan).map((p) => (
               <DropdownMenuItem
                 key={p}
-                onSelect={() => {
-                  const fd = new FormData();
-                  fd.set("_action", "plan");
-                  fd.set("userId", user.id);
-                  fd.set("plan", p);
-                  submit(fd);
-                }}
+                onSelect={() => submit(changePlanAction, { plan: p })}
                 className="capitalize"
               >
                 Set plan: {p}
               </DropdownMenuItem>
             ))}
+
             <DropdownMenuSeparator />
+
+            {/* Ban / Unban */}
+            {isBanned ? (
+              <DropdownMenuItem
+                onSelect={() => submit(unbanUserAction, {})}
+                className="gap-2"
+              >
+                <Ban className="h-3.5 w-3.5 text-emerald-400" />
+                Unban user
+              </DropdownMenuItem>
+            ) : (
+              <DropdownMenuItem
+                onSelect={() => {
+                  if (!confirm(`Ban ${user.email}? They will lose access.`)) return;
+                  submit(banUserAction, {});
+                }}
+                className="gap-2 text-orange-400 focus:text-orange-400"
+              >
+                <Ban className="h-3.5 w-3.5" />
+                Ban user
+              </DropdownMenuItem>
+            )}
+
+            <DropdownMenuSeparator />
+
             <DropdownMenuItem
               onSelect={() => {
-                const fd = new FormData();
-                fd.set("_action", "delete");
-                fd.set("userId", user.id);
-                submit(fd);
+                if (!confirm(`Delete ${user.email}? This cannot be undone.`)) return;
+                submit(deleteUserAction, {});
               }}
               className="gap-2 text-destructive focus:text-destructive"
             >
@@ -148,11 +162,7 @@ function UserRow({ user }: { user: User }) {
 }
 
 export function AdminUsersClient({
-  users,
-  total,
-  page,
-  pageSize,
-  query,
+  users, total, page, pageSize, query,
 }: {
   users: User[];
   total: number;
@@ -170,7 +180,7 @@ export function AdminUsersClient({
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-6 py-8 space-y-6">
+    <div className="px-6 py-8 space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Users</h1>
@@ -216,7 +226,6 @@ export function AdminUsersClient({
         </table>
       </div>
 
-      {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
@@ -224,16 +233,14 @@ export function AdminUsersClient({
           </p>
           <div className="flex gap-2">
             <Button
-              variant="outline"
-              size="sm"
+              variant="outline" size="sm"
               disabled={page <= 1}
               onClick={() => router.push(`/admin/users?page=${page - 1}${query ? `&q=${query}` : ""}`)}
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
             <Button
-              variant="outline"
-              size="sm"
+              variant="outline" size="sm"
               disabled={page >= totalPages}
               onClick={() => router.push(`/admin/users?page=${page + 1}${query ? `&q=${query}` : ""}`)}
             >

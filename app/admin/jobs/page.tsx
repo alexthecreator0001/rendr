@@ -25,12 +25,8 @@ export default async function AdminJobsPage({
       skip: (pageNum - 1) * pageSize,
       take: pageSize,
       select: {
-        id: true,
-        status: true,
-        inputType: true,
-        createdAt: true,
-        updatedAt: true,
-        errorMessage: true,
+        id: true, status: true, inputType: true,
+        createdAt: true, updatedAt: true, errorMessage: true,
         user: { select: { email: true } },
       },
     }),
@@ -39,8 +35,15 @@ export default async function AdminJobsPage({
 
   const totalPages = Math.ceil(total / pageSize);
 
+  const statusColors: Record<string, string> = {
+    succeeded: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
+    failed: "bg-red-500/10 text-red-400 border-red-500/20",
+    processing: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+    queued: "bg-zinc-500/10 text-zinc-400 border-zinc-500/20",
+  };
+
   return (
-    <div className="mx-auto max-w-6xl px-6 py-8 space-y-6">
+    <div className="px-6 py-8 space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Jobs</h1>
         <p className="text-sm text-muted-foreground mt-1">{total.toLocaleString()} jobs</p>
@@ -88,12 +91,6 @@ export default async function AdminJobsPage({
                   j.status === "succeeded" || j.status === "failed"
                     ? j.updatedAt.getTime() - j.createdAt.getTime()
                     : null;
-                const statusColors: Record<string, string> = {
-                  succeeded: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-                  failed: "bg-red-500/10 text-red-400 border-red-500/20",
-                  processing: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-                  queued: "bg-zinc-500/10 text-zinc-400 border-zinc-500/20",
-                };
                 return (
                   <tr key={j.id} className="border-b border-border hover:bg-muted/20 transition-colors">
                     <td className="px-4 py-3 font-mono text-[12px] text-muted-foreground">
@@ -123,7 +120,6 @@ export default async function AdminJobsPage({
         </table>
       </div>
 
-      {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">Page {pageNum} of {totalPages}</p>

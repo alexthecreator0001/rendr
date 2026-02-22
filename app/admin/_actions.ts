@@ -45,6 +45,41 @@ export async function changePlanAction(
 
   await prisma.user.update({ where: { id: userId }, data: { plan } });
   revalidatePath("/admin/users");
+  revalidatePath("/admin/subscriptions");
+  return {};
+}
+
+export async function banUserAction(
+  _: unknown,
+  formData: FormData
+): Promise<{ error?: string }> {
+  const adminId = await requireAdmin();
+  const userId = formData.get("userId") as string;
+
+  if (!userId) return { error: "Missing user ID." };
+  if (userId === adminId) return { error: "You cannot ban yourself." };
+
+  await prisma.user.update({
+    where: { id: userId },
+    data: { bannedAt: new Date() },
+  });
+  revalidatePath("/admin/users");
+  return {};
+}
+
+export async function unbanUserAction(
+  _: unknown,
+  formData: FormData
+): Promise<{ error?: string }> {
+  await requireAdmin();
+  const userId = formData.get("userId") as string;
+  if (!userId) return { error: "Missing user ID." };
+
+  await prisma.user.update({
+    where: { id: userId },
+    data: { bannedAt: null },
+  });
+  revalidatePath("/admin/users");
   return {};
 }
 

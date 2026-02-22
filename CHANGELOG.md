@@ -2,6 +2,22 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.18.0] — 2026-02-22
+### Added
+- **Full admin panel rebuild**: unified sidebar — same `AppSidebar` for both app and admin sections. When on `/admin/**` routes, sidebar expands to show all admin sub-items with red accent (Overview, Users, Subscriptions, Jobs, Support, Features). Single "Admin" collapsed link shown on app pages.
+- **Admin: Subscriptions page** (`/admin/subscriptions`): plan distribution cards with live progress bars, filterable user table by plan (Starter/Growth/Pro).
+- **Admin: Support center** (`/admin/support`): ticket management table with priority badges, status filters, inline status updates (open → in_progress → resolved → closed).
+- **Admin: Feature Requests** (`/admin/features`): community feature request management with vote counts, status pipeline (submitted → planned → in_progress → shipped → declined).
+- **Admin: Ban/Unban users**: Users page now supports banning (sets `bannedAt`) and unbanning. Banned users shown with strikethrough + orange badge.
+- **User: Support page** (`/app/support`): submit tickets with priority selector (low/normal/high/urgent), view own ticket history with status badges.
+- **User: Feature Requests page** (`/app/features`): browse all requests sorted by votes, upvote/remove vote with instant optimistic UI, submit new requests.
+- **Admin overview improvements**: 6-stat cards (added open tickets + pending features), SVG bar chart (jobs last 14 days), SVG donut chart (job status distribution), plan distribution horizontal bars. All pages full-width (removed `max-w-6xl` centering).
+- **Prisma schema**: added `bannedAt DateTime?` to User, new models `SupportTicket`, `FeatureRequest`, `FeatureVote`. Migration: `20260222000002_admin_features`.
+- **Server actions**: `app/actions/feedback.ts` — `submitSupportTicketAction`, `submitFeatureRequestAction`, `toggleVoteAction`, `updateTicketStatusAction`, `updateFeatureStatusAction`.
+### Changed
+- `app/admin/layout.tsx`: replaced `AdminSidebar` with `AppSidebar` + `SidebarProvider` + `AppTopbar` (matches app layout shell). Fetches usage data for sidebar widget.
+- `components/layout/app-sidebar.tsx`: expanded admin section with full sub-navigation; Support and Feature Requests nav links added for regular users; usage widget hidden on admin pages.
+
 ## [0.17.0] — 2026-02-22
 ### Fixed
 - **Admin access with stale JWT**: middleware no longer checks role (which can be stale after SQL promotion). Role verification now happens exclusively in the admin layout (fresh DB query), so newly-promoted admins can access `/admin` without re-login.
