@@ -2,6 +2,14 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.24.0] — 2026-02-22
+### Added
+- **Solutions pages** — `/solutions` index with 8 solution cards, plus individual pages at `/solutions/[slug]` (statically generated). Each page has a dark hero with for-who tags, a 3-card "challenge" section, a 3-card "how Rendr helps" section, a copy-ready Node.js code example in a terminal widget, related solution cards, and a CTA.
+- **8 solutions with full copy and code examples:** Invoicing, E-commerce Receipts, HR Documents, Automated Reporting, Legal Contracts, Certificates & Diplomas, Real Estate, Healthcare.
+- **Solutions data file** — `lib/solutions-data.ts` with typed `Solution` interface and `SOLUTIONS` array. All copy, features, and code examples are defined here.
+- **Navbar** — "Solutions" added between Features and Pricing.
+- **Footer** — Added "Solutions" to Product column; new Solutions column with links to all 8 solution pages; updated grid to 6 columns on desktop.
+
 ## [0.23.0] — 2026-02-22
 ### Fixed
 - **Template cover images not showing for users** — `coverImageUrl` was missing from the Prisma `select` in `app/app/templates/page.tsx` (both initial query and post-seed query). Also missing from the `Template` type in `templates-client.tsx`. Fixed both; `TemplateCard` now renders a cover image (when set) instead of the iframe preview thumbnail.

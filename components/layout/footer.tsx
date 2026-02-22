@@ -3,9 +3,20 @@ import Link from "next/link";
 const footerLinks = {
   Product: [
     { href: "/features", label: "Features" },
+    { href: "/solutions", label: "Solutions" },
     { href: "/pricing", label: "Pricing" },
     { href: "/blog", label: "Blog" },
     { href: "/changelog", label: "Changelog" },
+  ],
+  Solutions: [
+    { href: "/solutions/invoicing", label: "Invoicing" },
+    { href: "/solutions/ecommerce-receipts", label: "E-commerce" },
+    { href: "/solutions/hr-documents", label: "HR Documents" },
+    { href: "/solutions/legal-contracts", label: "Legal & Contracts" },
+    { href: "/solutions/reporting", label: "Reporting" },
+    { href: "/solutions/certificates", label: "Certificates" },
+    { href: "/solutions/real-estate", label: "Real Estate" },
+    { href: "/solutions/healthcare", label: "Healthcare" },
   ],
   Developers: [
     { href: "/docs", label: "Documentation" },
@@ -25,9 +36,9 @@ export function Footer() {
   return (
     <footer className="bg-zinc-950">
       <div className="mx-auto max-w-7xl px-6 pt-16 pb-12 sm:px-8 lg:px-10">
-        <div className="grid grid-cols-2 gap-10 sm:grid-cols-4">
+        <div className="grid grid-cols-2 gap-10 sm:grid-cols-3 lg:grid-cols-6">
           {/* Brand */}
-          <div className="col-span-2 sm:col-span-1">
+          <div className="col-span-2 sm:col-span-3 lg:col-span-2">
             <Link href="/" className="inline-flex items-center">
               <img src="/logo-white.svg" alt="Rendr" className="h-5 w-auto" />
             </Link>
