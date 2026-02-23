@@ -2,6 +2,19 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.30.4] — 2026-02-23
+### Added
+- USD/EUR currency auto-detection via CF-IPCountry header (EU → EUR, all others → USD)
+- `lib/currency.ts` — EU country set, detectCurrency(), PLAN_PRICES per currency, getPriceId()
+- 8 Stripe price IDs: Growth + Business × monthly + yearly × EUR + USD
+- Downgrade to Free button — cancels subscription at period end via `/api/stripe/cancel`
+- Resume button — removes cancel_at_period_end via `/api/stripe/resume`
+- CancellationBanner shown on billing page when subscription is pending cancellation
+### Changed
+- Billing page detects currency server-side and passes to BillingPlansSection
+- Plan comparison shows correct currency symbol; note shows detected currency
+- planFromPriceId updated to check all 8 price IDs
+
 ## [0.30.3] — 2026-02-23
 ### Added
 - `lib/plans.ts` — single source of truth for plan limits (render counts + file size)

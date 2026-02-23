@@ -1,6 +1,6 @@
 {
   "name": "rendr",
-  "version": "0.30.3",
+  "version": "0.30.4",
   "private": true,
   "scripts": {
     "postinstall": "prisma generate",

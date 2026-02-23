@@ -3,10 +3,11 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Zap, Settings, Check } from "lucide-react";
+import { Zap, Settings, Check, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { PLAN_PRICES, type Currency } from "@/lib/currency";
 
-// ── Plan data (client-side comparison grid) ────────────────────────────────
+// ── Plan data (static, currency-agnostic) ─────────────────────────────────
 
 const STARTER = {
   id: "starter",
@@ -25,9 +26,6 @@ const PAID_PLANS = [
   {
     id: "growth" as const,
     name: "Growth",
-    monthlyPrice: "€9.90",
-    yearlyPrice: "€99.90",
-    yearlyPerMonth: "€8.33",
     description: "Teams shipping PDFs in production",
     highlighted: true,
     features: [
@@ -42,9 +40,6 @@ const PAID_PLANS = [
   {
     id: "business" as const,
     name: "Business",
-    monthlyPrice: "€49.90",
-    yearlyPrice: "€490.90",
-    yearlyPerMonth: "€40.91",
     description: "High-volume and compliance-sensitive",
     highlighted: false,
     features: [
@@ -65,12 +60,14 @@ const PAID_PLANS = [
 export function CheckoutButton({
   plan,
   interval = "monthly",
+  currency = "eur",
   children,
   variant = "default",
   className,
 }: {
   plan: string;
   interval?: "monthly" | "yearly";
+  currency?: Currency;
   children: React.ReactNode;
   variant?: "default" | "outline";
   className?: string;
@@ -83,7 +80,7 @@ export function CheckoutButton({
       const res = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan, interval }),
+        body: JSON.stringify({ plan, interval, currency }),
       });
       const data = await res.json();
       if (data.url) window.location.href = data.url;
@@ -129,15 +126,75 @@ export function PortalButton({ className }: { className?: string }) {
       className={cn("gap-1.5", className)}
     >
       <Settings className="h-3.5 w-3.5" />
-      {loading ? "Redirecting…" : "Manage subscription"}
+      {loading ? "Redirecting…" : "Manage billing"}
+    </Button>
+  );
+}
+
+// ── CancelButton ───────────────────────────────────────────────────────────
+
+export function CancelButton({ className }: { className?: string }) {
+  const [loading, setLoading] = useState(false);
+
+  async function handleClick() {
+    setLoading(true);
+    try {
+      await fetch("/api/stripe/cancel", { method: "POST" });
+      window.location.href = "/app/billing";
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <Button
+      onClick={handleClick}
+      disabled={loading}
+      variant="outline"
+      className={cn("gap-1.5 text-muted-foreground hover:text-destructive hover:border-destructive/50", className)}
+    >
+      {loading ? "Cancelling…" : "Downgrade to Free"}
+    </Button>
+  );
+}
+
+// ── ResumeButton ───────────────────────────────────────────────────────────
+
+export function ResumeButton({ className }: { className?: string }) {
+  const [loading, setLoading] = useState(false);
+
+  async function handleClick() {
+    setLoading(true);
+    try {
+      await fetch("/api/stripe/resume", { method: "POST" });
+      window.location.href = "/app/billing";
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <Button
+      onClick={handleClick}
+      disabled={loading}
+      className={cn("gap-1.5", className)}
+    >
+      {loading ? "Resuming…" : "Keep subscription"}
     </Button>
   );
 }
 
 // ── BillingPlansSection ────────────────────────────────────────────────────
 
-export function BillingPlansSection({ currentPlanId }: { currentPlanId: string }) {
+export function BillingPlansSection({
+  currentPlanId,
+  currency,
+}: {
+  currentPlanId: string;
+  currency: Currency;
+}) {
   const [interval, setInterval] = useState<"monthly" | "yearly">("monthly");
+  const prices = PLAN_PRICES[currency];
 
   return (
     <div>
@@ -208,7 +265,8 @@ export function BillingPlansSection({ currentPlanId }: { currentPlanId: string }
         {/* Growth + Business */}
         {PAID_PLANS.map((plan) => {
           const isCurrent = plan.id === currentPlanId;
-          const price = interval === "monthly" ? plan.monthlyPrice : plan.yearlyPrice;
+          const planPrices = prices[plan.id];
+          const price = interval === "monthly" ? planPrices.monthly : planPrices.yearly;
           const period = interval === "monthly" ? "/mo" : "/yr";
 
           return (
@@ -244,7 +302,7 @@ export function BillingPlansSection({ currentPlanId }: { currentPlanId: string }
                 </div>
                 {interval === "yearly" && (
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    {plan.yearlyPerMonth}/mo billed annually
+                    {planPrices.yearlyPerMonth}/mo billed annually
                   </p>
                 )}
                 <p className="text-xs text-muted-foreground mt-1">{plan.description}</p>
@@ -267,6 +325,7 @@ export function BillingPlansSection({ currentPlanId }: { currentPlanId: string }
                 <CheckoutButton
                   plan={plan.id}
                   interval={interval}
+                  currency={currency}
                   variant={plan.highlighted ? "default" : "outline"}
                   className="w-full text-sm"
                 >
@@ -278,6 +337,38 @@ export function BillingPlansSection({ currentPlanId }: { currentPlanId: string }
           );
         })}
       </div>
+
+      {/* Currency note */}
+      <p className="mt-3 text-xs text-muted-foreground/60 text-right">
+        Prices in {currency === "eur" ? "EUR (€)" : "USD ($)"}
+        {" · "}
+        <span className="italic">detected from your location</span>
+      </p>
+    </div>
+  );
+}
+
+// ── DowngradeSection — shown when subscription is set to cancel ────────────
+
+export function CancellationBanner({
+  planName,
+  periodEnd,
+}: {
+  planName: string;
+  periodEnd: string;
+}) {
+  return (
+    <div className="rounded-xl border border-amber-200 bg-amber-50 dark:border-amber-900/50 dark:bg-amber-900/20 px-5 py-4 flex items-start gap-3">
+      <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium text-amber-800 dark:text-amber-300">
+          Your {planName} plan will end on {periodEnd}
+        </p>
+        <p className="text-xs text-amber-700/70 dark:text-amber-400/70 mt-0.5">
+          After that, you&apos;ll be moved to the Free plan (100 renders/month).
+        </p>
+      </div>
+      <ResumeButton className="shrink-0 text-xs h-8 px-3" />
     </div>
   );
 }

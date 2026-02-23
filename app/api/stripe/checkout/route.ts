@@ -2,17 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
 import { getStripe } from "@/lib/stripe";
-
-const PLAN_PRICE_IDS: Record<string, Record<string, string | undefined>> = {
-  growth: {
-    monthly: process.env.STRIPE_GROWTH_MONTHLY_PRICE_ID,
-    yearly:  process.env.STRIPE_GROWTH_YEARLY_PRICE_ID,
-  },
-  business: {
-    monthly: process.env.STRIPE_BUSINESS_MONTHLY_PRICE_ID,
-    yearly:  process.env.STRIPE_BUSINESS_YEARLY_PRICE_ID,
-  },
-};
+import { getPriceId, type Currency } from "@/lib/currency";
 
 export async function POST(req: NextRequest) {
   const session = await auth();
@@ -21,12 +11,13 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json();
-  const plan = body.plan as string;
+  const plan = body.plan as "growth" | "business";
   const interval: "monthly" | "yearly" = body.interval === "yearly" ? "yearly" : "monthly";
-  const priceId = PLAN_PRICE_IDS[plan]?.[interval];
+  const currency: Currency = body.currency === "usd" ? "usd" : "eur";
 
+  const priceId = getPriceId(plan, interval, currency);
   if (!priceId) {
-    return NextResponse.json({ error: "Invalid plan" }, { status: 400 });
+    return NextResponse.json({ error: "Invalid plan or price not configured" }, { status: 400 });
   }
 
   const user = await prisma.user.findUnique({

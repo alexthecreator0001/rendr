@@ -1,16 +1,19 @@
 import type { Metadata } from "next";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { prisma } from "@/lib/db";
 import { Zap, FileText, Clock, Webhook, Key, Shield, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { CheckoutButton, PortalButton, BillingPlansSection } from "./billing-actions";
+import { CheckoutButton, PortalButton, CancelButton, BillingPlansSection, CancellationBanner } from "./billing-actions";
+import { detectCurrency, PLAN_PRICES } from "@/lib/currency";
+import { getStripe } from "@/lib/stripe";
 
 export const metadata: Metadata = { title: "Billing" };
 
-// ── Plan config ────────────────────────────────────────────────────────────
+// ── Plan config (for current-plan display — pills, limit) ──────────────────
 
 const PLANS = [
   {
@@ -19,15 +22,8 @@ const PLANS = [
     price: "Free",
     description: "Side projects and exploration",
     limit: 100,
-    features: [
-      "100 renders / month",
-      "Max 2 MB per render",
-      "2 API keys",
-      "Community support",
-      "7-day log retention",
-    ],
     pills: [
-      { icon: FileText, label: "500 renders / mo" },
+      { icon: FileText, label: "100 renders / mo" },
       { icon: Key,      label: "REST API" },
       { icon: Clock,    label: "Async rendering" },
       { icon: Shield,   label: "Secure download links" },
@@ -36,19 +32,9 @@ const PLANS = [
   {
     id: "growth",
     name: "Growth",
-    price: "€9.90",
-    period: "/mo",
     description: "Teams shipping PDFs in production",
     limit: 5000,
     highlighted: true,
-    features: [
-      "5,000 renders / month",
-      "50,000 pages / month",
-      "Unlimited API keys",
-      "5 webhook endpoints",
-      "Email support",
-      "30-day log retention",
-    ],
     pills: [
       { icon: FileText, label: "5,000 renders / mo" },
       { icon: Key,      label: "Unlimited API keys" },
@@ -59,20 +45,8 @@ const PLANS = [
   {
     id: "business",
     name: "Business",
-    price: "€49.90",
-    period: "/mo",
     description: "High-volume and compliance-sensitive",
     limit: 50000,
-    features: [
-      "50,000 renders / month",
-      "500,000 pages / month",
-      "Unlimited API keys",
-      "Unlimited webhooks",
-      "Priority support + SLA",
-      "90-day log retention",
-      "Custom font uploads",
-      "Unlimited templates",
-    ],
     pills: [
       { icon: FileText, label: "50,000 renders / mo" },
       { icon: Key,      label: "Unlimited keys" },
@@ -93,6 +67,11 @@ export default async function BillingPage({
   if (!session?.user?.id) redirect("/login");
 
   const { upgraded } = await searchParams;
+
+  // Detect currency from Cloudflare / Vercel country header
+  const headersList = await headers();
+  const country = headersList.get("cf-ipcountry") ?? headersList.get("x-vercel-ip-country");
+  const currency = detectCurrency(country);
 
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -117,6 +96,19 @@ export default async function BillingPage({
     }),
   ]);
 
+  // Fetch live subscription state from Stripe
+  let cancelAtPeriodEnd = false;
+  let periodEndDate: Date | null = null;
+  if (user?.stripeSubscriptionId) {
+    try {
+      const sub = await getStripe().subscriptions.retrieve(user.stripeSubscriptionId);
+      cancelAtPeriodEnd = sub.cancel_at_period_end;
+      periodEndDate = new Date(sub.current_period_end * 1000);
+    } catch {
+      // Stripe unreachable or test data — ignore
+    }
+  }
+
   const currentPlanId = user?.plan ?? "starter";
   const currentPlan = PLANS.find((p) => p.id === currentPlanId) ?? PLANS[0];
   const planLimit = currentPlan.limit;
@@ -124,6 +116,9 @@ export default async function BillingPage({
   const resetDate = nextReset.toLocaleDateString("en-US", {
     month: "long", day: "numeric", year: "numeric",
   });
+  const periodEndStr = periodEndDate?.toLocaleDateString("en-US", {
+    month: "long", day: "numeric", year: "numeric",
+  }) ?? "";
   const barColor =
     usagePct >= 90 ? "bg-red-500" :
     usagePct >= 70 ? "bg-amber-500" :
@@ -132,21 +127,31 @@ export default async function BillingPage({
   const isOnPaidPlan = currentPlanId !== "starter";
   const isPastDue = user?.subscriptionStatus === "past_due";
 
+  // Current plan price display
+  const currentPlanPriceDisplay = isOnPaidPlan
+    ? `${PLAN_PRICES[currency][currentPlanId as "growth" | "business"].monthly}/mo`
+    : null;
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8 space-y-8">
 
       {/* Success banner */}
       {upgraded === "true" && (
         <div className="rounded-xl border border-green-200 bg-green-50 dark:border-green-900/50 dark:bg-green-900/20 px-5 py-3.5 flex items-center gap-3">
-          <Check className="h-5 w-5 text-green-600 dark:text-green-400 shrink-0" />
+          <span className="text-green-600 dark:text-green-400 text-base">✓</span>
           <p className="text-sm font-medium text-green-800 dark:text-green-300">
             You&apos;re now on the <strong>{currentPlan.name}</strong> plan. Thank you!
           </p>
         </div>
       )}
 
+      {/* Cancellation banner */}
+      {cancelAtPeriodEnd && periodEndDate && (
+        <CancellationBanner planName={currentPlan.name} periodEnd={periodEndStr} />
+      )}
+
       {/* Past-due warning */}
-      {isPastDue && (
+      {isPastDue && !cancelAtPeriodEnd && (
         <div className="rounded-xl border border-amber-200 bg-amber-50 dark:border-amber-900/50 dark:bg-amber-900/20 px-5 py-3.5 flex items-center gap-3">
           <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0" />
           <p className="text-sm font-medium text-amber-800 dark:text-amber-300 flex-1">
@@ -175,11 +180,16 @@ export default async function BillingPage({
                   <h2 className="text-base font-semibold">Current Plan</h2>
                   <Badge className="rounded-full bg-primary/10 text-primary border-0 text-[11px] font-semibold px-2">
                     {currentPlan.name}
-                    {currentPlan.price !== "Free" && ` — ${currentPlan.price}/mo`}
+                    {currentPlanPriceDisplay && ` — ${currentPlanPriceDisplay}`}
                   </Badge>
                   {isPastDue && (
                     <Badge variant="destructive" className="rounded-full text-[11px] font-semibold px-2">
                       Payment failed
+                    </Badge>
+                  )}
+                  {cancelAtPeriodEnd && (
+                    <Badge variant="secondary" className="rounded-full text-[11px] font-semibold px-2 text-amber-600 dark:text-amber-400">
+                      Cancels {periodEndStr}
                     </Badge>
                   )}
                 </div>
@@ -187,9 +197,14 @@ export default async function BillingPage({
               </div>
               <div className="flex items-center gap-2 shrink-0">
                 {isOnPaidPlan ? (
-                  <PortalButton />
+                  cancelAtPeriodEnd ? null : (
+                    <>
+                      <CancelButton />
+                      <PortalButton />
+                    </>
+                  )
                 ) : (
-                  <CheckoutButton plan="growth">
+                  <CheckoutButton plan="growth" interval="monthly" currency={currency}>
                     <Zap className="h-3.5 w-3.5" />
                     Upgrade plan
                   </CheckoutButton>
@@ -251,23 +266,15 @@ export default async function BillingPage({
         </div>
       </div>
 
-      {/* Plan Comparison — client component handles monthly/yearly toggle */}
-      <BillingPlansSection currentPlanId={currentPlanId} />
+      {/* Plan Comparison */}
+      <BillingPlansSection currentPlanId={currentPlanId} currency={currency} />
 
       {/* Invoice History */}
       <div className="rounded-2xl border border-border overflow-hidden">
         <div className="px-6 py-4 border-b border-border">
           <h2 className="text-base font-semibold">Invoice history</h2>
           <p className="text-sm text-muted-foreground mt-0.5">
-            Billing receipts from Stripe.{" "}
-            {isOnPaidPlan && (
-              <button
-                className="text-primary underline-offset-2 hover:underline text-sm"
-                onClick={undefined}
-              >
-                View in Stripe portal →
-              </button>
-            )}
+            Billing receipts from Stripe.
           </p>
         </div>
         <div className="flex flex-col items-center justify-center py-14 text-center">
