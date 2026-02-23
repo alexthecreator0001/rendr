@@ -15,7 +15,13 @@ export function getStripe(): Stripe {
 
 export function planFromPriceId(priceId: string | null | undefined): string {
   if (!priceId) return "starter";
-  if (priceId === process.env.STRIPE_GROWTH_PRICE_ID) return "growth";
-  if (priceId === process.env.STRIPE_BUSINESS_PRICE_ID) return "business";
+  if (
+    priceId === process.env.STRIPE_GROWTH_MONTHLY_PRICE_ID ||
+    priceId === process.env.STRIPE_GROWTH_YEARLY_PRICE_ID
+  ) return "growth";
+  if (
+    priceId === process.env.STRIPE_BUSINESS_MONTHLY_PRICE_ID ||
+    priceId === process.env.STRIPE_BUSINESS_YEARLY_PRICE_ID
+  ) return "business";
   return "starter";
 }

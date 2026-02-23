@@ -2,11 +2,11 @@ import type { Metadata } from "next";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
-import { Zap, Check, FileText, Clock, Webhook, Key, Shield, AlertTriangle } from "lucide-react";
+import { Zap, FileText, Clock, Webhook, Key, Shield, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { CheckoutButton, PortalButton } from "./billing-actions";
+import { CheckoutButton, PortalButton, BillingPlansSection } from "./billing-actions";
 
 export const metadata: Metadata = { title: "Billing" };
 
@@ -36,7 +36,7 @@ const PLANS = [
   {
     id: "growth",
     name: "Growth",
-    price: "$49",
+    price: "€9.90",
     period: "/mo",
     description: "Teams shipping PDFs in production",
     limit: 5000,
@@ -59,7 +59,7 @@ const PLANS = [
   {
     id: "business",
     name: "Business",
-    price: "$199",
+    price: "€49.90",
     period: "/mo",
     description: "High-volume and compliance-sensitive",
     limit: 50000,
@@ -251,79 +251,8 @@ export default async function BillingPage({
         </div>
       </div>
 
-      {/* Plan Comparison */}
-      <div>
-        <h2 className="text-base font-semibold mb-4">Compare plans</h2>
-        <div className="grid gap-4 sm:grid-cols-3">
-          {PLANS.map((plan) => {
-            const isCurrent = plan.id === currentPlanId;
-            return (
-              <div
-                key={plan.id}
-                className={`relative rounded-2xl border p-5 flex flex-col ${
-                  plan.highlighted
-                    ? "border-primary bg-primary/[0.03] shadow-sm"
-                    : "border-border bg-card"
-                }`}
-              >
-                {plan.highlighted && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <Badge className="rounded-full bg-primary text-primary-foreground text-[10px] px-2.5 py-0.5 font-semibold shadow-sm">
-                      Most popular
-                    </Badge>
-                  </div>
-                )}
-
-                <div className="mb-4">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm font-semibold">{plan.name}</span>
-                    {isCurrent && (
-                      <Badge variant="secondary" className="rounded-full text-[10px] px-2 py-0">
-                        Active
-                      </Badge>
-                    )}
-                  </div>
-                  <div className="flex items-baseline gap-0.5">
-                    <span className="text-3xl font-black tracking-tight">{plan.price}</span>
-                    {"period" in plan && (
-                      <span className="text-sm text-muted-foreground">{plan.period}</span>
-                    )}
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-1">{plan.description}</p>
-                </div>
-
-                <ul className="space-y-2 flex-1 mb-5">
-                  {plan.features.map((f) => (
-                    <li key={f} className="flex items-start gap-2 text-xs text-muted-foreground">
-                      <Check className="h-3.5 w-3.5 shrink-0 text-primary mt-0.5" />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-
-                {isCurrent ? (
-                  <Button size="sm" variant="outline" className="w-full" disabled>
-                    Current plan
-                  </Button>
-                ) : plan.id === "starter" ? (
-                  <Button size="sm" variant="outline" className="w-full" disabled>
-                    Free forever
-                  </Button>
-                ) : (
-                  <CheckoutButton
-                    plan={plan.id}
-                    variant={plan.highlighted ? "default" : "outline"}
-                    className="w-full text-sm"
-                  >
-                    {plan.highlighted && <Zap className="h-3.5 w-3.5 mr-1" />}
-                    Upgrade to {plan.name}
-                  </CheckoutButton>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </div>
+      {/* Plan Comparison — client component handles monthly/yearly toggle */}
+      <BillingPlansSection currentPlanId={currentPlanId} />
 
       {/* Invoice History */}
       <div className="rounded-2xl border border-border overflow-hidden">

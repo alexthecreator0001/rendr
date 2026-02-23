@@ -2,6 +2,13 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.30.2] — 2026-02-23
+### Added
+- Yearly billing toggle on billing page with "2 months free" badge
+- Growth and Business now have separate monthly + yearly price IDs
+### Changed
+- Updated plan prices to €9.90/mo (Growth) and €49.90/mo (Business)
+
 ## [0.30.1] — 2026-02-23
 ### Fixed
 - Stripe routes: use lazy `getStripe()` singleton instead of module-level client so `next build` succeeds without `STRIPE_SECRET_KEY` in the build environment
