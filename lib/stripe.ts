@@ -1,10 +1,18 @@
 import Stripe from "stripe";
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2024-12-18.acacia" as const,
-});
+// Lazy singleton — not created at module load time so `next build` succeeds
+// even when STRIPE_SECRET_KEY is not set in the build environment.
+let _stripe: Stripe | undefined;
 
-// Map Stripe price IDs → internal plan names
+export function getStripe(): Stripe {
+  if (!_stripe) {
+    _stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+      apiVersion: "2024-12-18.acacia" as const,
+    });
+  }
+  return _stripe;
+}
+
 export function planFromPriceId(priceId: string | null | undefined): string {
   if (!priceId) return "starter";
   if (priceId === process.env.STRIPE_GROWTH_PRICE_ID) return "growth";

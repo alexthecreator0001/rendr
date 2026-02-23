@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
-import { stripe } from "@/lib/stripe";
+import { getStripe } from "@/lib/stripe";
 
 const PLAN_PRICE_IDS: Record<string, string | undefined> = {
   growth: process.env.STRIPE_GROWTH_PRICE_ID,
@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
 
   // Already subscribed → send to portal to switch plan
   if (user.stripeSubscriptionId && user.stripeCustomerId) {
-    const portalSession = await stripe.billingPortal.sessions.create({
+    const portalSession = await getStripe().billingPortal.sessions.create({
       customer: user.stripeCustomerId,
       return_url: `${process.env.NEXTAUTH_URL}/app/billing`,
     });
@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
   // Create Stripe customer if needed
   let customerId = user.stripeCustomerId;
   if (!customerId) {
-    const customer = await stripe.customers.create({
+    const customer = await getStripe().customers.create({
       email: user.email,
       metadata: { userId: session.user.id },
     });
@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  const checkoutSession = await stripe.checkout.sessions.create({
+  const checkoutSession = await getStripe().checkout.sessions.create({
     customer: customerId,
     mode: "subscription",
     line_items: [{ price: priceId, quantity: 1 }],

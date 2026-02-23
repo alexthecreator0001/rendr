@@ -2,6 +2,10 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.30.1] — 2026-02-23
+### Fixed
+- Stripe routes: use lazy `getStripe()` singleton instead of module-level client so `next build` succeeds without `STRIPE_SECRET_KEY` in the build environment
+
 ## [0.30.0] — 2026-02-23
 ### Added
 - **Stripe payments** — full checkout + subscription management. New: `lib/stripe.ts`, `app/api/stripe/checkout`, `app/api/stripe/portal`, `app/api/stripe/webhook` routes. Billing page upgraded: real "Upgrade" buttons launch Stripe Checkout, paid users see "Manage subscription" → Stripe Customer Portal. Webhooks handle `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.payment_failed` — auto-updates `user.plan` and `subscriptionStatus`.
