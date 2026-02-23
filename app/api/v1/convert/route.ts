@@ -5,6 +5,9 @@ import { checkRateLimit } from "@/lib/rate-limit"
 import { prisma } from "@/lib/db"
 import { getQueue } from "@/lib/queue"
 import { apiError, ApiError } from "@/lib/errors"
+import { assertSafeUrl } from "@/lib/ssrf-guard"
+
+const HTML_MAX_BYTES = 5 * 1024 * 1024 // 5 MB
 
 const pdfOptionsSchema = z
   .object({
@@ -98,7 +101,22 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const { input, options, variables } = parsed.data
+    const { input, options, variables, webhook_url } = parsed.data
+
+    // Enforce HTML payload size limit
+    if (input.type === "html" && input.content && input.content.length > HTML_MAX_BYTES) {
+      return apiError(413, "HTML content exceeds the 5 MB limit", "payload_too_large")
+    }
+
+    // SSRF guard on webhook_url
+    if (webhook_url) {
+      try {
+        await assertSafeUrl(webhook_url)
+      } catch (e) {
+        return apiError(400, e instanceof Error ? e.message : "Invalid webhook URL", "invalid_request")
+      }
+    }
+
     const idempotencyKey = req.headers.get("idempotency-key")
 
     // Idempotency check

@@ -3,6 +3,7 @@ import crypto from "node:crypto"
 import { prisma } from "@/lib/db"
 import { saveFile } from "@/lib/storage"
 import { deliverWebhooks } from "@/lib/webhook"
+import { assertSafeUrl } from "@/lib/ssrf-guard"
 
 const TIMEOUT = parseInt(process.env.PLAYWRIGHT_TIMEOUT_MS ?? "30000", 10)
 const BASE_URL = process.env.AUTH_URL ?? process.env.NEXTAUTH_URL ?? "http://localhost:3000"
@@ -39,12 +40,16 @@ export async function processJob(jobId: string): Promise<void> {
       await page.setContent(job.inputContent, { waitUntil: "networkidle" })
     } else if (job.inputType === "url") {
       if (!job.inputContent) throw new Error("inputContent is required for url jobs")
+      // SSRF guard: block private/internal URLs before passing to Playwright
+      await assertSafeUrl(job.inputContent)
       await page.goto(job.inputContent, { waitUntil: "networkidle" })
     } else if (job.inputType === "template") {
       if (!job.template) throw new Error("Template not found")
       let html = job.template.html
       for (const [key, val] of Object.entries(variables)) {
-        html = html.replace(new RegExp(`\\{\\{\\s*${key}\\s*\\}\\}`, "g"), val)
+        // Escape regex metacharacters in the key to prevent ReDoS
+        const safeKey = key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+        html = html.replace(new RegExp(`\\{\\{\\s*${safeKey}\\s*\\}\\}`, "g"), val)
       }
       await page.setContent(html, { waitUntil: "networkidle" })
     } else {

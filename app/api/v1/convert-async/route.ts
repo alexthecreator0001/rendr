@@ -6,13 +6,42 @@ import { prisma } from "@/lib/db"
 import { getQueue } from "@/lib/queue"
 import { apiError, ApiError } from "@/lib/errors"
 
+const HTML_MAX_BYTES = 5 * 1024 * 1024 // 5 MB
+
+const pdfOptionsSchema = z
+  .object({
+    format: z.enum(["A4", "Letter", "Legal", "Tabloid", "A3", "A5", "A6"]).optional(),
+    width: z.string().optional(),
+    height: z.string().optional(),
+    landscape: z.boolean().optional(),
+    printBackground: z.boolean().optional(),
+    preferCSSPageSize: z.boolean().optional(),
+    scale: z.number().min(0.1).max(2).optional(),
+    pageRanges: z.string().optional(),
+    margin: z
+      .object({
+        top: z.string().optional(),
+        right: z.string().optional(),
+        bottom: z.string().optional(),
+        left: z.string().optional(),
+      })
+      .optional(),
+    displayHeaderFooter: z.boolean().optional(),
+    headerTemplate: z.string().optional(),
+    footerTemplate: z.string().optional(),
+    tagged: z.boolean().optional(),
+    outline: z.boolean().optional(),
+    waitFor: z.number().min(0).max(10).optional(),
+  })
+  .optional()
+
 const convertSchema = z.object({
   input: z.object({
     type: z.enum(["html", "url", "template"]),
     content: z.string().optional(),
     template_id: z.string().optional(),
   }),
-  options: z.record(z.unknown()).optional(),
+  options: pdfOptionsSchema,
   variables: z.record(z.string()).optional(),
 })
 
@@ -36,6 +65,12 @@ export async function POST(req: NextRequest) {
     }
 
     const { input, options, variables } = parsed.data
+
+    // Enforce HTML payload size limit
+    if (input.type === "html" && input.content && input.content.length > HTML_MAX_BYTES) {
+      return apiError(413, "HTML content exceeds the 5 MB limit", "payload_too_large")
+    }
+
     const idempotencyKey = req.headers.get("idempotency-key")
 
     if (idempotencyKey) {

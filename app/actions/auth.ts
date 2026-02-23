@@ -96,7 +96,8 @@ export async function registerAction(
   });
 
   if (existing) {
-    return { error: "An account with this email already exists." };
+    // Generic message to prevent email enumeration
+    return { error: "Unable to create account. Please try a different email or sign in." };
   }
 
   const passwordHash = await hashPassword(parsed.data.password);

@@ -2,6 +2,16 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.26.0] — 2026-02-23
+### Security
+- **ReDoS fix** — template variable keys are now regex-escaped before building the replacement pattern in `worker/processor.ts`, preventing ReDoS via crafted variable names.
+- **SSRF prevention** — new `lib/ssrf-guard.ts` utility blocks requests to private/loopback/link-local IP ranges (RFC-1918, 169.254.x.x, ::1, fc00::/7, fe80::/10). Applied to: URL-to-PDF rendering in the worker, webhook URL creation (`app/actions/webhooks.ts`), and `webhook_url` in the sync convert route.
+- **Path traversal fix** — `/api/v1/files/[token]` now resolves `resultPath` and asserts it starts within `$STORAGE_LOCAL_DIR/pdfs/` before reading the file.
+- **HTML payload size limit** — both convert endpoints now reject HTML bodies larger than 5 MB (error 413).
+- **Security headers** — `next.config.ts` now emits `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy`, and `Strict-Transport-Security` on all responses.
+- **Email enumeration** — `registerAction` now returns a generic error instead of confirming whether an email is already registered.
+- **Strict convert-async schema** — `/api/v1/convert-async` now uses the same explicit `pdfOptionsSchema` as `/api/v1/convert` instead of `z.record(z.unknown())`.
+
 ## [0.25.0] — 2026-02-22
 ### Changed
 - **Navbar redesigned** — icons on all nav items (Zap for Features, CreditCard for Pricing, BookOpen for Docs, FileText for Blog). Solutions replaced with a hover-triggered megamenu showing all 8 solutions with colored icons and short names in a 4×2 grid, plus a "View all solutions" footer link. Docs now opens in a new tab with an ExternalLink indicator. Mobile sheet has expandable Solutions section with 2-column grid.

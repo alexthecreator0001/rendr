@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import crypto from "node:crypto";
+import { assertSafeUrl } from "@/lib/ssrf-guard";
 
 async function getSession() {
   const session = await auth();
@@ -27,6 +28,13 @@ export async function createWebhookAction(
   const rawEvents = formData.getAll("events") as string[];
   const parsed = createSchema.safeParse({ url: formData.get("url"), events: rawEvents });
   if (!parsed.success) return { error: "Valid URL and at least one event are required." };
+
+  // SSRF guard: block private/internal URLs
+  try {
+    await assertSafeUrl(parsed.data.url);
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "Invalid webhook URL." };
+  }
 
   const secret = "whsec_" + crypto.randomBytes(32).toString("base64url");
 
