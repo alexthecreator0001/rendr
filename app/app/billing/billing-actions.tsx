@@ -13,8 +13,8 @@ const STARTER = {
   name: "Starter",
   description: "Side projects and exploration",
   features: [
-    "500 renders / month",
-    "5,000 pages / month",
+    "100 renders / month",
+    "Max 2 MB per render",
     "2 API keys",
     "Community support",
     "7-day log retention",
@@ -26,8 +26,8 @@ const PAID_PLANS = [
     id: "growth" as const,
     name: "Growth",
     monthlyPrice: "€9.90",
-    yearlyPrice: "€99",
-    yearlyPerMonth: "€8.25",
+    yearlyPrice: "€99.90",
+    yearlyPerMonth: "€8.33",
     description: "Teams shipping PDFs in production",
     highlighted: true,
     features: [
@@ -43,8 +43,8 @@ const PAID_PLANS = [
     id: "business" as const,
     name: "Business",
     monthlyPrice: "€49.90",
-    yearlyPrice: "€499",
-    yearlyPerMonth: "€41.58",
+    yearlyPrice: "€490.90",
+    yearlyPerMonth: "€40.91",
     description: "High-volume and compliance-sensitive",
     highlighted: false,
     features: [

@@ -8,7 +8,7 @@ import {
   CreditCard, BookOpen, Wand2, BriefcaseBusiness,
   Settings, LogOut, MoreVertical, ExternalLink,
   Zap, ShieldCheck, Users, BarChart3, Headphones,
-  Lightbulb, MessageSquare, Users2, Bell, FileText, ArrowRight,
+  Lightbulb, MessageSquare, Users2, Bell, FileText,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -56,9 +56,9 @@ const adminNavItems = [
 ] as const;
 
 const PLAN_LABELS: Record<string, string> = {
-  starter: "Starter",
-  growth: "Growth",
-  pro: "Pro",
+  starter:  "Starter",
+  growth:   "Growth",
+  business: "Business",
 };
 
 interface AppSidebarProps {
@@ -107,7 +107,7 @@ export function AppSidebar({ user, usage, plan, role }: AppSidebarProps) {
             <img
               src="/logo.svg"
               alt="Rendr"
-              className="h-[17px] w-auto"
+              className="h-[17px] w-auto invert dark:invert-0"
             />
           </Link>
         </div>
@@ -226,50 +226,66 @@ export function AppSidebar({ user, usage, plan, role }: AppSidebarProps) {
           </nav>
         </ScrollArea>
 
-        {/* Usage widget — only show for app section */}
+        {/* Usage + plan — flat, no card */}
         {!onAdminSection && (
-          <div className="px-3 pb-2">
-            <Link
-              href="/app/usage"
-              onClick={close}
-              className="group block rounded-xl border border-border/60 bg-muted/30 px-3.5 py-3 hover:bg-accent/50 hover:border-border transition-all duration-150"
-            >
-              {/* Plan + arrow */}
-              <div className="flex items-center justify-between mb-2.5">
+          <div className="px-3.5 pt-2 pb-1.5 border-t border-border/50">
+            {/* Plan row */}
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-1.5">
                 <span className={cn(
-                  "text-[10px] font-semibold uppercase tracking-widest",
-                  usagePct >= 90 ? "text-red-400" :
-                  usagePct >= 70 ? "text-amber-400" :
-                  "text-muted-foreground"
-                )}>
-                  {planLabel} Plan
+                  "h-1.5 w-1.5 rounded-full shrink-0",
+                  plan === "business" ? "bg-violet-500" :
+                  plan === "growth"   ? "bg-blue-500"   :
+                  "bg-muted-foreground/40"
+                )} />
+                <span className="text-[12px] font-medium text-foreground leading-none">
+                  {planLabel}
                 </span>
-                <ArrowRight className="h-3 w-3 text-muted-foreground/30 group-hover:text-muted-foreground/70 transition-colors" />
               </div>
-
-              {/* Big usage number */}
-              <div className="flex items-baseline gap-1 mb-0.5">
-                <span className="text-[20px] font-bold tabular-nums leading-none">{usage.used}</span>
-                <span className="text-[11px] text-muted-foreground/50 font-mono">/ {usage.limit}</span>
-              </div>
-              <p className="text-[10px] text-muted-foreground/60 mb-2.5">renders this month</p>
-
-              {/* Progress bar */}
-              <div className="h-1 w-full overflow-hidden rounded-full bg-muted">
-                <div
-                  className={cn("h-full rounded-full transition-all duration-500", barColor)}
-                  style={{ width: `${usagePct}%` }}
-                />
-              </div>
-
-              {/* Upgrade nudge */}
-              {usagePct >= 70 && (
-                <div className="mt-2 flex items-center gap-1 text-[10px] text-amber-500">
-                  <Zap className="h-3 w-3" />
-                  <span>{usagePct >= 90 ? "Almost at limit — upgrade" : "Upgrade for more renders"}</span>
-                </div>
+              {plan === "starter" && (
+                <Link
+                  href="/app/billing"
+                  onClick={close}
+                  className="text-[11px] text-primary hover:underline underline-offset-2 leading-none"
+                >
+                  Upgrade
+                </Link>
               )}
-            </Link>
+            </div>
+
+            {/* Usage numbers */}
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="text-[11px] text-muted-foreground leading-none">
+                <span className="tabular-nums font-semibold text-foreground">{usage.used.toLocaleString()}</span>
+                {" / "}{usage.limit.toLocaleString()} renders
+              </span>
+              <span className={cn(
+                "text-[10px] tabular-nums font-medium leading-none",
+                usagePct >= 90 ? "text-red-500" :
+                usagePct >= 70 ? "text-amber-500" :
+                "text-muted-foreground/50"
+              )}>{usagePct}%</span>
+            </div>
+
+            {/* Progress bar */}
+            <div className="h-[3px] w-full overflow-hidden rounded-full bg-muted">
+              <div
+                className={cn("h-full rounded-full transition-all duration-500", barColor)}
+                style={{ width: `${usagePct}%` }}
+              />
+            </div>
+
+            {/* Upgrade nudge */}
+            {usagePct >= 70 && (
+              <Link
+                href="/app/billing"
+                onClick={close}
+                className="mt-2 flex items-center gap-1 text-[10px] text-amber-500 hover:text-amber-600 transition-colors"
+              >
+                <Zap className="h-3 w-3 shrink-0" />
+                {usagePct >= 90 ? "Almost at limit — upgrade" : "Upgrade for more renders"}
+              </Link>
+            )}
           </div>
         )}
 

@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db"
 import { saveFile } from "@/lib/storage"
 import { deliverWebhooks } from "@/lib/webhook"
 import { assertSafeUrl } from "@/lib/ssrf-guard"
+import { getPlanSizeLimit } from "@/lib/plans"
 
 const TIMEOUT = parseInt(process.env.PLAYWRIGHT_TIMEOUT_MS ?? "30000", 10)
 const BASE_URL = process.env.AUTH_URL ?? process.env.NEXTAUTH_URL ?? "http://localhost:3000"
@@ -106,6 +107,18 @@ export async function processJob(jobId: string): Promise<void> {
     await context.close()
     await browser.close()
     browser = undefined
+
+    // Enforce per-plan PDF size limit
+    const userPlan = (await prisma.user.findUnique({
+      where: { id: job.userId },
+      select: { plan: true },
+    }))?.plan ?? "starter"
+    const sizeLimit = getPlanSizeLimit(userPlan)
+    if (pdfBuffer.length > sizeLimit) {
+      const sizeMb = (pdfBuffer.length / 1024 / 1024).toFixed(1)
+      const limitMb = (sizeLimit / 1024 / 1024).toFixed(0)
+      throw new Error(`PDF is ${sizeMb} MB — exceeds the ${limitMb} MB limit on the Free plan. Upgrade to remove this limit.`)
+    }
 
     const { path: resultPath } = await saveFile(job.id, Buffer.from(pdfBuffer))
     const downloadToken = crypto.randomBytes(32).toString("base64url")

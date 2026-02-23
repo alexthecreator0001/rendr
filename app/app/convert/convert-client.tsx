@@ -12,7 +12,7 @@ import {
 import {
   Loader2, Download, CheckCircle2, XCircle,
   AlertTriangle, FileCode, Braces, Plus, ChevronDown,
-  Zap, Globe, PanelRight,
+  Zap, Globe, PanelRight, CreditCard,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -63,7 +63,7 @@ function InspectorRow({ label, children }: { label: string; children: React.Reac
 }
 
 // ── Main component ────────────────────────────────────────────────────────────
-export function ConvertClient({ templates }: { templates: ConvertTemplate[] }) {
+export function ConvertClient({ templates, plan = "starter" }: { templates: ConvertTemplate[]; plan?: string }) {
   const [state, action, pending] = useActionState<ConvertState, FormData>(
     convertUrlAction, null
   );
@@ -321,6 +321,17 @@ export function ConvertClient({ templates }: { templates: ConvertTemplate[] }) {
               </button>
             </div>
           </div>
+
+          {/* Free plan notice */}
+          {plan === "starter" && (
+            <div className="flex items-center gap-2 px-4 py-1.5 bg-muted/50 border-b border-border text-[11px] text-muted-foreground shrink-0">
+              <CreditCard className="h-3 w-3 shrink-0 text-amber-500" />
+              <span><span className="font-medium text-foreground">Free plan:</span> max 2 MB output · 100 renders/month</span>
+              <Link href="/app/billing" className="ml-auto text-primary hover:underline underline-offset-2 shrink-0">
+                Upgrade →
+              </Link>
+            </div>
+          )}
 
           {/* Slow warning */}
           {slowWarning && (

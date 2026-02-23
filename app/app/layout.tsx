@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import { AppTopbar } from "@/components/layout/app-topbar";
 import { SidebarProvider } from "@/components/providers/sidebar-provider";
+import { getPlanRenderLimit } from "@/lib/plans";
 
 export const metadata = {
   title: {
@@ -50,7 +51,7 @@ export default async function AppLayout({
       <div className="flex h-screen overflow-hidden bg-background">
         <AppSidebar
           user={{ email: session.user.email ?? "" }}
-          usage={{ used: rendersThisMonth, limit: 100 }}
+          usage={{ used: rendersThisMonth, limit: getPlanRenderLimit(plan) }}
           plan={plan}
           role={role}
         />

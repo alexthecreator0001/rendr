@@ -4,13 +4,8 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
 import { getQueue } from "@/lib/queue";
 import { sendUsageWarningEmail, sendUsageLimitReachedEmail } from "@/lib/email";
+import { getPlanRenderLimit } from "@/lib/plans";
 import { z } from "zod";
-
-const PLAN_LIMITS: Record<string, number> = {
-  starter: 100,
-  growth: 1000,
-  pro: Infinity,
-};
 
 async function checkUsageThresholds(userId: string): Promise<void> {
   const user = await prisma.user.findUnique({
@@ -19,8 +14,8 @@ async function checkUsageThresholds(userId: string): Promise<void> {
   });
   if (!user) return;
 
-  const limit = PLAN_LIMITS[user.plan] ?? 100;
-  if (!isFinite(limit)) return; // unlimited plan
+  const limit = getPlanRenderLimit(user.plan);
+  if (!isFinite(limit)) return;
 
   const startOfMonth = new Date();
   startOfMonth.setDate(1);
@@ -65,6 +60,23 @@ export async function convertUrlAction(
 ): Promise<ConvertState> {
   const session = await auth();
   if (!session?.user?.id) return { error: "Not authenticated." };
+
+  // Block if user has hit their monthly render limit
+  const userForLimit = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { plan: true },
+  });
+  const renderLimit = getPlanRenderLimit(userForLimit?.plan ?? "starter");
+  if (isFinite(renderLimit)) {
+    const monthStart = new Date();
+    monthStart.setDate(1); monthStart.setHours(0, 0, 0, 0);
+    const usedThisMonth = await prisma.job.count({
+      where: { userId: session.user.id, createdAt: { gte: monthStart } },
+    });
+    if (usedThisMonth >= renderLimit) {
+      return { error: `Monthly limit of ${renderLimit} renders reached. Upgrade your plan to continue.` };
+    }
+  }
 
   const mode = formData.get("mode") as string;
 

@@ -2,6 +2,18 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.30.3] — 2026-02-23
+### Added
+- `lib/plans.ts` — single source of truth for plan limits (render counts + file size)
+- 2 MB PDF size limit enforced in worker for Free plan; Studio shows "Free plan: max 2 MB" notice
+- Blocking render-limit gate in `convertUrlAction` (returns error instead of queuing when at limit)
+### Changed
+- New logo asset replacing old one; sidebar logo uses `invert dark:invert-0` (black in light mode, white in dark mode)
+- Sidebar usage section redesigned: flat layout, no card — plan dot indicator, usage bar, upgrade link
+- Free plan limit updated to 100 renders/month (was 500); billing page + studio updated
+- Prices updated — Growth: €9.90/mo · €99.90/yr · Business: €49.90/mo · €490.90/yr
+- Growth/Business plan limits: 5,000 and 50,000 renders/month (sidebar now shows correct limit per plan)
+
 ## [0.30.2] — 2026-02-23
 ### Added
 - Yearly billing toggle on billing page with "2 months free" badge

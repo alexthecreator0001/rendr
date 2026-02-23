@@ -18,10 +18,10 @@ const PLANS = [
     name: "Starter",
     price: "Free",
     description: "Side projects and exploration",
-    limit: 500,
+    limit: 100,
     features: [
-      "500 renders / month",
-      "5,000 pages / month",
+      "100 renders / month",
+      "Max 2 MB per render",
       "2 API keys",
       "Community support",
       "7-day log retention",
