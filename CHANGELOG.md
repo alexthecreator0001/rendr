@@ -2,6 +2,15 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.29.0] — 2026-02-23
+### Fixed
+- **Navbar dropdown gap bug** — the 4px gap between the Solutions trigger and the dropdown panel caused `onMouseLeave` to fire prematurely, closing the menu before the user could reach it. Fixed by wrapping the panel in an outer div at `top-full` with `pt-1.5` padding, making the hover-trackable area seamless.
+- **Favicon updated** — new `favicon.png` (dark background + white angular R mark) copied to `public/favicon.png` and `app/icon.png`.
+### Added
+- **Annual billing toggle** — pricing cards now include a Monthly / Annual toggle with 20% discount on paid plans (Growth: $49 → $39/mo, Business: $199 → $159/mo). Shows "Save 20%" badge. Toggle state is local to the `PricingCards` client component.
+- **API key render counts** — the API keys table now shows a "Renders (mo.)" column with the number of jobs rendered via each key in the current calendar month. Backed by a `job.groupBy` query in the dashboard API route.
+- **Solutions: "Try template free" CTA** — added a secondary outline button to each solution page hero linking to `/register?template={slug}`. Positioned between "Get started free" and "Docs".
+
 ## [0.28.0] — 2026-02-23
 ### Fixed
 - **Template cover images not showing for users** — two-part fix: (1) `updateAdminTemplateAction` now propagates `coverImageUrl` to all user templates with the same name via `updateMany` whenever the admin saves a template. (2) `seedStarterTemplates` now uses the admin's actual DB templates (including `coverImageUrl`) as the seed source instead of the hardcoded array — falls back to `STARTER_TEMPLATES` if no admin account exists.

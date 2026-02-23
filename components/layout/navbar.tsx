@@ -36,52 +36,58 @@ function SolutionsMenu({ active }: { active?: boolean }) {
         />
       </button>
 
-      {/* Dropdown panel */}
+      {/* Dropdown panel — outer wrapper bridges gap from button to panel */}
       <div
         className={cn(
-          "absolute left-1/2 top-[calc(100%+4px)] z-50 w-[580px] -translate-x-1/2",
-          "rounded-2xl border border-white/[0.08] bg-zinc-950/[0.98] backdrop-blur-3xl",
-          "shadow-2xl shadow-black/70",
-          "transition-all duration-150 origin-top",
-          open
-            ? "opacity-100 translate-y-0 scale-100 pointer-events-auto"
-            : "opacity-0 -translate-y-1 scale-[0.98] pointer-events-none"
+          "absolute left-1/2 top-full z-50 w-[580px] -translate-x-1/2 pt-1.5",
+          open ? "pointer-events-auto" : "pointer-events-none"
         )}
       >
-        {/* Caret */}
-        <div className="absolute -top-[6px] left-1/2 h-3 w-3 -translate-x-1/2 rotate-45 rounded-tl-[2px] border-l border-t border-white/[0.08] bg-zinc-950/[0.98]" />
+        <div
+          className={cn(
+            "rounded-2xl border border-white/[0.08] bg-zinc-950/[0.98] backdrop-blur-3xl",
+            "shadow-2xl shadow-black/70",
+            "transition-all duration-150 origin-top",
+            open
+              ? "opacity-100 translate-y-0 scale-100"
+              : "opacity-0 -translate-y-1 scale-[0.98]"
+          )}
+        >
+          {/* Caret */}
+          <div className="absolute -top-[6px] left-1/2 h-3 w-3 -translate-x-1/2 rotate-45 rounded-tl-[2px] border-l border-t border-white/[0.08] bg-zinc-950/[0.98]" />
 
-        {/* Grid */}
-        <div className="grid grid-cols-2 p-2">
-          {SOLUTIONS.map((s) => (
+          {/* Grid */}
+          <div className="grid grid-cols-2 p-2">
+            {SOLUTIONS.map((s) => (
+              <Link
+                key={s.slug}
+                href={`/solutions/${s.slug}`}
+                onClick={() => setOpen(false)}
+                className="group rounded-xl px-4 py-3.5 transition-colors duration-100 hover:bg-white/[0.05]"
+              >
+                <p className="mb-1.5 text-[13px] font-medium leading-none text-white">
+                  {s.name}
+                </p>
+                <p className="text-[11.5px] leading-snug text-zinc-500 group-hover:text-zinc-400 transition-colors">
+                  {s.tagline}
+                </p>
+              </Link>
+            ))}
+          </div>
+
+          {/* Footer */}
+          <div className="flex items-center justify-between border-t border-white/[0.06] px-5 py-3">
+            <span className="text-[11.5px] text-zinc-600">
+              PDF generation for every workflow
+            </span>
             <Link
-              key={s.slug}
-              href={`/solutions/${s.slug}`}
+              href="/solutions"
               onClick={() => setOpen(false)}
-              className="group rounded-xl px-4 py-3.5 transition-colors duration-100 hover:bg-white/[0.05]"
+              className="text-[12px] font-medium text-zinc-400 transition-colors hover:text-white"
             >
-              <p className="mb-1.5 text-[13px] font-medium leading-none text-white">
-                {s.name}
-              </p>
-              <p className="text-[11.5px] leading-snug text-zinc-500 group-hover:text-zinc-400 transition-colors">
-                {s.tagline}
-              </p>
+              All solutions →
             </Link>
-          ))}
-        </div>
-
-        {/* Footer */}
-        <div className="flex items-center justify-between border-t border-white/[0.06] px-5 py-3">
-          <span className="text-[11.5px] text-zinc-600">
-            PDF generation for every workflow
-          </span>
-          <Link
-            href="/solutions"
-            onClick={() => setOpen(false)}
-            className="text-[12px] font-medium text-zinc-400 transition-colors hover:text-white"
-          >
-            All solutions →
-          </Link>
+          </div>
         </div>
       </div>
     </div>

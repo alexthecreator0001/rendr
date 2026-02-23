@@ -24,6 +24,7 @@ type ApiKeyRow = {
   revokedAt: string | null;
   createdAt: string;
   lastUsedAt: string | null;
+  rendersThisMonth: number;
 };
 
 async function fetchApiKeys(): Promise<ApiKeyRow[]> {
@@ -143,8 +144,9 @@ export default function ApiKeysPage() {
                 <th className="px-4 py-3 text-left font-medium text-muted-foreground">Name</th>
                 <th className="px-4 py-3 text-left font-medium text-muted-foreground">Key</th>
                 <th className="px-4 py-3 text-left font-medium text-muted-foreground">Status</th>
-                <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden sm:table-cell">Last used</th>
-                <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden md:table-cell">Created</th>
+                <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden sm:table-cell">Renders (mo.)</th>
+                <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden md:table-cell">Last used</th>
+                <th className="px-4 py-3 text-left font-medium text-muted-foreground hidden lg:table-cell">Created</th>
                 <th className="px-4 py-3" />
               </tr>
             </thead>
@@ -160,10 +162,13 @@ export default function ApiKeysPage() {
                       <Badge variant="secondary" className="text-xs bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400 border-0">Active</Badge>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-muted-foreground text-xs hidden sm:table-cell">
-                    {k.lastUsedAt ? new Date(k.lastUsedAt).toLocaleDateString() : "Never"}
+                  <td className="px-4 py-3 text-xs hidden sm:table-cell">
+                    <span className="font-medium tabular-nums">{k.rendersThisMonth.toLocaleString()}</span>
                   </td>
                   <td className="px-4 py-3 text-muted-foreground text-xs hidden md:table-cell">
+                    {k.lastUsedAt ? new Date(k.lastUsedAt).toLocaleDateString() : "Never"}
+                  </td>
+                  <td className="px-4 py-3 text-muted-foreground text-xs hidden lg:table-cell">
                     {new Date(k.createdAt).toLocaleDateString()}
                   </td>
                   <td className="px-4 py-3 text-right">

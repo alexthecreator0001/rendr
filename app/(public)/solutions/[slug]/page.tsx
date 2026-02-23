@@ -127,11 +127,19 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
                 </Button>
                 <Button
                   size="lg"
+                  variant="outline"
+                  asChild
+                  className="h-11 rounded-xl px-6 text-sm font-medium border-white/10 text-zinc-300 hover:bg-white/[0.07] hover:text-white bg-transparent"
+                >
+                  <Link href={`/register?template=${solution.slug}`}>Try template free</Link>
+                </Button>
+                <Button
+                  size="lg"
                   variant="ghost"
                   asChild
-                  className="h-11 rounded-xl px-6 text-sm text-white/50 hover:text-white hover:bg-white/[0.06]"
+                  className="h-11 rounded-xl px-6 text-sm text-white/40 hover:text-white hover:bg-white/[0.06]"
                 >
-                  <Link href="/docs/quick-start">View docs →</Link>
+                  <Link href="/docs/quick-start">Docs →</Link>
                 </Button>
               </div>
             </div>
