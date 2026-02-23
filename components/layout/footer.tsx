@@ -40,7 +40,7 @@ export function Footer() {
           {/* Brand */}
           <div className="col-span-2 sm:col-span-3 lg:col-span-2">
             <Link href="/" className="inline-flex items-center">
-              <img src="/logo-white.svg" alt="Rendr" className="h-5 w-auto" />
+              <img src="/logo-white.svg" alt="Rendr" className="h-[18px] w-auto" />
             </Link>
             <p className="mt-4 text-sm leading-relaxed text-zinc-500 max-w-[180px]">
               HTML to PDF, done right.

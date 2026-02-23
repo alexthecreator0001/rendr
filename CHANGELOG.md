@@ -2,6 +2,13 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.27.0] — 2026-02-23
+### Changed
+- **Navbar redesign** — complete rewrite to minimal Apple-quality design. Removed all icons from nav items. Clean text-only navigation at 13.5px medium weight. Active state: full white; inactive: zinc-400 with white hover. Sticky frosted glass (`bg-zinc-950/80 backdrop-blur-2xl`) on scroll, transparent over hero. Solutions megamenu rewritten as clean 2-column text grid — solution name + tagline, no icons, no colored badges. "Get started" is a rounded white pill button. Mobile sheet matches the dark zinc-950 aesthetic.
+- **Logo updated** — all pages now use the new Rendr wordmark (`Group 5384.svg`). Applied to navbar, mobile sheet, footer, app sidebar, and auth pages.
+- **Favicon** — new `favicon.png` (Rendr R-mark) added to `public/` and referenced in root layout metadata. Next.js App Router `icon.png` also placed in `app/` for automatic detection.
+- **Security headers** — `logo.svg` dark variant regenerated from new logo source.
+
 ## [0.26.0] — 2026-02-23
 ### Security
 - **ReDoS fix** — template variable keys are now regex-escaped before building the replacement pattern in `worker/processor.ts`, preventing ReDoS via crafted variable names.

@@ -107,7 +107,7 @@ export function AppSidebar({ user, usage, plan, role }: AppSidebarProps) {
             <img
               src="/logo-white.svg"
               alt="Rendr"
-              className="h-[18px] w-auto invert dark:invert-0"
+              className="h-[17px] w-auto"
             />
           </Link>
         </div>

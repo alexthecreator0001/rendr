@@ -32,6 +32,10 @@ export const metadata: Metadata = {
   description:
     "Rendr converts HTML templates to production-ready PDFs via a simple API. No headless browser to manage.",
   keywords: ["pdf", "html to pdf", "api", "templates", "rendering"],
+  icons: {
+    icon: "/favicon.png",
+    apple: "/favicon.png",
+  },
   openGraph: {
     title: "Rendr — HTML to PDF API",
     description:
