@@ -12,7 +12,7 @@ export default async function SettingsPage() {
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
-    select: { email: true, createdAt: true },
+    select: { email: true, createdAt: true, plan: true },
   });
 
   return (
@@ -20,6 +20,7 @@ export default async function SettingsPage() {
       <SettingsClient
         email={user?.email ?? ""}
         createdAt={user?.createdAt ?? new Date()}
+        plan={user?.plan ?? "starter"}
       />
     </div>
   );

@@ -9,6 +9,7 @@ import {
   Settings, LogOut, MoreVertical, ExternalLink,
   Zap, ShieldCheck, Users, BarChart3, Headphones,
   Lightbulb, MessageSquare, Users2, Bell, FileText,
+  ChevronsUpDown, Check,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -66,9 +67,10 @@ interface AppSidebarProps {
   usage: { used: number; limit: number };
   plan: string;
   role?: string;
+  teams?: { id: string; name: string }[];
 }
 
-export function AppSidebar({ user, usage, plan, role }: AppSidebarProps) {
+export function AppSidebar({ user, usage, plan, role, teams = [] }: AppSidebarProps) {
   const pathname = usePathname();
   const [pending, startTransition] = useTransition();
   const { open, close } = useSidebar();
@@ -83,6 +85,12 @@ export function AppSidebar({ user, usage, plan, role }: AppSidebarProps) {
   const planLabel = PLAN_LABELS[plan] ?? plan;
   const isAdmin = role === "admin";
   const onAdminSection = pathname.startsWith("/admin");
+
+  // Workspace switcher — determine current workspace from URL
+  const teamMatch = pathname.match(/^\/app\/teams\/([^/]+)/);
+  const currentTeamId = teamMatch?.[1] ?? null;
+  const currentTeam = currentTeamId ? teams.find((t) => t.id === currentTeamId) : null;
+  const currentWorkspaceName = currentTeam?.name ?? "Personal";
 
   return (
     <>
@@ -110,6 +118,51 @@ export function AppSidebar({ user, usage, plan, role }: AppSidebarProps) {
               className="h-[17px] w-auto invert dark:invert-0"
             />
           </Link>
+        </div>
+
+        {/* Workspace switcher */}
+        <div className="px-2.5 py-2 border-b border-border/50">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="group w-full flex items-center gap-2 rounded-lg px-2 py-1.5 text-left hover:bg-accent/60 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                <div className="h-5 w-5 shrink-0 rounded bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center text-[9px] font-bold text-white select-none">
+                  {currentWorkspaceName.slice(0, 1).toUpperCase()}
+                </div>
+                <span className="text-[12px] font-medium flex-1 truncate leading-none">{currentWorkspaceName}</span>
+                <ChevronsUpDown className="h-3 w-3 shrink-0 text-muted-foreground/40 group-hover:text-muted-foreground/70 transition-colors" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side="bottom" align="start" sideOffset={4} className="w-[190px]">
+              <DropdownMenuItem asChild>
+                <Link href="/app" onClick={close} className="flex items-center gap-2 cursor-pointer">
+                  <div className="h-4 w-4 shrink-0 rounded bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center text-[8px] font-bold text-white">
+                    P
+                  </div>
+                  <span className="flex-1">Personal</span>
+                  {!currentTeamId && <Check className="h-3 w-3 text-primary" />}
+                </Link>
+              </DropdownMenuItem>
+              {teams.length > 0 && <DropdownMenuSeparator />}
+              {teams.map((team) => (
+                <DropdownMenuItem key={team.id} asChild>
+                  <Link href={`/app/teams/${team.id}`} onClick={close} className="flex items-center gap-2 cursor-pointer">
+                    <div className="h-4 w-4 shrink-0 rounded bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-[8px] font-bold text-white">
+                      {team.name.slice(0, 1).toUpperCase()}
+                    </div>
+                    <span className="flex-1 truncate">{team.name}</span>
+                    {currentTeamId === team.id && <Check className="h-3 w-3 text-primary" />}
+                  </Link>
+                </DropdownMenuItem>
+              ))}
+              <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <Link href="/app/teams" onClick={close} className="text-muted-foreground cursor-pointer">
+                  <Users2 className="h-3.5 w-3.5 mr-2" />
+                  Manage teams
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         {/* Navigation */}

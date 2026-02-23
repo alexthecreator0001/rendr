@@ -2,6 +2,13 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.30.5] — 2026-02-23
+### Fixed
+- Settings page now shows the user's actual plan instead of hardcoded "Starter"
+- Team invite page now shows a landing with "Create account" + "Sign in" buttons for unauthenticated visitors (previously redirected directly to /login)
+### Added
+- Workspace switcher in sidebar — compact dropdown above nav shows Personal + all teams the user belongs to, with current workspace highlighted
+
 ## [0.30.4] — 2026-02-23
 ### Added
 - USD/EUR currency auto-detection via CF-IPCountry header (EU → EUR, all others → USD)

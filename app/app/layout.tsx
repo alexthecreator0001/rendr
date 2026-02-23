@@ -24,7 +24,7 @@ export default async function AppLayout({
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
-  const [rendersThisMonth, user] = await Promise.all([
+  const [rendersThisMonth, user, teamMemberships] = await Promise.all([
     prisma.job.count({
       where: {
         userId: session.user.id,
@@ -36,6 +36,11 @@ export default async function AppLayout({
       where: { id: session.user.id },
       select: { plan: true, role: true, emailVerified: true },
     }),
+    prisma.teamMember.findMany({
+      where: { userId: session.user.id },
+      select: { team: { select: { id: true, name: true } } },
+      orderBy: { joinedAt: "asc" },
+    }),
   ]);
 
   // DB-checked verification guard — cannot be bypassed via JWT
@@ -45,6 +50,7 @@ export default async function AppLayout({
 
   const plan = user?.plan ?? "starter";
   const role = user?.role ?? "user";
+  const teams = teamMemberships.map((m) => m.team);
 
   return (
     <SidebarProvider>
@@ -54,6 +60,7 @@ export default async function AppLayout({
           usage={{ used: rendersThisMonth, limit: getPlanRenderLimit(plan) }}
           plan={plan}
           role={role}
+          teams={teams}
         />
         <div className="flex flex-1 flex-col overflow-hidden min-w-0">
           <AppTopbar user={{ email: session.user.email ?? "" }} />

@@ -11,9 +11,16 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
+const PLAN_LABELS: Record<string, string> = {
+  starter: "Starter",
+  growth: "Growth",
+  business: "Business",
+};
+
 interface SettingsClientProps {
   email: string;
   createdAt: Date;
+  plan: string;
 }
 
 function Section({
@@ -45,7 +52,7 @@ function Section({
   );
 }
 
-export function SettingsClient({ email, createdAt }: SettingsClientProps) {
+export function SettingsClient({ email, createdAt, plan }: SettingsClientProps) {
   const [state, action, pending] = useActionState(changePasswordAction, null);
 
   const initials = email.slice(0, 2).toUpperCase();
@@ -89,7 +96,7 @@ export function SettingsClient({ email, createdAt }: SettingsClientProps) {
                   <p className="font-semibold text-sm">{email}</p>
                   <div className="flex items-center gap-2 mt-1">
                     <Badge variant="secondary" className="rounded-full px-2 py-0 text-[10px] h-5">
-                      Starter
+                      {PLAN_LABELS[plan] ?? plan}
                     </Badge>
                     <span className="text-xs text-muted-foreground">Member since {joined}</span>
                   </div>
