@@ -2,6 +2,12 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.28.0] — 2026-02-23
+### Fixed
+- **Template cover images not showing for users** — two-part fix: (1) `updateAdminTemplateAction` now propagates `coverImageUrl` to all user templates with the same name via `updateMany` whenever the admin saves a template. (2) `seedStarterTemplates` now uses the admin's actual DB templates (including `coverImageUrl`) as the seed source instead of the hardcoded array — falls back to `STARTER_TEMPLATES` if no admin account exists.
+### Added
+- **Admin: "Sync covers to all users" button** — one-click bulk push of all admin template cover images to every matching user template. Useful after bulk cover image uploads.
+
 ## [0.27.0] — 2026-02-23
 ### Changed
 - **Navbar redesign** — complete rewrite to minimal Apple-quality design. Removed all icons from nav items. Clean text-only navigation at 13.5px medium weight. Active state: full white; inactive: zinc-400 with white hover. Sticky frosted glass (`bg-zinc-950/80 backdrop-blur-2xl`) on scroll, transparent over hero. Solutions megamenu rewritten as clean 2-column text grid — solution name + tagline, no icons, no colored badges. "Get started" is a rounded white pill button. Mobile sheet matches the dark zinc-950 aesthetic.

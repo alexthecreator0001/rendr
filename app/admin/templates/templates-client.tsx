@@ -13,7 +13,8 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
   DialogTrigger, DialogFooter, DialogDescription,
 } from "@/components/ui/dialog";
-import { Plus, Pencil, Trash2, Layers, AlertTriangle, ImageIcon, Upload } from "lucide-react";
+import { Plus, Pencil, Trash2, Layers, AlertTriangle, ImageIcon, Upload, RefreshCw } from "lucide-react";
+import { syncTemplateCoversAction } from "@/app/admin/_actions";
 
 type Template = {
   id: string;
@@ -220,6 +221,41 @@ function DeleteButton({ id }: { id: string }) {
   );
 }
 
+function SyncCoversButton() {
+  const [pending, setPending] = useState(false);
+  const [result, setResult] = useState<string | null>(null);
+
+  async function handleSync() {
+    setPending(true);
+    setResult(null);
+    try {
+      const res = await syncTemplateCoversAction();
+      if (res.error) setResult(`Error: ${res.error}`);
+      else setResult(`Synced cover images to ${res.synced} user templates`);
+    } finally {
+      setPending(false);
+    }
+  }
+
+  return (
+    <div className="flex items-center gap-2">
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={handleSync}
+        disabled={pending}
+        className="rounded-lg gap-1.5 text-xs"
+      >
+        <RefreshCw className={`h-3.5 w-3.5 ${pending ? "animate-spin" : ""}`} />
+        {pending ? "Syncing…" : "Sync covers to all users"}
+      </Button>
+      {result && (
+        <span className="text-xs text-muted-foreground">{result}</span>
+      )}
+    </div>
+  );
+}
+
 export function AdminTemplatesClient({
   templates,
   adminUserId,
@@ -236,7 +272,10 @@ export function AdminTemplatesClient({
             Canonical templates stored in your admin account. Set a cover image so they look great on the templates page.
           </p>
         </div>
-        <CreateDialog adminUserId={adminUserId} />
+        <div className="flex items-center gap-2">
+          <SyncCoversButton />
+          <CreateDialog adminUserId={adminUserId} />
+        </div>
       </div>
 
       {templates.length === 0 ? (

@@ -1,6 +1,6 @@
 import type { PrismaClient } from "@prisma/client";
 
-export type StarterTemplate = { name: string; html: string };
+export type StarterTemplate = { name: string; html: string; coverImageUrl?: string | null };
 
 export const STARTER_TEMPLATES: StarterTemplate[] = [
 
@@ -499,6 +499,10 @@ body{font-family:'Inter',system-ui,sans-serif;background:#fff;color:#111827;font
 /**
  * Seeds starter templates for a newly created user.
  * Skips if the user already has templates (idempotent for normal use).
+ *
+ * Uses admin's templates as the canonical source (so cover images set in
+ * /admin/templates are included). Falls back to the hardcoded STARTER_TEMPLATES
+ * if no admin account exists yet.
  */
 export async function seedStarterTemplates(
   userId: string,
@@ -510,16 +514,36 @@ export async function seedStarterTemplates(
     if (existing > 0) return;
   }
 
-  // Upsert by name so re-seeding refreshes HTML without duplicating
-  for (const t of STARTER_TEMPLATES) {
+  // Prefer admin's templates as the canonical seed source (includes coverImageUrl)
+  const adminUser = await prisma.user.findFirst({
+    where: { role: "admin" },
+    select: { id: true },
+  });
+
+  const source: StarterTemplate[] =
+    adminUser
+      ? await prisma.template.findMany({
+          where: { userId: adminUser.id },
+          select: { name: true, html: true, coverImageUrl: true },
+          orderBy: { createdAt: "asc" },
+        })
+      : STARTER_TEMPLATES;
+
+  // Upsert by name so re-seeding refreshes HTML and cover images without duplicating
+  for (const t of source) {
     const existing = await prisma.template.findFirst({
       where: { userId, name: t.name },
       select: { id: true },
     });
     if (existing) {
-      await prisma.template.update({ where: { id: existing.id }, data: { html: t.html } });
+      await prisma.template.update({
+        where: { id: existing.id },
+        data: { html: t.html, coverImageUrl: t.coverImageUrl ?? null },
+      });
     } else {
-      await prisma.template.create({ data: { userId, name: t.name, html: t.html } });
+      await prisma.template.create({
+        data: { userId, name: t.name, html: t.html, coverImageUrl: t.coverImageUrl ?? null },
+      });
     }
   }
 }

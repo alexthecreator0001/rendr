@@ -134,6 +134,14 @@ export async function updateAdminTemplateAction(
   if (!html) return { error: "HTML is required." };
 
   await prisma.template.update({ where: { id }, data: { name, html, coverImageUrl } });
+
+  // Propagate coverImageUrl to every other user's template with the same name
+  // so cover images set in admin are visible to all existing users
+  await prisma.template.updateMany({
+    where: { name, NOT: { id } },
+    data: { coverImageUrl },
+  });
+
   revalidatePath("/admin/templates");
   revalidatePath("/app/templates");
   return {};
@@ -151,6 +159,29 @@ export async function deleteAdminTemplateAction(
   revalidatePath("/admin/templates");
   revalidatePath("/app/templates");
   return {};
+}
+
+export async function syncTemplateCoversAction(): Promise<{ error?: string; synced?: number }> {
+  const adminId = await requireAdmin();
+
+  // Fetch all admin templates that have a cover image
+  const adminTemplates = await prisma.template.findMany({
+    where: { userId: adminId, coverImageUrl: { not: null } },
+    select: { name: true, coverImageUrl: true },
+  });
+
+  let synced = 0;
+  for (const t of adminTemplates) {
+    const result = await prisma.template.updateMany({
+      where: { name: t.name, NOT: { userId: adminId } },
+      data: { coverImageUrl: t.coverImageUrl },
+    });
+    synced += result.count;
+  }
+
+  revalidatePath("/app/templates");
+  revalidatePath("/admin/templates");
+  return { synced };
 }
 
 // ─── Admin: Blog management ───────────────────────────────────────────────────
