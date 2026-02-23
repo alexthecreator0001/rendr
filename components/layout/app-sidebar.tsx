@@ -105,7 +105,7 @@ export function AppSidebar({ user, usage, plan, role }: AppSidebarProps) {
         <div className="flex h-14 items-center border-b border-border px-4">
           <Link href="/" className="flex items-center" onClick={close}>
             <img
-              src="/logo-white.svg"
+              src="/logo.svg"
               alt="Rendr"
               className="h-[17px] w-auto"
             />

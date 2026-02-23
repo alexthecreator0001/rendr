@@ -18,7 +18,7 @@ export default function RegisterPage() {
         {/* ── Left panel — branding (desktop only) ─────────────────── */}
         <div className="hidden lg:flex flex-col justify-between border-r border-white/[0.07] bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-950 p-10">
           <Link href="/">
-            <img src="/logo-white.svg" alt="Rendr" className="h-5 w-auto" />
+            <img src="/logo.svg" alt="Rendr" className="h-5 w-auto" />
           </Link>
 
           <div>
@@ -64,7 +64,7 @@ export default function RegisterPage() {
         <div className="bg-zinc-950 p-8 sm:p-10 lg:p-12">
           {/* Mobile logo */}
           <Link href="/" className="mb-8 block lg:hidden">
-            <img src="/logo-white.svg" alt="Rendr" className="h-5 w-auto" />
+            <img src="/logo.svg" alt="Rendr" className="h-5 w-auto" />
           </Link>
 
           <div className="mb-8">

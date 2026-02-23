@@ -11,11 +11,17 @@ model User {
   id            String    @id @default(cuid())
   email         String    @unique
   passwordHash  String
-  plan          String    @default("starter")
-  role          String    @default("user")   // "user" | "admin"
+  plan          String    @default("starter")  // "starter" | "growth" | "business"
+  role          String    @default("user")     // "user" | "admin"
   emailVerified DateTime?
   bannedAt      DateTime?
   createdAt     DateTime  @default(now())
+
+  // Stripe billing
+  stripeCustomerId     String?  @unique
+  stripeSubscriptionId String?  @unique
+  stripePriceId        String?
+  subscriptionStatus   String?  // active | trialing | past_due | canceled | unpaid
 
   apiKeys            ApiKey[]
   jobs               Job[]

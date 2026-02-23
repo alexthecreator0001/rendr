@@ -7,7 +7,7 @@ export default function Loading() {
           <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-primary animate-spin" />
         </div>
         <img
-          src="/logo.svg"
+          src="/logo-dark.svg"
           alt="Rendr"
           className="h-4 w-auto opacity-20 dark:invert animate-pulse"
         />

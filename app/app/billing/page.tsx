@@ -2,103 +2,97 @@ import type { Metadata } from "next";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
-import { Zap, Check, FileText, Clock, Webhook, Key, Shield } from "lucide-react";
+import { Zap, Check, FileText, Clock, Webhook, Key, Shield, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
+import { CheckoutButton, PortalButton } from "./billing-actions";
 
 export const metadata: Metadata = { title: "Billing" };
 
-const PLAN_LIMITS: Record<string, number> = {
-  starter: 100,
-  growth: 2000,
-  pro: 999999,
-};
+// ── Plan config ────────────────────────────────────────────────────────────
 
-const PLAN_LABELS: Record<string, string> = {
-  starter: "Starter — Free",
-  growth: "Growth — $29/mo",
-  pro: "Pro — $99/mo",
-};
-
-const PLAN_FEATURE_PILLS: Record<string, { icon: React.ElementType; label: string }[]> = {
-  starter: [
-    { icon: FileText, label: "100 renders / mo" },
-    { icon: Key,      label: "REST API" },
-    { icon: Clock,    label: "Async rendering" },
-    { icon: Shield,   label: "Secure download links" },
-  ],
-  growth: [
-    { icon: FileText, label: "2,000 renders / mo" },
-    { icon: Key,      label: "REST API" },
-    { icon: Webhook,  label: "Webhooks" },
-    { icon: Shield,   label: "Priority queue" },
-  ],
-  pro: [
-    { icon: FileText, label: "Unlimited renders" },
-    { icon: Key,      label: "REST API" },
-    { icon: Webhook,  label: "Webhooks" },
-    { icon: Shield,   label: "Dedicated worker" },
-  ],
-};
-
-const plans = [
+const PLANS = [
   {
     id: "starter",
     name: "Starter",
     price: "Free",
-    description: "For individuals and side projects",
+    description: "Side projects and exploration",
+    limit: 500,
     features: [
-      "100 renders / month",
-      "A4 & Letter formats",
-      "URL, HTML & template input",
-      "PDF download links",
-      "REST API access",
+      "500 renders / month",
+      "5,000 pages / month",
+      "2 API keys",
       "Community support",
+      "7-day log retention",
     ],
-    cta: "Current plan",
-    ctaHref: null as string | null,
+    pills: [
+      { icon: FileText, label: "500 renders / mo" },
+      { icon: Key,      label: "REST API" },
+      { icon: Clock,    label: "Async rendering" },
+      { icon: Shield,   label: "Secure download links" },
+    ],
   },
   {
     id: "growth",
     name: "Growth",
-    price: "$29",
+    price: "$49",
     period: "/mo",
-    description: "For teams shipping real products",
+    description: "Teams shipping PDFs in production",
+    limit: 5000,
     highlighted: true,
     features: [
-      "2,000 renders / month",
-      "All Starter features",
-      "Webhooks",
-      "Custom headers & footers",
-      "Priority rendering queue",
+      "5,000 renders / month",
+      "50,000 pages / month",
+      "Unlimited API keys",
+      "5 webhook endpoints",
       "Email support",
+      "30-day log retention",
     ],
-    cta: "Upgrade to Growth",
-    ctaHref: "/pricing" as string | null,
+    pills: [
+      { icon: FileText, label: "5,000 renders / mo" },
+      { icon: Key,      label: "Unlimited API keys" },
+      { icon: Webhook,  label: "Webhooks" },
+      { icon: Shield,   label: "Priority queue" },
+    ],
   },
   {
-    id: "pro",
-    name: "Pro",
-    price: "$99",
+    id: "business",
+    name: "Business",
+    price: "$199",
     period: "/mo",
-    description: "For high-volume production workloads",
+    description: "High-volume and compliance-sensitive",
+    limit: 50000,
     features: [
-      "Unlimited renders",
-      "All Growth features",
-      "Custom fonts & assets",
-      "Dedicated worker",
-      "SLA guarantee",
-      "Slack support",
+      "50,000 renders / month",
+      "500,000 pages / month",
+      "Unlimited API keys",
+      "Unlimited webhooks",
+      "Priority support + SLA",
+      "90-day log retention",
+      "Custom font uploads",
+      "Unlimited templates",
     ],
-    cta: "Upgrade to Pro",
-    ctaHref: "/pricing" as string | null,
+    pills: [
+      { icon: FileText, label: "50,000 renders / mo" },
+      { icon: Key,      label: "Unlimited keys" },
+      { icon: Webhook,  label: "Unlimited webhooks" },
+      { icon: Shield,   label: "SLA guarantee" },
+    ],
   },
-];
+] as const;
 
-export default async function BillingPage() {
+// ── Page ──────────────────────────────────────────────────────────────────
+
+export default async function BillingPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ upgraded?: string }>;
+}) {
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
+
+  const { upgraded } = await searchParams;
 
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -114,30 +108,54 @@ export default async function BillingPage() {
     }),
     prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { plan: true },
+      select: {
+        plan: true,
+        subscriptionStatus: true,
+        stripeSubscriptionId: true,
+        stripeCustomerId: true,
+      },
     }),
   ]);
 
-  const currentPlan = user?.plan ?? "starter";
-  const planLimit = currentPlan === "pro" ? 999999 : (PLAN_LIMITS[currentPlan] ?? 100);
-  const planLabel = PLAN_LABELS[currentPlan] ?? "Starter — Free";
-  const featurePills = PLAN_FEATURE_PILLS[currentPlan] ?? PLAN_FEATURE_PILLS.starter;
-
-  const usagePct = currentPlan === "pro"
-    ? Math.min(Math.round((rendersThisMonth / 1000) * 100), 100) // relative for pro
-    : Math.min(Math.round((rendersThisMonth / planLimit) * 100), 100);
-
-  const resetDate = nextReset.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
-
+  const currentPlanId = user?.plan ?? "starter";
+  const currentPlan = PLANS.find((p) => p.id === currentPlanId) ?? PLANS[0];
+  const planLimit = currentPlan.limit;
+  const usagePct = Math.min(Math.round((rendersThisMonth / planLimit) * 100), 100);
+  const resetDate = nextReset.toLocaleDateString("en-US", {
+    month: "long", day: "numeric", year: "numeric",
+  });
   const barColor =
     usagePct >= 90 ? "bg-red-500" :
     usagePct >= 70 ? "bg-amber-500" :
     "bg-primary";
 
-  const isOnPaidPlan = currentPlan !== "starter";
+  const isOnPaidPlan = currentPlanId !== "starter";
+  const isPastDue = user?.subscriptionStatus === "past_due";
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8 space-y-8">
+
+      {/* Success banner */}
+      {upgraded === "true" && (
+        <div className="rounded-xl border border-green-200 bg-green-50 dark:border-green-900/50 dark:bg-green-900/20 px-5 py-3.5 flex items-center gap-3">
+          <Check className="h-5 w-5 text-green-600 dark:text-green-400 shrink-0" />
+          <p className="text-sm font-medium text-green-800 dark:text-green-300">
+            You&apos;re now on the <strong>{currentPlan.name}</strong> plan. Thank you!
+          </p>
+        </div>
+      )}
+
+      {/* Past-due warning */}
+      {isPastDue && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 dark:border-amber-900/50 dark:bg-amber-900/20 px-5 py-3.5 flex items-center gap-3">
+          <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0" />
+          <p className="text-sm font-medium text-amber-800 dark:text-amber-300 flex-1">
+            Your last payment failed. Update your payment method to keep your plan active.
+          </p>
+          <PortalButton className="shrink-0 text-xs h-8 px-3" />
+        </div>
+      )}
+
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Billing</h1>
@@ -149,37 +167,39 @@ export default async function BillingPage() {
       <div className="rounded-2xl border border-border overflow-hidden">
         <div className="divide-y divide-border">
 
-          {/* ── Current Plan ─────────────────────────────────── */}
+          {/* Current Plan */}
           <div className="p-6">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <div className="flex items-center gap-2.5 mb-1">
                   <h2 className="text-base font-semibold">Current Plan</h2>
                   <Badge className="rounded-full bg-primary/10 text-primary border-0 text-[11px] font-semibold px-2">
-                    {planLabel}
+                    {currentPlan.name}
+                    {currentPlan.price !== "Free" && ` — ${currentPlan.price}/mo`}
                   </Badge>
+                  {isPastDue && (
+                    <Badge variant="destructive" className="rounded-full text-[11px] font-semibold px-2">
+                      Payment failed
+                    </Badge>
+                  )}
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  {currentPlan === "pro"
-                    ? "Unlimited renders · dedicated worker · SLA guarantee"
-                    : currentPlan === "growth"
-                    ? "2,000 renders per month · priority queue"
-                    : "100 renders per month · no credit card required"}
-                </p>
+                <p className="text-sm text-muted-foreground">{currentPlan.description}</p>
               </div>
-              {!isOnPaidPlan && (
-                <Button asChild className="shrink-0">
-                  <Link href="/pricing">
-                    <Zap className="h-3.5 w-3.5 mr-1.5" />
+              <div className="flex items-center gap-2 shrink-0">
+                {isOnPaidPlan ? (
+                  <PortalButton />
+                ) : (
+                  <CheckoutButton plan="growth">
+                    <Zap className="h-3.5 w-3.5" />
                     Upgrade plan
-                  </Link>
-                </Button>
-              )}
+                  </CheckoutButton>
+                )}
+              </div>
             </div>
 
             {/* Feature pills */}
             <div className="mt-5 flex flex-wrap gap-2">
-              {featurePills.map(({ icon: Icon, label }) => (
+              {currentPlan.pills.map(({ icon: Icon, label }) => (
                 <div key={label} className="flex items-center gap-1.5 rounded-full border border-border bg-muted/40 px-3 py-1 text-xs text-muted-foreground">
                   <Icon className="h-3 w-3" />
                   {label}
@@ -188,81 +208,58 @@ export default async function BillingPage() {
             </div>
           </div>
 
-          {/* ── Usage This Month ─────────────────────────────── */}
+          {/* Usage */}
           <div className="p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-base font-semibold">Usage this month</h2>
               <span className="text-sm font-mono text-muted-foreground">
-                {rendersThisMonth}
-                {currentPlan !== "pro" && ` / ${planLimit}`}
-                {" renders"}
+                {rendersThisMonth.toLocaleString()} / {planLimit.toLocaleString()} renders
               </span>
             </div>
 
-            {/* Big number */}
             <div className="flex items-end gap-3 mb-4">
               <span className="text-5xl font-black tracking-tight text-foreground">
-                {rendersThisMonth}
+                {rendersThisMonth.toLocaleString()}
               </span>
-              {currentPlan !== "pro" && (
-                <span className="text-lg text-muted-foreground mb-1.5 font-medium">
-                  / {planLimit}
-                </span>
-              )}
-              {currentPlan !== "pro" && (
-                <span className={`ml-auto text-sm font-semibold mb-1.5 ${
-                  usagePct >= 90 ? "text-red-500" : usagePct >= 70 ? "text-amber-500" : "text-green-500"
-                }`}>
-                  {usagePct}% used
-                </span>
-              )}
-              {currentPlan === "pro" && (
-                <span className="ml-auto text-sm font-semibold mb-1.5 text-green-500">
-                  Unlimited
-                </span>
-              )}
+              <span className="text-lg text-muted-foreground mb-1.5 font-medium">
+                / {planLimit.toLocaleString()}
+              </span>
+              <span className={`ml-auto text-sm font-semibold mb-1.5 ${
+                usagePct >= 90 ? "text-red-500" : usagePct >= 70 ? "text-amber-500" : "text-green-500"
+              }`}>
+                {usagePct}% used
+              </span>
             </div>
 
-            {currentPlan !== "pro" && (
-              <>
-                {/* Progress bar */}
-                <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
-                  <div
-                    className={`h-full rounded-full transition-all ${barColor}`}
-                    style={{ width: `${usagePct}%` }}
-                  />
-                </div>
-                <p className="mt-2.5 text-xs text-muted-foreground">
-                  Resets on {resetDate}
-                  {usagePct >= 80 && (
-                    <span className="ml-2 text-amber-600 dark:text-amber-400 font-medium">
-                      · Running low?{" "}
-                      <Link href="/pricing" className="underline underline-offset-2">Upgrade for more.</Link>
-                    </span>
-                  )}
-                </p>
-              </>
-            )}
-            {currentPlan === "pro" && (
-              <p className="text-xs text-muted-foreground">
-                Resets on {resetDate} · unlimited renders on Pro
-              </p>
-            )}
+            <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
+              <div
+                className={`h-full rounded-full transition-all ${barColor}`}
+                style={{ width: `${usagePct}%` }}
+              />
+            </div>
+            <p className="mt-2.5 text-xs text-muted-foreground">
+              Resets on {resetDate}
+              {usagePct >= 80 && (
+                <span className="ml-2 text-amber-600 dark:text-amber-400 font-medium">
+                  · Running low?{" "}
+                  <Link href="/pricing" className="underline underline-offset-2">Upgrade for more.</Link>
+                </span>
+              )}
+            </p>
           </div>
 
         </div>
       </div>
 
-      {/* ── Plan Comparison ──────────────────────────────────── */}
+      {/* Plan Comparison */}
       <div>
         <h2 className="text-base font-semibold mb-4">Compare plans</h2>
         <div className="grid gap-4 sm:grid-cols-3">
-          {plans.map((plan) => {
-            const isCurrent = plan.id === currentPlan;
-            const ctaHref = isCurrent ? null : plan.ctaHref;
+          {PLANS.map((plan) => {
+            const isCurrent = plan.id === currentPlanId;
             return (
               <div
-                key={plan.name}
+                key={plan.id}
                 className={`relative rounded-2xl border p-5 flex flex-col ${
                   plan.highlighted
                     ? "border-primary bg-primary/[0.03] shadow-sm"
@@ -277,7 +274,6 @@ export default async function BillingPage() {
                   </div>
                 )}
 
-                {/* Plan name + price */}
                 <div className="mb-4">
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-sm font-semibold">{plan.name}</span>
@@ -289,14 +285,13 @@ export default async function BillingPage() {
                   </div>
                   <div className="flex items-baseline gap-0.5">
                     <span className="text-3xl font-black tracking-tight">{plan.price}</span>
-                    {"period" in plan && plan.period && (
+                    {"period" in plan && (
                       <span className="text-sm text-muted-foreground">{plan.period}</span>
                     )}
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">{plan.description}</p>
                 </div>
 
-                {/* Features */}
                 <ul className="space-y-2 flex-1 mb-5">
                   {plan.features.map((f) => (
                     <li key={f} className="flex items-start gap-2 text-xs text-muted-foreground">
@@ -306,23 +301,23 @@ export default async function BillingPage() {
                   ))}
                 </ul>
 
-                {/* CTA */}
-                {ctaHref ? (
-                  <Button
-                    asChild
-                    size="sm"
-                    variant={plan.highlighted ? "default" : "outline"}
-                    className="w-full"
-                  >
-                    <Link href={ctaHref}>
-                      {plan.highlighted && <Zap className="h-3.5 w-3.5 mr-1.5" />}
-                      {plan.cta}
-                    </Link>
+                {isCurrent ? (
+                  <Button size="sm" variant="outline" className="w-full" disabled>
+                    Current plan
+                  </Button>
+                ) : plan.id === "starter" ? (
+                  <Button size="sm" variant="outline" className="w-full" disabled>
+                    Free forever
                   </Button>
                 ) : (
-                  <Button size="sm" variant="outline" className="w-full" disabled>
-                    {isCurrent ? "Current plan" : plan.cta}
-                  </Button>
+                  <CheckoutButton
+                    plan={plan.id}
+                    variant={plan.highlighted ? "default" : "outline"}
+                    className="w-full text-sm"
+                  >
+                    {plan.highlighted && <Zap className="h-3.5 w-3.5 mr-1" />}
+                    Upgrade to {plan.name}
+                  </CheckoutButton>
                 )}
               </div>
             );
@@ -330,25 +325,45 @@ export default async function BillingPage() {
         </div>
       </div>
 
-      {/* ── Invoice History ──────────────────────────────────── */}
+      {/* Invoice History */}
       <div className="rounded-2xl border border-border overflow-hidden">
         <div className="px-6 py-4 border-b border-border">
           <h2 className="text-base font-semibold">Invoice history</h2>
           <p className="text-sm text-muted-foreground mt-0.5">
-            Billing receipts for paid plans.
+            Billing receipts from Stripe.{" "}
+            {isOnPaidPlan && (
+              <button
+                className="text-primary underline-offset-2 hover:underline text-sm"
+                onClick={undefined}
+              >
+                View in Stripe portal →
+              </button>
+            )}
           </p>
         </div>
         <div className="flex flex-col items-center justify-center py-14 text-center">
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-muted/60 mb-4">
             <FileText className="h-6 w-6 text-muted-foreground/50" />
           </div>
-          <p className="text-sm font-medium">No invoices yet</p>
-          <p className="text-xs text-muted-foreground mt-1 max-w-xs">
-            Invoices will appear here once you upgrade to a paid plan.
-          </p>
-          <Button asChild variant="outline" size="sm" className="mt-4">
-            <Link href="/pricing">View pricing</Link>
-          </Button>
+          {isOnPaidPlan ? (
+            <>
+              <p className="text-sm font-medium">View invoices in Stripe</p>
+              <p className="text-xs text-muted-foreground mt-1 max-w-xs">
+                All billing history and invoice PDFs are available in the Stripe customer portal.
+              </p>
+              <PortalButton className="mt-4" />
+            </>
+          ) : (
+            <>
+              <p className="text-sm font-medium">No invoices yet</p>
+              <p className="text-xs text-muted-foreground mt-1 max-w-xs">
+                Invoices will appear here once you upgrade to a paid plan.
+              </p>
+              <Button asChild variant="outline" size="sm" className="mt-4">
+                <Link href="/pricing">View pricing</Link>
+              </Button>
+            </>
+          )}
         </div>
       </div>
     </div>

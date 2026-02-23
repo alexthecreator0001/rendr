@@ -137,11 +137,15 @@ export function Navbar() {
 
         {/* Logo */}
         <Link href="/" className="flex shrink-0 items-center">
-          <img src="/logo-white.svg" alt="Rendr" className="h-[17px] w-auto" />
+          <img src="/logo.svg" alt="Rendr" className="h-[17px] w-auto" />
         </Link>
 
         {/* Desktop nav */}
         <nav className="hidden items-center md:flex">
+          <Link href="/" className={navItem(pathname === "/")}>
+            Home
+          </Link>
+
           <Link href="/features" className={navItem(isFeatures)}>
             Features
           </Link>
@@ -205,11 +209,22 @@ export function Navbar() {
             >
               {/* Header */}
               <div className="flex h-[52px] items-center border-b border-white/[0.07] px-5">
-                <img src="/logo-white.svg" alt="Rendr" className="h-[17px] w-auto" />
+                <img src="/logo.svg" alt="Rendr" className="h-[17px] w-auto" />
               </div>
 
               {/* Nav */}
               <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-px">
+                <Link
+                  href="/"
+                  onClick={() => setMobileOpen(false)}
+                  className={cn(
+                    "flex items-center rounded-xl px-3 py-2.5 text-[13.5px] font-medium transition-colors",
+                    pathname === "/" ? "bg-white/[0.07] text-white" : "text-zinc-400 hover:text-zinc-100 hover:bg-white/[0.05]"
+                  )}
+                >
+                  Home
+                </Link>
+
                 <Link
                   href="/features"
                   onClick={() => setMobileOpen(false)}

@@ -2,6 +2,17 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.30.0] — 2026-02-23
+### Added
+- **Stripe payments** — full checkout + subscription management. New: `lib/stripe.ts`, `app/api/stripe/checkout`, `app/api/stripe/portal`, `app/api/stripe/webhook` routes. Billing page upgraded: real "Upgrade" buttons launch Stripe Checkout, paid users see "Manage subscription" → Stripe Customer Portal. Webhooks handle `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.payment_failed` — auto-updates `user.plan` and `subscriptionStatus`.
+- **Stripe DB fields** — `stripeCustomerId`, `stripeSubscriptionId`, `stripePriceId`, `subscriptionStatus` added to User model via migration `20260223000001_add_stripe_billing`.
+- **Navbar: Home link** — added explicit "Home" nav item as first link in desktop and mobile nav.
+### Changed
+- **Logo files renamed** — `logo-white.svg` → `logo.svg` (primary, white fills for dark backgrounds), `logo.svg` → `logo-dark.svg` (dark fills for light backgrounds, used only in loading screen). All references updated. Cleaner and unambiguous.
+- **Removed loose PNGs** — `synk-benefits.png`, `synk-features.png`, `synk-hero.png` removed from git and repo root. `studio-current.png`, `studio-wide.png` deleted.
+- **Billing page rebuilt** — standardized plan IDs to `starter`/`growth`/`business` (was `pro`). Added upgrade/success/past-due states. Invoice history section links to Stripe portal.
+- **`.env.example`** — added `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_GROWTH_PRICE_ID`, `STRIPE_BUSINESS_PRICE_ID`.
+
 ## [0.29.0] — 2026-02-23
 ### Fixed
 - **Navbar dropdown gap bug** — the 4px gap between the Solutions trigger and the dropdown panel caused `onMouseLeave` to fire prematurely, closing the menu before the user could reach it. Fixed by wrapping the panel in an outer div at `top-full` with `pt-1.5` padding, making the hover-trackable area seamless.
