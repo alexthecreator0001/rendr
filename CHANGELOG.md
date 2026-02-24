@@ -2,6 +2,22 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.31.0] — 2026-02-24
+### Fixed
+- Pricing cards now show correct prices from `lib/currency.ts` ($9.90/$49.90 instead of $49/$199)
+- Pricing cards detect EUR/USD currency from visitor location via CF-IPCountry header
+- Monthly/annual toggle replaced with clickable buttons that work reliably
+- Starter plan features corrected: 100 renders/month (was 500), matches server-enforced limit
+- FAQ section updated to match correct 100 renders/month free tier
+### Changed
+- Hero section right side: replaced code terminal with a live dashboard mockup
+- Team workspace page redesigned as a proper dashboard with stat cards, templates, and members
+- Removed duplicate profile picture/user menu from topbar (kept in sidebar only)
+
+## [0.30.6] — 2026-02-24
+### Changed
+- Hero section right side: replaced code terminal with a live dashboard mockup showing stat cards, activity chart, jobs table, and mini sidebar — gives visitors an instant feel for the product
+
 ## [0.30.5] — 2026-02-23
 ### Fixed
 - Settings page now shows the user's actual plan instead of hardcoded "Starter"

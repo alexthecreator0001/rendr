@@ -33,7 +33,7 @@ const faqs = [
   },
   {
     q: "Is there a free tier? What are the limits?",
-    a: "Yes — the Starter plan is free forever. You get 500 renders and 5,000 pages per month, 2 API keys, and 1 webhook endpoint. No credit card required to start.",
+    a: "Yes — the Starter plan is free forever. You get 100 renders per month, 2 API keys, and community support. No credit card required to start.",
   },
   {
     q: "Which programming languages does Rendr support?",

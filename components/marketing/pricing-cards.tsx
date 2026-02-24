@@ -4,19 +4,18 @@ import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { PLAN_PRICES, type Currency } from "@/lib/currency";
 
 const plans = [
   {
+    id: "starter" as const,
     name: "Starter",
-    monthlyPrice: 0,
-    period: "forever",
     description: "For side projects and early exploration.",
     highlighted: false,
     features: [
-      "500 renders / month",
-      "5,000 pages / month",
+      "100 renders / month",
+      "Max 2 MB per render",
       "2 API keys",
-      "1 webhook endpoint",
       "Community support",
       "7-day log retention",
     ],
@@ -25,9 +24,8 @@ const plans = [
     ctaVariant: "outline" as const,
   },
   {
+    id: "growth" as const,
     name: "Growth",
-    monthlyPrice: 49,
-    period: "per month",
     description: "For teams shipping PDFs in production.",
     highlighted: true,
     badge: "Most popular",
@@ -38,17 +36,14 @@ const plans = [
       "5 webhook endpoints",
       "Email support",
       "30-day log retention",
-      "Signed delivery URLs",
-      "Template library (25 templates)",
     ],
     cta: "Start free trial",
     href: "/register?plan=growth",
     ctaVariant: "default" as const,
   },
   {
+    id: "business" as const,
     name: "Business",
-    monthlyPrice: 199,
-    period: "per month",
     description: "High-volume and compliance-sensitive workloads.",
     highlighted: false,
     features: [
@@ -60,7 +55,6 @@ const plans = [
       "90-day log retention",
       "Custom font uploads",
       "Unlimited templates",
-      "Audit log",
     ],
     cta: "Contact sales",
     href: "mailto:sales@rendrpdf.com",
@@ -68,17 +62,23 @@ const plans = [
   },
 ];
 
-export function PricingCards() {
+interface PricingCardsProps {
+  currency?: Currency;
+}
+
+export function PricingCards({ currency = "eur" }: PricingCardsProps) {
   const [annual, setAnnual] = useState(false);
+  const prices = PLAN_PRICES[currency];
 
   function getPrice(plan: typeof plans[number]) {
-    if (plan.monthlyPrice === 0) return "$0";
-    const price = annual ? Math.round(plan.monthlyPrice * 0.8) : plan.monthlyPrice;
-    return `$${price}`;
+    if (plan.id === "starter") return "Free";
+    const planPrices = prices[plan.id as "growth" | "business"];
+    if (annual) return planPrices.yearlyPerMonth;
+    return planPrices.monthly;
   }
 
   function getPeriod(plan: typeof plans[number]) {
-    if (plan.monthlyPrice === 0) return "forever";
+    if (plan.id === "starter") return "forever";
     return annual ? "/ mo, billed annually" : "/ month";
   }
 
@@ -86,31 +86,29 @@ export function PricingCards() {
     <div className="space-y-8">
       {/* Toggle */}
       <div className="flex items-center justify-center gap-3">
-        <span className={cn("text-sm font-medium", !annual ? "text-foreground" : "text-muted-foreground")}>
-          Monthly
-        </span>
         <button
           type="button"
-          onClick={() => setAnnual((v) => !v)}
+          onClick={() => setAnnual(false)}
           className={cn(
-            "relative h-6 w-11 rounded-full transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-            annual ? "bg-blue-500" : "bg-muted"
+            "rounded-full px-4 py-1.5 text-sm font-medium transition-colors",
+            !annual ? "bg-white/10 text-foreground" : "text-muted-foreground hover:text-foreground"
           )}
-          aria-pressed={annual}
         >
-          <span
-            className={cn(
-              "pointer-events-none absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform duration-200",
-              annual ? "translate-x-5" : "translate-x-0.5"
-            )}
-          />
+          Monthly
         </button>
-        <span className={cn("text-sm font-medium", annual ? "text-foreground" : "text-muted-foreground")}>
+        <button
+          type="button"
+          onClick={() => setAnnual(true)}
+          className={cn(
+            "rounded-full px-4 py-1.5 text-sm font-medium transition-colors flex items-center gap-2",
+            annual ? "bg-white/10 text-foreground" : "text-muted-foreground hover:text-foreground"
+          )}
+        >
           Annual
-        </span>
-        <span className="rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 ring-1 ring-emerald-500/20">
-          Save 20%
-        </span>
+          <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 ring-1 ring-emerald-500/20">
+            2 months free
+          </span>
+        </button>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3 lg:gap-8 lg:items-start">
@@ -144,6 +142,11 @@ export function PricingCards() {
                   {getPeriod(plan)}
                 </span>
               </div>
+              {annual && plan.id !== "starter" && (
+                <p className={cn("mt-1 text-xs", plan.highlighted ? "text-zinc-500" : "text-muted-foreground")}>
+                  {prices[plan.id as "growth" | "business"].yearly} billed annually
+                </p>
+              )}
               <p className={cn("mt-2 text-sm", plan.highlighted ? "text-zinc-400" : "text-muted-foreground")}>
                 {plan.description}
               </p>
@@ -173,6 +176,11 @@ export function PricingCards() {
           </div>
         ))}
       </div>
+
+      {/* Currency note */}
+      <p className="text-center text-xs text-muted-foreground/60">
+        Prices in {currency === "eur" ? "EUR" : "USD"} · detected from your location
+      </p>
     </div>
   );
 }

@@ -1,20 +1,14 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import {
   Bell, Search, FileOutput, LayoutDashboard, Key,
   Layers, Webhook, BarChart2, CreditCard, BriefcaseBusiness,
-  BookOpen, Settings, LogOut, Menu,
+  BookOpen, Settings, Menu,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem,
-  DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { signOutAction } from "@/app/actions/auth";
 import { useSidebar } from "@/components/providers/sidebar-provider";
 import Link from "next/link";
 
@@ -38,9 +32,7 @@ interface AppTopbarProps {
 export function AppTopbar({ user }: AppTopbarProps) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const [pending, startTransition] = useTransition();
   const { toggle } = useSidebar();
-  const initials = user.email.slice(0, 2).toUpperCase();
 
   const filtered = query.trim()
     ? SEARCH_ITEMS.filter((i) => i.label.toLowerCase().includes(query.toLowerCase()))
@@ -80,44 +72,6 @@ export function AppTopbar({ user }: AppTopbarProps) {
           <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" aria-label="Notifications">
             <Bell className="h-4 w-4" />
           </Button>
-
-          {/* User menu */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
-                <Avatar className="h-7 w-7">
-                  <AvatarFallback className="bg-gradient-to-br from-blue-500 to-violet-600 text-[11px] font-semibold text-white">
-                    {initials}
-                  </AvatarFallback>
-                </Avatar>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-52">
-              <DropdownMenuLabel>
-                <p className="truncate text-sm font-medium">{user.email}</p>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
-                <Link href="/app/settings" className="flex items-center gap-2">
-                  <Settings className="h-4 w-4" /> Settings
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/app/billing" className="flex items-center gap-2">
-                  <CreditCard className="h-4 w-4" /> Billing
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                className="flex items-center gap-2 text-destructive focus:text-destructive cursor-pointer"
-                onSelect={() => startTransition(() => signOutAction())}
-                disabled={pending}
-              >
-                <LogOut className="h-4 w-4" />
-                {pending ? "Signing out…" : "Sign out"}
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
       </header>
 

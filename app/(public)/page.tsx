@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { auth } from "@/auth";
+import { detectCurrency } from "@/lib/currency";
 import { Hero } from "@/components/marketing/hero";
 import { TrustRow } from "@/components/marketing/trust-row";
 import { PainPoints } from "@/components/marketing/pain-points";
@@ -20,6 +22,10 @@ export const metadata: Metadata = {
 export default async function LandingPage() {
   const session = await auth();
   if (session?.user) redirect("/app");
+
+  const headersList = await headers();
+  const country = headersList.get("cf-ipcountry") ?? headersList.get("x-vercel-ip-country");
+  const currency = detectCurrency(country);
 
   return (
     <>
@@ -46,7 +52,7 @@ export default async function LandingPage() {
               Start free. Scale when you need to. No surprises.
             </p>
           </div>
-          <PricingCards />
+          <PricingCards currency={currency} />
         </div>
       </section>
 

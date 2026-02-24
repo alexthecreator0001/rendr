@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import {
   Users2, Link2, Crown, Trash2, LogOut,
-  Layers, Copy, Check, AlertTriangle, ChevronLeft,
+  Layers, Copy, Check, AlertTriangle, Wand2,
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -150,68 +150,67 @@ function DangerZone({ team, isOwner }: { team: Team; isOwner: boolean }) {
 
 export function TeamClient({ team, userId, isOwner }: { team: Team; userId: string; isOwner: boolean }) {
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <Link href="/app/teams" className="text-muted-foreground hover:text-foreground transition-colors">
-          <ChevronLeft className="h-5 w-5" />
-        </Link>
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">{team.name}</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            {team.members.length} member{team.members.length !== 1 ? "s" : ""}
-            {isOwner && " · you are the owner"}
-          </p>
+    <div className="space-y-8">
+      {/* Team dashboard header */}
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">{team.name}</h1>
+        <p className="text-sm text-muted-foreground mt-1">
+          {team.members.length} member{team.members.length !== 1 ? "s" : ""}
+          {" · "}
+          {team.templates.length} template{team.templates.length !== 1 ? "s" : ""}
+          {isOwner && " · you are the owner"}
+        </p>
+      </div>
+
+      {/* Quick stats */}
+      <div className="grid gap-4 sm:grid-cols-3">
+        <div className="rounded-2xl border border-border bg-card p-5">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-sm text-muted-foreground">Members</span>
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/10">
+              <Users2 className="h-4 w-4 text-blue-400" />
+            </div>
+          </div>
+          <p className="text-3xl font-bold tracking-tight">{team.members.length}</p>
+        </div>
+        <div className="rounded-2xl border border-border bg-card p-5">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-sm text-muted-foreground">Templates</span>
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-500/10">
+              <Layers className="h-4 w-4 text-violet-400" />
+            </div>
+          </div>
+          <p className="text-3xl font-bold tracking-tight">{team.templates.length}</p>
+        </div>
+        <div className="rounded-2xl border border-border bg-card p-5">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-sm text-muted-foreground">Quick action</span>
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10">
+              <Wand2 className="h-4 w-4 text-emerald-400" />
+            </div>
+          </div>
+          <Link
+            href="/app/convert"
+            className="text-sm font-medium text-primary hover:underline underline-offset-2"
+          >
+            Open Studio
+          </Link>
         </div>
       </div>
 
       {/* Invite */}
       <InviteSection teamId={team.id} isOwner={isOwner} />
 
-      {/* Members */}
-      <div className="rounded-2xl border border-border bg-card overflow-hidden">
-        <div className="px-5 py-3.5 border-b border-border bg-muted/30">
-          <h3 className="font-semibold text-sm flex items-center gap-2">
-            <Users2 className="h-4 w-4 text-muted-foreground" />
-            Members
-          </h3>
-        </div>
-        <div className="divide-y divide-border">
-          {team.members.map((member) => (
-            <div key={member.id} className="flex items-center justify-between px-5 py-3.5 gap-4">
-              <div className="min-w-0">
-                <p className="text-sm font-medium truncate">{member.user.email}</p>
-                <div className="flex items-center gap-1.5 mt-0.5">
-                  {member.role === "owner" && (
-                    <span className="inline-flex items-center gap-1 text-[10px] text-amber-600 dark:text-amber-400">
-                      <Crown className="h-2.5 w-2.5" /> Owner
-                    </span>
-                  )}
-                  <span className="text-[10px] text-muted-foreground">
-                    Joined {new Date(member.joinedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-                  </span>
-                </div>
-              </div>
-              {isOwner && member.user.id !== userId && (
-                <RemoveMemberButton teamId={team.id} userId={member.user.id} />
-              )}
-              {member.user.id === userId && (
-                <span className="text-xs text-muted-foreground/50">You</span>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-
       {/* Team templates */}
-      {team.templates.length > 0 && (
-        <div className="rounded-2xl border border-border bg-card overflow-hidden">
-          <div className="px-5 py-3.5 border-b border-border bg-muted/30 flex items-center justify-between">
-            <h3 className="font-semibold text-sm flex items-center gap-2">
-              <Layers className="h-4 w-4 text-muted-foreground" />
-              Team templates
-            </h3>
-            <span className="text-xs text-muted-foreground">{team.templates.length}</span>
-          </div>
+      <div className="rounded-2xl border border-border bg-card overflow-hidden">
+        <div className="px-5 py-3.5 border-b border-border bg-muted/30 flex items-center justify-between">
+          <h3 className="font-semibold text-sm flex items-center gap-2">
+            <Layers className="h-4 w-4 text-muted-foreground" />
+            Team templates
+          </h3>
+          <span className="text-xs text-muted-foreground">{team.templates.length}</span>
+        </div>
+        {team.templates.length > 0 ? (
           <div className="divide-y divide-border">
             {team.templates.map((t) => (
               <div key={t.id} className="flex items-center justify-between px-5 py-3.5 gap-4">
@@ -225,8 +224,58 @@ export function TeamClient({ team, userId, isOwner }: { team: Team; userId: stri
               </div>
             ))}
           </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-muted/60 mb-3">
+              <Layers className="h-5 w-5 text-muted-foreground/50" />
+            </div>
+            <p className="text-sm font-medium">No templates yet</p>
+            <p className="text-xs text-muted-foreground mt-1 max-w-xs">
+              Create templates in Studio and assign them to this team.
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Members */}
+      <div className="rounded-2xl border border-border bg-card overflow-hidden">
+        <div className="px-5 py-3.5 border-b border-border bg-muted/30">
+          <h3 className="font-semibold text-sm flex items-center gap-2">
+            <Users2 className="h-4 w-4 text-muted-foreground" />
+            Members
+          </h3>
         </div>
-      )}
+        <div className="divide-y divide-border">
+          {team.members.map((member) => (
+            <div key={member.id} className="flex items-center justify-between px-5 py-3.5 gap-4">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-violet-600 text-xs font-bold text-white select-none">
+                  {member.user.email.slice(0, 2).toUpperCase()}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-sm font-medium truncate">{member.user.email}</p>
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    {member.role === "owner" && (
+                      <span className="inline-flex items-center gap-1 text-[10px] text-amber-600 dark:text-amber-400">
+                        <Crown className="h-2.5 w-2.5" /> Owner
+                      </span>
+                    )}
+                    <span className="text-[10px] text-muted-foreground">
+                      Joined {new Date(member.joinedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              {isOwner && member.user.id !== userId && (
+                <RemoveMemberButton teamId={team.id} userId={member.user.id} />
+              )}
+              {member.user.id === userId && (
+                <span className="text-xs text-muted-foreground/50">You</span>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
 
       <DangerZone team={team} isOwner={isOwner} />
     </div>

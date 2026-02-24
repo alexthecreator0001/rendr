@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
+import { detectCurrency } from "@/lib/currency";
 import { PricingCards } from "@/components/marketing/pricing-cards";
 import {
   Accordion,
@@ -38,7 +40,10 @@ const faqs = [
   },
 ];
 
-export default function PricingPage() {
+export default async function PricingPage() {
+  const headersList = await headers();
+  const country = headersList.get("cf-ipcountry") ?? headersList.get("x-vercel-ip-country");
+  const currency = detectCurrency(country);
   return (
     <div className="bg-background">
       {/* Header */}
@@ -61,7 +66,7 @@ export default function PricingPage() {
       {/* Cards */}
       <section className="pb-24 sm:pb-32">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <PricingCards />
+          <PricingCards currency={currency} />
         </div>
       </section>
 
