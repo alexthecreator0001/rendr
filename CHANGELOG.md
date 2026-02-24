@@ -2,6 +2,10 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.32.15] — 2026-02-24
+### Changed
+- Hero image fades significantly reduced — less black overlay on all edges
+
 ## [0.32.14] — 2026-02-24
 ### Changed
 - Hero spiral opacity reduced slightly (0.07 → 0.05 base)

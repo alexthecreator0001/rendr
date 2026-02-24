@@ -29,13 +29,13 @@ export function Hero() {
             draggable={false}
           />
           {/* Left edge fade (only on image area) */}
-          <div className="absolute inset-y-0 left-0 w-[40%] bg-gradient-to-r from-zinc-950/80 to-transparent" />
+          <div className="absolute inset-y-0 left-0 w-[30%] bg-gradient-to-r from-zinc-950/50 to-transparent" />
           {/* Bottom fade */}
-          <div className="absolute inset-x-0 bottom-0 h-[35%] bg-gradient-to-t from-zinc-950/70 to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 h-[25%] bg-gradient-to-t from-zinc-950/40 to-transparent" />
           {/* Top fade */}
-          <div className="absolute inset-x-0 top-0 h-[15%] bg-gradient-to-b from-zinc-950/40 to-transparent" />
+          <div className="absolute inset-x-0 top-0 h-[10%] bg-gradient-to-b from-zinc-950/25 to-transparent" />
           {/* Right edge fade */}
-          <div className="absolute inset-y-0 right-0 w-[5%] bg-gradient-to-r from-transparent to-zinc-950/40" />
+          <div className="absolute inset-y-0 right-0 w-[5%] bg-gradient-to-r from-transparent to-zinc-950/25" />
         </div>
       </div>
 
