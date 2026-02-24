@@ -2,6 +2,11 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.32.12] — 2026-02-24
+### Changed
+- Hero spiral opacity halved (0.14 → 0.07 base)
+- Hero image anchored to bottom of section instead of vertically centered
+
 ## [0.32.11] — 2026-02-24
 ### Fixed
 - Hero spiral visible on left side — image fade gradient was covering entire left 58% of viewport, now scoped only to the image area on the right 55%

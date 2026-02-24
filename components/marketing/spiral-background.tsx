@@ -192,7 +192,7 @@ export function SpiralBackground() {
         const idx = Math.floor(Math.abs(Math.sin(wave) * FILL_CHARS.length)) % FILL_CHARS.length;
 
         // Brightness pulse based on a second wave
-        const pulse = 0.14 + Math.sin(t * 1.3 + distances[i] * 5) * 0.04;
+        const pulse = 0.07 + Math.sin(t * 1.3 + distances[i] * 5) * 0.02;
         ctx.fillStyle = `rgba(255, 255, 255, ${pulse})`;
         ctx.fillText(FILL_CHARS[idx], x, y);
       }

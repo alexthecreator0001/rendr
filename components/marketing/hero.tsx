@@ -25,7 +25,7 @@ export function Hero() {
           <img
             src="/hero.png"
             alt=""
-            className="absolute right-0 top-1/2 -translate-y-1/2 w-full max-w-none h-auto select-none"
+            className="absolute right-0 bottom-0 w-full max-w-none h-auto select-none"
             draggable={false}
           />
           {/* Left edge fade (only on image area) */}
