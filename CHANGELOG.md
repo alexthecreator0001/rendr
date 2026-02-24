@@ -2,6 +2,12 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.32.9] — 2026-02-24
+### Changed
+- Hero spiral animation rewritten: smooth radial wave from center instead of random flickering, opacity boosted ~30%
+- Hero spiral properly centered using computed art dimensions
+- Footer ASCII art opacity increased to 50%
+
 ## [0.32.8] — 2026-02-24
 ### Fixed
 - Hero spiral ASCII background was invisible due to broken variable references and missing z-index layering

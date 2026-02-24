@@ -110,7 +110,7 @@ export function FooterAsciiArt() {
         const y = pos.row * lineHeight;
 
         if (x >= -charWidth && x <= canvas.width) {
-          ctx.fillStyle = "rgba(255, 255, 255, 0.15)";
+          ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
           ctx.fillText(SYMBOLS[state.current], x, y);
         }
       }

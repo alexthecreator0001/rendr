@@ -118,26 +118,34 @@ export function SpiralBackground() {
     if (!ctx) return;
 
     // Build positions for all non-space characters
-    const charPositions: { row: number; col: number; original: string }[] = [];
+    const charPositions: { row: number; col: number }[] = [];
     const maxCols = Math.max(...SPIRAL_ART.map((line) => line.length));
+    const totalRows = SPIRAL_ART.length;
 
-    for (let r = 0; r < SPIRAL_ART.length; r++) {
+    for (let r = 0; r < totalRows; r++) {
       for (let c = 0; c < SPIRAL_ART[r].length; c++) {
         if (SPIRAL_ART[r][c] !== " ") {
-          charPositions.push({ row: r, col: c, original: SPIRAL_ART[r][c] });
+          charPositions.push({ row: r, col: c });
         }
       }
     }
 
-    const baseFontSize = 5;
-    const baseLineHeight = baseFontSize * 1.15;
-    const baseCharWidth = baseFontSize * 0.6;
+    // Pre-compute distance from center for each position (for wave animation)
+    const centerRow = totalRows / 2;
+    const centerCol = maxCols / 2;
+    const distances = charPositions.map((p) => {
+      const dr = (p.row - centerRow) / totalRows;
+      const dc = (p.col - centerCol) / maxCols;
+      return Math.sqrt(dr * dr + dc * dc);
+    });
 
+    const baseFontSize = 5;
+    const baseCharWidth = baseFontSize * 0.6;
     const baseArtWidth = maxCols * baseCharWidth;
-    const baseArtHeight = SPIRAL_ART.length * baseLineHeight;
+    const baseArtHeight = totalRows * baseFontSize * 1.15;
 
     let fontSize = baseFontSize;
-    let lineHeight = baseLineHeight;
+    let lineHeight = baseFontSize * 1.15;
     let charWidth = baseCharWidth;
 
     const resize = () => {
@@ -146,10 +154,9 @@ export function SpiralBackground() {
       canvas.width = parent.clientWidth;
       canvas.height = parent.clientHeight;
 
-      // Scale font to fill the container
       const scaleX = canvas.width / baseArtWidth;
       const scaleY = canvas.height / baseArtHeight;
-      const scale = Math.max(scaleX, scaleY) * 1.1;
+      const scale = Math.max(scaleX, scaleY) * 1.05;
       fontSize = baseFontSize * scale;
       lineHeight = fontSize * 1.15;
       charWidth = fontSize * 0.6;
@@ -158,46 +165,36 @@ export function SpiralBackground() {
     resize();
     window.addEventListener("resize", resize);
 
-    // Each position cycles through symbols at random intervals
-    const symbolState = charPositions.map(() => ({
-      current: Math.floor(Math.random() * FILL_CHARS.length),
-      nextChange: Math.random() * 4000,
-    }));
-
-    let lastTime = 0;
     let animId: number;
 
     const draw = (time: number) => {
-      const dt = time - lastTime;
-      lastTime = time;
-
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.font = `${fontSize}px monospace`;
       ctx.textBaseline = "top";
 
-      // Center the art
-      const currentArtWidth = maxCols * charWidth;
-      const currentArtHeight = SPIRAL_ART.length * lineHeight;
-      const offsetX = (canvas.width - currentArtWidth) / 2;
-      const offsetY = (canvas.height - currentArtHeight) / 2;
+      const artW = maxCols * charWidth;
+      const artH = totalRows * lineHeight;
+      const offsetX = (canvas.width - artW) / 2;
+      const offsetY = (canvas.height - artH) / 2;
+
+      // Slow time for smooth wave
+      const t = time * 0.0008;
 
       for (let i = 0; i < charPositions.length; i++) {
         const pos = charPositions[i];
-        const state = symbolState[i];
-
-        state.nextChange -= dt;
-        if (state.nextChange <= 0) {
-          state.current = (state.current + 1 + Math.floor(Math.random() * (FILL_CHARS.length - 1))) % FILL_CHARS.length;
-          state.nextChange = 800 + Math.random() * 3000;
-        }
-
         const x = offsetX + pos.col * charWidth;
         const y = offsetY + pos.row * lineHeight;
 
-        if (x >= -charWidth && x <= canvas.width && y >= -lineHeight && y <= canvas.height) {
-          ctx.fillStyle = "rgba(255, 255, 255, 0.035)";
-          ctx.fillText(FILL_CHARS[state.current], x, y);
-        }
+        if (x < -charWidth || x > canvas.width || y < -lineHeight || y > canvas.height) continue;
+
+        // Smooth wave: symbol index based on distance from center + time
+        const wave = t + distances[i] * 8;
+        const idx = Math.floor(Math.abs(Math.sin(wave) * FILL_CHARS.length)) % FILL_CHARS.length;
+
+        // Subtle brightness pulse based on a second wave
+        const pulse = 0.04 + Math.sin(t * 1.3 + distances[i] * 5) * 0.015;
+        ctx.fillStyle = `rgba(255, 255, 255, ${pulse})`;
+        ctx.fillText(FILL_CHARS[idx], x, y);
       }
 
       animId = requestAnimationFrame(draw);
