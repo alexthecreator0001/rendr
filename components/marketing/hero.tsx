@@ -29,7 +29,7 @@ export function Hero() {
             draggable={false}
           />
           {/* Bottom fade only */}
-          <div className="absolute inset-x-0 bottom-0 h-[40%] bg-gradient-to-t from-zinc-950 via-zinc-950/60 to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 h-[55%] bg-gradient-to-t from-zinc-950 via-zinc-950/80 via-40% to-transparent" />
         </div>
       </div>
 
