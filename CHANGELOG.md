@@ -2,6 +2,10 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.32.14] — 2026-02-24
+### Changed
+- Hero spiral opacity reduced slightly (0.07 → 0.05 base)
+
 ## [0.32.13] — 2026-02-24
 ### Fixed
 - Hero image fade gradients were solid black (from-zinc-950), completely hiding the spiral behind them
