@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AsciiBackground } from "@/components/marketing/ascii-background";
 
 const footerLinks = {
   Product: [
@@ -34,8 +35,9 @@ const footerLinks = {
 
 export function Footer() {
   return (
-    <footer className="bg-zinc-950">
-      <div className="mx-auto max-w-7xl px-6 pt-16 pb-12 sm:px-8 lg:px-10">
+    <footer className="relative overflow-hidden bg-zinc-950">
+      <AsciiBackground />
+      <div className="relative z-10 mx-auto max-w-7xl px-6 pt-16 pb-12 sm:px-8 lg:px-10">
         <div className="grid grid-cols-2 gap-10 sm:grid-cols-3 lg:grid-cols-6">
           {/* Brand */}
           <div className="col-span-2 sm:col-span-3 lg:col-span-2">

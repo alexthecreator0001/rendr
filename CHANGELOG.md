@@ -2,6 +2,11 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.32.2] — 2026-02-24
+### Changed
+- Hero section: left/right grid layout with text on left, product screenshot on right with soft glow and edge fades (no card wrapper)
+- Footer: animated ASCII art "Rendr" background with cycling symbols ($, #, @, %, &, *, etc.) rendered on canvas at low opacity
+
 ## [0.32.1] — 2026-02-24
 ### Changed
 - Hero section redesigned: centered text layout with full-width product screenshot, subtle perspective tilt, glow backdrop, and smooth bottom fade into page background
