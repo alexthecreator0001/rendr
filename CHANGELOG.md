@@ -2,6 +2,14 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.39.0] — 2026-02-24
+### Changed
+- **Features page redesign**: replaced bento grid + deep dives with clean hero, 3-step "how it works" section, curl example, and bottom CTA — kept "Everything in one API" capabilities grid
+### Fixed
+- **Navbar clickability**: Solutions megamenu dropdown no longer blocks clicks on logo/home when closed (was rendering an invisible overlay)
+### Added
+- **Blog posts**: 5 seed blog posts covering HTML-to-PDF approach, AI template creation, webhook delivery, PDF merge API, and security model
+
 ## [0.38.0] — 2026-02-24
 ### Added
 - **PDF merge endpoint**: `POST /api/v1/merge` — combine 2–50 existing PDFs into a single document with optional metadata and custom filename

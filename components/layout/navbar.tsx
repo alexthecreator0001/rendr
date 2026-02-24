@@ -36,22 +36,12 @@ function SolutionsMenu({ active }: { active?: boolean }) {
         />
       </button>
 
-      {/* Dropdown panel — outer wrapper bridges gap from button to panel */}
-      <div
-        className={cn(
-          "absolute left-1/2 top-full z-50 w-[580px] -translate-x-1/2 pt-1.5",
-          open ? "pointer-events-auto" : "pointer-events-none"
-        )}
+      {/* Dropdown panel — only rendered when open to avoid blocking clicks on other nav items */}
+      {open && <div
+        className="absolute left-1/2 top-full z-50 w-[580px] -translate-x-1/2 pt-1.5"
       >
         <div
-          className={cn(
-            "rounded-2xl border border-white/[0.08] bg-zinc-950/[0.98] backdrop-blur-3xl",
-            "shadow-2xl shadow-black/70",
-            "transition-all duration-150 origin-top",
-            open
-              ? "opacity-100 translate-y-0 scale-100"
-              : "opacity-0 -translate-y-1 scale-[0.98]"
-          )}
+          className="rounded-2xl border border-white/[0.08] bg-zinc-950/[0.98] backdrop-blur-3xl shadow-2xl shadow-black/70 animate-in fade-in slide-in-from-top-1 duration-150"
         >
           {/* Caret */}
           <div className="absolute -top-[6px] left-1/2 h-3 w-3 -translate-x-1/2 rotate-45 rounded-tl-[2px] border-l border-t border-white/[0.08] bg-zinc-950/[0.98]" />
@@ -89,7 +79,7 @@ function SolutionsMenu({ active }: { active?: boolean }) {
             </Link>
           </div>
         </div>
-      </div>
+      </div>}
     </div>
   );
 }
