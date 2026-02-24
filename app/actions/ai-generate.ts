@@ -62,7 +62,7 @@ export async function generateTemplateAction(
     return { error: "Please describe the template you want to generate." };
   }
 
-  const prompt = `Create a ${style.toLowerCase()} ${documentType.toLowerCase()} template.\n\nDescription: ${description}`;
+  const prompt = `Document type: ${documentType}\nDesign style: ${style}\n\nUser request: ${description}\n\nGenerate a complete, professional ${documentType.toLowerCase()} with realistic sample data filled in. The design style should be "${style.toLowerCase()}".`;
 
   const result = await generateTemplate(prompt);
 

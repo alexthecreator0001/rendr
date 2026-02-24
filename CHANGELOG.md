@@ -2,6 +2,12 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.34.1] — 2026-02-24
+### Changed
+- AI Studio: preview now renders in A4 paper format (centered page) instead of fullscreen
+- AI Studio: templates now generate with realistic sample data instead of {{ variable }} placeholders
+- Completely revamped OpenAI prompt for professional, production-quality document output
+
 ## [0.34.0] — 2026-02-24
 ### Added
 - AI Studio: AI-powered HTML template generator using GPT-4o

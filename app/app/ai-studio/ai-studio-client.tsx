@@ -279,16 +279,26 @@ export function AiStudioClient({ plan, creditsUsed: initialUsed, creditsLimit }:
                 </div>
               </div>
 
-              {/* iframe preview */}
-              <div className="flex-1 min-h-0 p-4">
-                <div className="h-full rounded-lg overflow-hidden border border-border/60 bg-white shadow-sm">
-                  <iframe
-                    ref={iframeRef}
-                    srcDoc={generatedHtml}
-                    className="w-full h-full border-0"
-                    title="Template Preview"
-                    sandbox="allow-same-origin"
-                  />
+              {/* A4 paper preview */}
+              <div className="flex-1 min-h-0 overflow-auto py-6 px-4">
+                <div className="mx-auto" style={{ width: "210mm", maxWidth: "100%" }}>
+                  <div
+                    className="bg-white shadow-xl border border-black/10 mx-auto overflow-hidden"
+                    style={{
+                      width: "210mm",
+                      minHeight: "297mm",
+                      maxWidth: "100%",
+                    }}
+                  >
+                    <iframe
+                      ref={iframeRef}
+                      srcDoc={generatedHtml}
+                      className="w-full border-0"
+                      style={{ minHeight: "297mm" }}
+                      title="Template Preview"
+                      sandbox="allow-same-origin"
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -346,7 +356,7 @@ export function AiStudioClient({ plan, creditsUsed: initialUsed, creditsLimit }:
                 <div>
                   <h3 className="text-sm font-semibold text-foreground">AI Template Generator</h3>
                   <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
-                    Describe the document you need and AI will generate a ready-to-use HTML template with placeholders.
+                    Describe the document you need and AI will generate a professional, ready-to-use HTML template with realistic sample data.
                   </p>
                 </div>
                 <div className="flex flex-wrap justify-center gap-1.5 pt-1">
