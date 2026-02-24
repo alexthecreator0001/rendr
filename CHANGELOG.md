@@ -2,6 +2,15 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.36.0] — 2026-02-24
+### Changed
+- Hero spiral background: increased opacity ~2.5x (0.04±0.012 → 0.09±0.035) for better visibility
+- Features page: replaced 4 empty ImagePlaceholder components with contextual code-based illustrations (async pipeline, webhook delivery, versioned templates, font embedding)
+
+### Added
+- Terms of Service page (`/terms`) — 16-section legal document covering service usage, billing, liability, and GDPR
+- Privacy Policy page (`/privacy`) — 12-section policy covering data collection, retention, security, and user rights (GDPR/CCPA)
+
 ## [0.35.4] — 2026-02-24
 ### Fixed
 - Hero mobile: image now touches bottom border (removed bottom fade/padding, negative margin cancels section padding)
