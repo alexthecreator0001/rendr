@@ -2,6 +2,11 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.32.6] — 2026-02-24
+### Changed
+- Hero background replaced with animated spiral ASCII art (from ascii-art file) instead of grid lines
+- Spiral ASCII art animates by cycling characters through different symbols
+
 ## [0.32.5] — 2026-02-24
 ### Changed
 - Hero image on the right side at 50% width, text on the left

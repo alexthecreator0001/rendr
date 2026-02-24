@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ArrowRight, BookOpen, Check, Terminal } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { SpiralBackground } from "@/components/marketing/spiral-background";
 
 export function Hero() {
   return (
@@ -11,14 +12,8 @@ export function Hero() {
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute left-0 top-0 h-[700px] w-[700px] -translate-x-1/3 -translate-y-1/4 rounded-full bg-blue-600/10 blur-[140px]" />
         <div className="absolute right-0 top-1/2 h-[500px] w-[500px] translate-x-1/3 rounded-full bg-violet-600/8 blur-[120px]" />
-        <div
-          className="absolute inset-0 opacity-[0.018]"
-          style={{
-            backgroundImage: `linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)`,
-            backgroundSize: "48px 48px",
-          }}
-        />
       </div>
+      <SpiralBackground />
 
       {/* Hero image — absolutely positioned on the RIGHT */}
       <div className="pointer-events-none absolute inset-0 hidden lg:block">
