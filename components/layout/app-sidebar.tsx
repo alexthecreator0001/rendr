@@ -9,7 +9,7 @@ import {
   Settings, LogOut, MoreVertical, ExternalLink,
   Zap, ShieldCheck, Users, BarChart3, Headphones,
   Lightbulb, MessageSquare, Users2, Bell, FileText,
-  ChevronsUpDown, Check,
+  ChevronsUpDown, Check, Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -27,6 +27,7 @@ function buildNavGroups(base: string) {
     [
       { href: base || "/app",    label: "Overview",       icon: LayoutDashboard, exact: true },
       { href: `${base}/convert`, label: "Studio",         icon: Wand2 },
+      { href: `${base}/ai-studio`, label: "AI Studio",   icon: Sparkles },
       { href: `${base}/jobs`,    label: "Jobs",           icon: BriefcaseBusiness },
       { href: `${base}/usage`,   label: "Usage",          icon: BarChart2 },
     ],

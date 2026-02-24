@@ -20,3 +20,13 @@ export function getPlanRenderLimit(plan: string): number {
 export function getPlanSizeLimit(plan: string): number {
   return PLAN_SIZE_LIMITS[plan] ?? 2 * 1024 * 1024;
 }
+
+export const PLAN_AI_LIMITS: Record<string, number> = {
+  starter:  1,
+  growth:   20,
+  business: 50,
+};
+
+export function getPlanAiLimit(plan: string): number {
+  return PLAN_AI_LIMITS[plan] ?? 1;
+}

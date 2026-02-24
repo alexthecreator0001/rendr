@@ -2,6 +2,15 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.34.0] — 2026-02-24
+### Added
+- AI Studio: AI-powered HTML template generator using GPT-4o
+- Users describe document type, style, and details to generate ready-to-use HTML templates
+- Live iframe preview of generated templates with copy HTML and save-as-template actions
+- Per-plan AI credit limits: starter=1/mo, growth=20/mo, business=50/mo
+- New sidebar navigation entry with Sparkles icon
+- New env var: `OPENAI_API_KEY` for OpenAI API access
+
 ## [0.33.2] — 2026-02-24
 ### Changed
 - Hero image: only bottom fade, removed all side/top fades
