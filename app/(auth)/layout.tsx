@@ -2,7 +2,7 @@ import { SpiralBackground } from "@/components/marketing/spiral-background";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-zinc-950 px-4 py-12">
+    <div className="dark relative flex min-h-screen items-center justify-center overflow-hidden bg-zinc-950 px-4 py-12" style={{ colorScheme: "dark" }}>
       {/* Animated spiral background */}
       <div className="pointer-events-none absolute inset-0 opacity-[0.18]">
         <SpiralBackground />

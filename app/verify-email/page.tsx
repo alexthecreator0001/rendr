@@ -49,7 +49,7 @@ export default async function VerifyEmailPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-zinc-950 px-4">
+    <div className="dark min-h-screen flex items-center justify-center bg-zinc-950 px-4" style={{ colorScheme: "dark" }}>
       {/* Subtle background orbs */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
         <div className="absolute -top-40 left-1/2 -translate-x-1/2 h-[500px] w-[500px] rounded-full bg-blue-600/5 blur-[120px]" />

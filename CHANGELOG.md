@@ -2,6 +2,15 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.41.0] — 2026-02-24
+### Added
+- **Light theme**: dashboard (`/app`) and docs (`/docs`) now support light/dark toggle via sun/moon button in the topbar
+- Theme toggle added to app topbar (next to notifications bell)
+- Docs already had toggle — now functional
+### Changed
+- Root ThemeProvider: removed `forcedTheme="dark"`, enabled `enableSystem` for system preference detection
+- Marketing pages, auth pages, and verify-email page force `dark` class on their wrapper to stay dark regardless of theme setting
+
 ## [0.40.0] — 2026-02-24
 ### Changed
 - **Hero image**: replaced with new dashboard screenshot (hero.png)

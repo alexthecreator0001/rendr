@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useSidebar } from "@/components/providers/sidebar-provider";
+import { ThemeToggle } from "@/components/theme-toggle";
 import Link from "next/link";
 
 const SEARCH_ITEMS = [
@@ -68,6 +69,8 @@ export function AppTopbar({ user }: AppTopbarProps) {
               ⌘K
             </kbd>
           </Button>
+
+          <ThemeToggle />
 
           <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" aria-label="Notifications">
             <Bell className="h-4 w-4" />
