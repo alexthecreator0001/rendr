@@ -20,28 +20,28 @@ export function Hero() {
         />
       </div>
 
-      {/* Hero image — absolutely positioned, huge, touching left edge */}
+      {/* Hero image — absolutely positioned on the LEFT */}
       <div className="pointer-events-none absolute inset-0 hidden lg:block">
         <div className="absolute inset-0">
           <img
             src="/hero.png"
             alt=""
-            className="absolute right-0 top-1/2 -translate-y-1/2 w-[65%] max-w-none h-auto select-none"
+            className="absolute left-0 top-1/2 -translate-y-1/2 w-[40%] max-w-none h-auto select-none"
             draggable={false}
           />
-          {/* Left fade into background */}
-          <div className="absolute inset-y-0 left-0 w-[70%] bg-gradient-to-r from-zinc-950 via-zinc-950/90 via-40% to-transparent" />
+          {/* Right fade into background */}
+          <div className="absolute inset-y-0 right-0 w-[65%] bg-gradient-to-l from-zinc-950 via-zinc-950/90 via-40% to-transparent" />
           {/* Bottom fade */}
           <div className="absolute inset-x-0 bottom-0 h-[45%] bg-gradient-to-t from-zinc-950 via-zinc-950/80 to-transparent" />
           {/* Top fade */}
           <div className="absolute inset-x-0 top-0 h-[20%] bg-gradient-to-b from-zinc-950/80 to-transparent" />
-          {/* Right edge fade */}
-          <div className="absolute inset-y-0 right-0 w-[8%] bg-gradient-to-l from-zinc-950/70 to-transparent" />
+          {/* Left edge fade */}
+          <div className="absolute inset-y-0 left-0 w-[5%] bg-gradient-to-r from-zinc-950/50 to-transparent" />
         </div>
       </div>
 
       <div className="relative z-10 mx-auto max-w-7xl px-6 py-24 lg:px-8 lg:py-32">
-        <div className="max-w-xl">
+        <div className="max-w-xl lg:ml-auto">
 
           <h1 className="animate-fade-up delay-100 font-heading text-[3.25rem] font-extrabold leading-[0.92] tracking-[-0.045em] text-white sm:text-[4rem] lg:text-[4.5rem]">
             HTML to PDF,

@@ -2,6 +2,11 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.32.4] — 2026-02-24
+### Changed
+- Hero image moved to left side at 40% width, text pushed to right via `ml-auto`
+- Footer ASCII art reduced 30% (18px → 13px)
+
 ## [0.32.3] — 2026-02-24
 ### Changed
 - Hero image now massive and absolutely positioned, bleeding across the right side of the viewport with gradient fades on all edges

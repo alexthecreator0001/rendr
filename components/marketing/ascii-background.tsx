@@ -53,7 +53,7 @@ export function AsciiBackground() {
       }
     }
 
-    const fontSize = 18;
+    const fontSize = 13;
     const lineHeight = fontSize * 1.2;
     const charWidth = fontSize * 0.6;
 
