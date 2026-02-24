@@ -21,19 +21,19 @@ export function Hero() {
 
       {/* Hero image — absolutely positioned on the RIGHT */}
       <div className="pointer-events-none absolute inset-0 z-[2] hidden lg:block">
-        <div className="absolute inset-0">
+        <div className="absolute right-0 inset-y-0 w-[55%]">
           <img
             src="/hero.png"
             alt=""
-            className="absolute right-0 top-1/2 -translate-y-1/2 w-[50%] max-w-none h-auto select-none"
+            className="absolute right-0 top-1/2 -translate-y-1/2 w-full max-w-none h-auto select-none"
             draggable={false}
           />
-          {/* Left fade into background */}
-          <div className="absolute inset-y-0 left-0 w-[58%] bg-gradient-to-r from-zinc-950 via-zinc-950/90 via-45% to-transparent" />
+          {/* Left edge fade (only on image area) */}
+          <div className="absolute inset-y-0 left-0 w-[40%] bg-gradient-to-r from-zinc-950 via-zinc-950/70 to-transparent" />
           {/* Bottom fade */}
-          <div className="absolute inset-x-0 bottom-0 h-[45%] bg-gradient-to-t from-zinc-950 via-zinc-950/80 to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 h-[45%] bg-gradient-to-t from-zinc-950 via-zinc-950/70 to-transparent" />
           {/* Top fade */}
-          <div className="absolute inset-x-0 top-0 h-[20%] bg-gradient-to-b from-zinc-950/80 to-transparent" />
+          <div className="absolute inset-x-0 top-0 h-[20%] bg-gradient-to-b from-zinc-950/60 to-transparent" />
           {/* Right edge fade */}
           <div className="absolute inset-y-0 right-0 w-[5%] bg-gradient-to-r from-transparent to-zinc-950/50" />
         </div>
