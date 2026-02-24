@@ -2,6 +2,10 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.32.1] — 2026-02-24
+### Changed
+- Hero section redesigned: centered text layout with full-width product screenshot, subtle perspective tilt, glow backdrop, and smooth bottom fade into page background
+
 ## [0.32.0] — 2026-02-24
 ### Added
 - Full team workspaces: teams now have their own API keys, jobs, templates, webhooks, and usage pages
