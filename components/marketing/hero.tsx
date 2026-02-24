@@ -85,15 +85,15 @@ export function Hero() {
           </p>
         </div>
 
-        {/* Mobile: show hero image below text */}
-        <div className="animate-fade-up delay-200 relative mt-12 lg:hidden">
+        {/* Mobile: show hero image below text — full bleed, touching edges */}
+        <div className="animate-fade-up delay-200 relative mt-12 -mx-6 lg:hidden">
           <img
             src="/hero.png"
             alt="Rendr Dashboard"
             className="w-full h-auto block select-none"
             draggable={false}
           />
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[40%] bg-gradient-to-t from-zinc-950 via-zinc-950/70 to-transparent" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[50%] bg-gradient-to-t from-zinc-950 via-zinc-950/70 to-transparent" />
         </div>
       </div>
 
