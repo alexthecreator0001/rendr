@@ -21,7 +21,7 @@ export function Hero() {
 
       {/* Hero image — absolutely positioned on the RIGHT */}
       <div className="pointer-events-none absolute inset-0 z-[2] hidden lg:block">
-        <div className="absolute right-0 inset-y-0 w-[45%]">
+        <div className="absolute right-0 inset-y-0 w-[55%]">
           <img
             src="/hero.png"
             alt=""

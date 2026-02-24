@@ -57,7 +57,7 @@ export default function FeaturesPage() {
       {/* Header */}
       <Section size="md">
         <Container>
-          <div className="flex items-start gap-6">
+          <div className="flex items-center justify-between gap-8">
             <div className="max-w-2xl">
               <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-primary">
                 Features
@@ -70,7 +70,7 @@ export default function FeaturesPage() {
                 get when you integrate Rendr.
               </p>
             </div>
-            <div className="hidden lg:block pt-4">
+            <div className="hidden lg:flex items-center" style={{ height: "220px" }}>
               <FireAscii />
             </div>
           </div>

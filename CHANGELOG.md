@@ -2,6 +2,11 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.33.1] — 2026-02-24
+### Changed
+- Hero image back to 55% width (was too small at 45%)
+- Fire ASCII animation properly sized to fill available height, scales responsively
+
 ## [0.33.0] — 2026-02-24
 ### Changed
 - Hero image 10% smaller (55% → 45% width), no longer overlapping text

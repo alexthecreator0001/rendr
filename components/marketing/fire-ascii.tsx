@@ -111,16 +111,30 @@ export function FireAscii() {
       return Math.sqrt(nr * nr + nc * nc * 0.3);
     });
 
-    const fontSize = 3;
-    const lineHeight = fontSize * 1.1;
-    const charWidth = fontSize * 0.6;
-    const artWidth = maxCols * charWidth;
-    const artHeight = totalRows * lineHeight;
+    let fontSize = 3;
+    let lineHeight = fontSize * 1.1;
+    let charWidth = fontSize * 0.6;
 
-    canvas.width = Math.ceil(artWidth);
-    canvas.height = Math.ceil(artHeight);
-    container.style.width = `${canvas.width}px`;
-    container.style.height = `${canvas.height}px`;
+    const resize = () => {
+      const targetHeight = container.parentElement?.clientHeight || 250;
+      const baseCharWidth = 0.6;
+      const baseLineHeight = 1.1;
+      // Scale to fit the target height
+      fontSize = targetHeight / (totalRows * baseLineHeight);
+      fontSize = Math.max(2, Math.min(fontSize, 6));
+      lineHeight = fontSize * baseLineHeight;
+      charWidth = fontSize * baseCharWidth;
+
+      const artWidth = maxCols * charWidth;
+      const artHeight = totalRows * lineHeight;
+      canvas.width = Math.ceil(artWidth);
+      canvas.height = Math.ceil(artHeight);
+      container.style.width = `${canvas.width}px`;
+      container.style.height = `${canvas.height}px`;
+    };
+
+    resize();
+    window.addEventListener("resize", resize);
 
     let animId: number;
 
@@ -152,7 +166,10 @@ export function FireAscii() {
 
     animId = requestAnimationFrame(draw);
 
-    return () => cancelAnimationFrame(animId);
+    return () => {
+      cancelAnimationFrame(animId);
+      window.removeEventListener("resize", resize);
+    };
   }, []);
 
   return (
