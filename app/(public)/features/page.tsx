@@ -164,11 +164,13 @@ export default function FeaturesPage() {
                 </div>
                 {/* Code */}
                 <div className="p-5 font-mono text-[12px] leading-[1.7]">
-                  <pre className="overflow-x-auto"><code><span className="text-emerald-400">curl</span>{" "}<span className="text-zinc-500">-X POST</span>{" "}<span className="text-blue-400">https://rendrpdf.com/api/v1/convert</span>{" \\\n  "}<span className="text-zinc-500">-H</span>{" "}<span className="text-amber-300">{'"Authorization: Bearer rk_live_..."'}</span>{" \\\n  "}<span className="text-zinc-500">-H</span>{" "}<span className="text-amber-300">{'"Content-Type: application/json"'}</span>{" \\\n  "}<span className="text-zinc-500">-d</span>{" "}<span className="text-amber-300">{"'"}</span>
-<span className="text-zinc-400">{"{"}</span>
-<span className="text-zinc-400">{"  "}</span><span className="text-emerald-400">{'"input"'}</span><span className="text-zinc-400">:</span>{" "}{"{"}{" "}<span className="text-emerald-400">{'"type"'}</span><span className="text-zinc-400">:</span>{" "}<span className="text-amber-300">{'"html"'}</span><span className="text-zinc-400">,</span>{" "}<span className="text-emerald-400">{'"html"'}</span><span className="text-zinc-400">:</span>{" "}<span className="text-amber-300">{'"<h1>Invoice #42</h1>"'}</span>{" "},
-<span className="text-zinc-400">{"  "}</span><span className="text-emerald-400">{'"options"'}</span><span className="text-zinc-400">:</span>{" "}{"{"}{" "}<span className="text-emerald-400">{'"format"'}</span><span className="text-zinc-400">:</span>{" "}<span className="text-amber-300">{'"A4"'}</span><span className="text-zinc-400">,</span>{" "}<span className="text-emerald-400">{'"margin"'}</span><span className="text-zinc-400">:</span>{" "}<span className="text-amber-300">{'"20mm"'}</span>{" }{"}"}
-<span className="text-zinc-400">{"}"}</span><span className="text-amber-300">{"'"}</span></code></pre>
+                  <pre className="overflow-x-auto text-zinc-400"><code>{`curl -X POST https://rendrpdf.com/api/v1/convert \\
+  -H "Authorization: Bearer rk_live_..." \\
+  -H "Content-Type: application/json" \\
+  -d '{
+  "input": { "type": "html", "html": "<h1>Invoice #42</h1>" },
+  "options": { "format": "A4", "margin": "20mm" }
+}'`}</code></pre>
                 </div>
                 {/* Response preview */}
                 <div className="border-t border-white/[0.06] px-5 py-3.5 flex items-center justify-between">
@@ -176,7 +178,7 @@ export default function FeaturesPage() {
                     <span className="flex h-5 items-center rounded-full bg-emerald-500/15 px-2 text-[10px] font-semibold text-emerald-400">200</span>
                     <span className="text-[11px] text-zinc-500">application/json · 340ms</span>
                   </div>
-                  <span className="font-mono text-[11px] text-zinc-600">{"{ pdf_url, job_id, pages }"}</span>
+                  <span className="font-mono text-[11px] text-zinc-600">{`{ pdf_url, job_id, pages }`}</span>
                 </div>
               </div>
             </div>
