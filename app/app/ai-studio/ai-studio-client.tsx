@@ -35,7 +35,6 @@ import {
   ImagePlus,
   X,
   RotateCcw,
-  User,
   Bot,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -64,7 +63,7 @@ const MAX_LOGO_SIZE = 512 * 1024; // 512 KB
 
 interface ChatEntry {
   role: "user" | "assistant";
-  text: string; // Display text (user message or "Template generated/updated")
+  text: string;
 }
 
 interface Props {
@@ -74,15 +73,14 @@ interface Props {
 }
 
 export function AiStudioClient({ plan, creditsUsed: initialUsed, creditsLimit }: Props) {
-  // Save form (useActionState pattern)
   const [saveState, saveAction, savePending] = useActionState<
     { error?: string; success?: boolean } | null,
     FormData
   >(saveAiTemplateAction, null);
 
   // Chat state
-  const [messages, setMessages] = useState<AiMessage[]>([]); // Full OpenAI messages
-  const [chatEntries, setChatEntries] = useState<ChatEntry[]>([]); // Display entries
+  const [messages, setMessages] = useState<AiMessage[]>([]);
+  const [chatEntries, setChatEntries] = useState<ChatEntry[]>([]);
   const [html, setHtml] = useState<string | null>(null);
   const [sampleData, setSampleData] = useState<Record<string, string>>({});
   const [creditsUsed, setCreditsUsed] = useState(initialUsed);
@@ -112,14 +110,13 @@ export function AiStudioClient({ plan, creditsUsed: initialUsed, creditsLimit }:
   // Scroll chat to bottom on new entries
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [chatEntries]);
+  }, [chatEntries, pending]);
 
   // Build preview HTML — replace {{ variables }} with sample data
   const previewHtml = useMemo(() => {
     if (!html) return null;
     let result = html;
     const data = { ...sampleData };
-    // Override logo_url with user's uploaded logo
     if (logoDataUri) data.logo_url = logoDataUri;
     for (const [key, value] of Object.entries(data)) {
       result = result.replace(
@@ -136,6 +133,9 @@ export function AiStudioClient({ plan, creditsUsed: initialUsed, creditsLimit }:
     setInput("");
     setError(null);
 
+    // Immediately add user message to chat for instant feedback
+    setChatEntries((prev) => [...prev, { role: "user", text: msg }]);
+
     startTransition(async () => {
       const result: GenerateResult = await chatGenerateAction({
         messages,
@@ -147,14 +147,9 @@ export function AiStudioClient({ plan, creditsUsed: initialUsed, creditsLimit }:
 
       if (result.error) {
         setError(result.error);
-        setChatEntries((prev) => [
-          ...prev,
-          { role: "user", text: msg },
-        ]);
         return;
       }
 
-      // Build the user content that was sent to OpenAI (mirror action logic)
       let userContent = msg;
       if (!hasGenerated) {
         userContent = `Document type: ${documentType}\nDesign style: ${style}\n\n${msg}`;
@@ -170,8 +165,12 @@ export function AiStudioClient({ plan, creditsUsed: initialUsed, creditsLimit }:
       ]);
       setChatEntries((prev) => [
         ...prev,
-        { role: "user", text: msg },
-        { role: "assistant", text: prev.length === 0 ? "Template generated" : "Template updated" },
+        {
+          role: "assistant",
+          text: prev.filter((e) => e.role === "assistant").length === 0
+            ? "Template generated — see preview on the right"
+            : "Template updated — preview refreshed",
+        },
       ]);
       setHtml(result.html ?? null);
       setSampleData(result.sampleData ?? {});
@@ -199,7 +198,6 @@ export function AiStudioClient({ plan, creditsUsed: initialUsed, creditsLimit }:
       setLogoName(file.name);
     };
     reader.readAsDataURL(file);
-    // Reset so same file can be re-selected
     e.target.value = "";
   }
 
@@ -281,140 +279,145 @@ export function AiStudioClient({ plan, creditsUsed: initialUsed, creditsLimit }:
       {/* Main content */}
       <div className="flex flex-1 min-h-0 overflow-hidden">
 
-        {/* ── Left panel ─────────────────────────────────────────────────── */}
-        <div className="w-[340px] shrink-0 border-r border-border bg-background flex flex-col">
+        {/* ── Left panel — Chat ──────────────────────────────────────────── */}
+        <div className="w-[380px] shrink-0 border-r border-border bg-background flex flex-col">
 
-          {/* Config section — only before first generation */}
-          {!hasGenerated && (
-            <div className="p-4 space-y-3 border-b border-border/50 shrink-0">
-              <div className="grid grid-cols-2 gap-2">
-                <div className="space-y-1">
-                  <label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">
-                    Type
-                  </label>
-                  <Select value={documentType} onValueChange={setDocumentType}>
-                    <SelectTrigger className="h-8 text-[12px]">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {DOCUMENT_TYPES.map((t) => (
-                        <SelectItem key={t} value={t} className="text-[12px]">
-                          {t}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-1">
-                  <label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">
-                    Style
-                  </label>
-                  <Select value={style} onValueChange={setStyle}>
-                    <SelectTrigger className="h-8 text-[12px]">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {STYLES.map((s) => (
-                        <SelectItem key={s} value={s} className="text-[12px]">
-                          {s}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+          {/* Config bar — always visible, compact when generated */}
+          <div className="px-3 py-2.5 border-b border-border shrink-0">
+            <div className="flex items-center gap-2">
+              {/* Type & Style — side by side */}
+              <div className="flex gap-1.5 flex-1 min-w-0">
+                <Select value={documentType} onValueChange={setDocumentType} disabled={hasGenerated}>
+                  <SelectTrigger className="h-7 text-[11px] flex-1 min-w-0">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {DOCUMENT_TYPES.map((t) => (
+                      <SelectItem key={t} value={t} className="text-[12px]">{t}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Select value={style} onValueChange={setStyle} disabled={hasGenerated}>
+                  <SelectTrigger className="h-7 text-[11px] flex-1 min-w-0">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {STYLES.map((s) => (
+                      <SelectItem key={s} value={s} className="text-[12px]">{s}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
-              {/* Logo upload */}
-              <div>
-                <input
-                  ref={logoInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleLogoUpload}
-                  className="hidden"
-                />
-                {logoDataUri ? (
-                  <div className="flex items-center gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2">
-                    <img
-                      src={logoDataUri}
-                      alt="Logo"
-                      className="h-6 w-auto max-w-[80px] object-contain"
-                    />
-                    <span className="text-[11px] text-muted-foreground truncate flex-1">
-                      {logoName}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={removeLogo}
-                      className="text-muted-foreground hover:text-foreground transition-colors"
-                    >
-                      <X className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
-                ) : (
+              {/* Logo button — always visible */}
+              <input
+                ref={logoInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleLogoUpload}
+                className="hidden"
+              />
+              {logoDataUri ? (
+                <div className="flex items-center gap-1.5 rounded-md border border-border bg-muted/40 px-2 py-1 shrink-0">
+                  <img
+                    src={logoDataUri}
+                    alt="Logo"
+                    className="h-5 w-auto max-w-[48px] object-contain"
+                  />
                   <button
                     type="button"
-                    onClick={() => logoInputRef.current?.click()}
-                    className="flex items-center gap-2 w-full rounded-lg border border-dashed border-border px-3 py-2 text-[11px] text-muted-foreground hover:text-foreground hover:border-foreground/20 transition-colors"
+                    onClick={removeLogo}
+                    className="text-muted-foreground hover:text-foreground transition-colors"
                   >
-                    <ImagePlus className="h-3.5 w-3.5 shrink-0" />
-                    Upload logo (optional)
+                    <X className="h-3 w-3" />
                   </button>
-                )}
-              </div>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => logoInputRef.current?.click()}
+                  title="Upload logo"
+                  className="flex h-7 w-7 items-center justify-center rounded-md border border-dashed border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors shrink-0"
+                >
+                  <ImagePlus className="h-3.5 w-3.5" />
+                </button>
+              )}
             </div>
-          )}
+          </div>
 
-          {/* Chat messages */}
-          <div className="flex-1 overflow-y-auto min-h-0">
-            {chatEntries.length === 0 && !hasGenerated ? (
-              // Empty state hint
-              <div className="p-4 pt-6 text-center">
-                <Sparkles className="h-5 w-5 text-muted-foreground/30 mx-auto mb-2" />
-                <p className="text-[12px] text-muted-foreground/60 leading-relaxed">
-                  Describe the template you want. Be specific about sections, layout, and content.
+          {/* ── Chat area ──────────────────────────────────────────────────── */}
+          <div className="flex-1 overflow-y-auto min-h-0 bg-muted/20">
+            {chatEntries.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-full px-6 text-center">
+                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/10 mb-3">
+                  <Sparkles className="h-5 w-5 text-primary" />
+                </div>
+                <p className="text-[13px] font-medium text-foreground mb-1">
+                  What template do you need?
                 </p>
+                <p className="text-[11px] text-muted-foreground leading-relaxed max-w-[260px]">
+                  Describe your document below. After generating, you can keep chatting to refine colors, layout, sections, and more.
+                </p>
+                <div className="flex flex-wrap justify-center gap-1.5 mt-4">
+                  {[
+                    "SaaS invoice with line items",
+                    "Minimalist receipt",
+                    "Modern resume",
+                    "Professional certificate",
+                  ].map((suggestion) => (
+                    <button
+                      key={suggestion}
+                      type="button"
+                      onClick={() => setInput(suggestion)}
+                      className="rounded-full border border-border bg-background px-3 py-1 text-[10px] text-muted-foreground hover:text-foreground hover:border-foreground/20 transition-colors"
+                    >
+                      {suggestion}
+                    </button>
+                  ))}
+                </div>
               </div>
             ) : (
-              <div className="p-3 space-y-2">
+              <div className="px-4 py-4 space-y-4">
                 {chatEntries.map((entry, i) => (
-                  <div key={i} className={cn("flex gap-2", entry.role === "user" ? "justify-end" : "justify-start")}>
-                    {entry.role === "assistant" && (
-                      <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10 mt-0.5">
-                        <Bot className="h-3 w-3 text-primary" />
+                  <div key={i}>
+                    {entry.role === "user" ? (
+                      /* ── User message ── */
+                      <div className="flex justify-end">
+                        <div className="max-w-[85%] rounded-2xl rounded-br-md bg-primary px-4 py-2.5">
+                          <p className="text-[13px] leading-relaxed text-primary-foreground whitespace-pre-wrap">
+                            {entry.text}
+                          </p>
+                        </div>
                       </div>
-                    )}
-                    <div
-                      className={cn(
-                        "rounded-lg px-3 py-1.5 text-[12px] leading-relaxed max-w-[85%]",
-                        entry.role === "user"
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-muted/60 text-muted-foreground"
-                      )}
-                    >
-                      {entry.role === "assistant" ? (
-                        <span className="flex items-center gap-1.5">
-                          <Check className="h-3 w-3 text-emerald-500 shrink-0" />
-                          {entry.text}
-                        </span>
-                      ) : (
-                        entry.text
-                      )}
-                    </div>
-                    {entry.role === "user" && (
-                      <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-foreground/10 mt-0.5">
-                        <User className="h-3 w-3 text-foreground/60" />
+                    ) : (
+                      /* ── AI message ── */
+                      <div className="flex gap-2.5">
+                        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-violet-600 mt-0.5">
+                          <Bot className="h-3.5 w-3.5 text-white" />
+                        </div>
+                        <div className="max-w-[85%] rounded-2xl rounded-bl-md bg-muted px-4 py-2.5">
+                          <p className="text-[13px] leading-relaxed text-foreground flex items-center gap-2">
+                            <Check className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+                            {entry.text}
+                          </p>
+                        </div>
                       </div>
                     )}
                   </div>
                 ))}
+
+                {/* Typing indicator */}
                 {pending && (
-                  <div className="flex gap-2 justify-start">
-                    <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10 mt-0.5">
-                      <Bot className="h-3 w-3 text-primary" />
+                  <div className="flex gap-2.5">
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-violet-600">
+                      <Bot className="h-3.5 w-3.5 text-white" />
                     </div>
-                    <div className="rounded-lg px-3 py-1.5 bg-muted/60">
-                      <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />
+                    <div className="rounded-2xl rounded-bl-md bg-muted px-4 py-3">
+                      <div className="flex items-center gap-1.5">
+                        <span className="block h-2 w-2 rounded-full bg-foreground/30 animate-pulse" />
+                        <span className="block h-2 w-2 rounded-full bg-foreground/30 animate-pulse [animation-delay:150ms]" />
+                        <span className="block h-2 w-2 rounded-full bg-foreground/30 animate-pulse [animation-delay:300ms]" />
+                      </div>
                     </div>
                   </div>
                 )}
@@ -425,14 +428,14 @@ export function AiStudioClient({ plan, creditsUsed: initialUsed, creditsLimit }:
 
           {/* Error */}
           {error && (
-            <div className="mx-3 mb-2 rounded-lg border border-destructive/30 bg-destructive/5 px-3 py-2 text-[11px] text-destructive">
+            <div className="mx-3 mb-0 mt-2 rounded-lg border border-destructive/30 bg-destructive/5 px-3 py-2 text-[11px] text-destructive shrink-0">
               {error}
             </div>
           )}
 
           {/* No credits warning */}
           {noCredits && (
-            <div className="mx-3 mb-2 flex items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/5 px-3 py-2 text-[11px] text-amber-500">
+            <div className="mx-3 mt-2 flex items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/5 px-3 py-2 text-[11px] text-amber-500 shrink-0">
               <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
               <span>
                 No credits left.{" "}
@@ -443,9 +446,9 @@ export function AiStudioClient({ plan, creditsUsed: initialUsed, creditsLimit }:
             </div>
           )}
 
-          {/* Input area */}
-          <div className="p-3 border-t border-border/50 shrink-0">
-            <div className="flex gap-2 items-end">
+          {/* ── Input area ─────────────────────────────────────────────────── */}
+          <div className="p-3 border-t border-border shrink-0 bg-background">
+            <div className="flex gap-2 items-end rounded-xl border border-border bg-muted/30 p-1.5 focus-within:ring-2 focus-within:ring-ring focus-within:border-transparent transition-all">
               <textarea
                 ref={inputRef}
                 value={input}
@@ -453,15 +456,15 @@ export function AiStudioClient({ plan, creditsUsed: initialUsed, creditsLimit }:
                 onKeyDown={handleKeyDown}
                 placeholder={
                   hasGenerated
-                    ? "Refine: \"Make the header larger\", \"Add a notes section\"..."
+                    ? "Tell AI what to change..."
                     : "Describe your template..."
                 }
                 rows={2}
                 disabled={pending || noCredits}
                 className={cn(
-                  "flex-1 rounded-lg border border-border bg-background px-3 py-2",
-                  "text-[12px] leading-relaxed placeholder:text-muted-foreground/40",
-                  "focus:outline-none focus:ring-2 focus:ring-ring",
+                  "flex-1 bg-transparent px-2.5 py-1.5",
+                  "text-[13px] leading-relaxed placeholder:text-muted-foreground/40",
+                  "focus:outline-none",
                   "disabled:opacity-50 resize-none"
                 )}
               />
@@ -470,7 +473,7 @@ export function AiStudioClient({ plan, creditsUsed: initialUsed, creditsLimit }:
                 size="sm"
                 onClick={handleSend}
                 disabled={pending || noCredits || !input.trim()}
-                className="h-9 w-9 p-0 shrink-0"
+                className="h-8 w-8 p-0 shrink-0 rounded-lg"
               >
                 {pending ? (
                   <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -479,42 +482,22 @@ export function AiStudioClient({ plan, creditsUsed: initialUsed, creditsLimit }:
                 )}
               </Button>
             </div>
-            <p className="mt-1.5 text-[10px] text-muted-foreground/40">
-              Each message uses 1 credit · Enter to send · Shift+Enter for new line
-            </p>
-          </div>
-
-          {/* Credits bar */}
-          <div className="px-3 pb-3 shrink-0">
-            <div className="flex items-center justify-between text-[10px] mb-1">
-              <span className="text-muted-foreground">Credits</span>
+            <div className="flex items-center justify-between mt-1.5 px-1">
+              <p className="text-[10px] text-muted-foreground/40">
+                Enter to send · Shift+Enter for new line
+              </p>
               <span
                 className={cn(
-                  "tabular-nums font-semibold",
+                  "text-[10px] tabular-nums font-medium",
                   noCredits
                     ? "text-red-500"
                     : creditsLeft <= 3
                       ? "text-amber-500"
-                      : "text-foreground"
+                      : "text-muted-foreground/40"
                 )}
               >
-                {creditsLeft} / {creditsLimit}
+                {creditsLeft} credit{creditsLeft !== 1 ? "s" : ""} left
               </span>
-            </div>
-            <div className="h-[3px] w-full overflow-hidden rounded-full bg-muted">
-              <div
-                className={cn(
-                  "h-full rounded-full transition-all duration-500",
-                  noCredits
-                    ? "bg-red-500"
-                    : creditsLeft <= 3
-                      ? "bg-amber-500"
-                      : "bg-primary"
-                )}
-                style={{
-                  width: `${Math.min(100, (creditsUsed / creditsLimit) * 100)}%`,
-                }}
-              />
             </div>
           </div>
         </div>
@@ -577,7 +560,6 @@ export function AiStudioClient({ plan, creditsUsed: initialUsed, creditsLimit }:
                   </div>
                 ) : (
                   <form action={saveAction} className="flex items-center gap-2">
-                    {/* Save raw HTML with {{ variables }}, not filled preview */}
                     <input type="hidden" name="html" value={html!} />
                     <Input
                       name="name"

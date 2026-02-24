@@ -2,6 +2,14 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.35.1] — 2026-02-24
+### Changed
+- AI Studio: completely redesigned chat UI — large message bubbles, gradient AI avatar, typing indicator with animated dots, proper spacing
+- AI Studio: logo upload always visible in top config bar (not hidden after first generation)
+- AI Studio: left panel wider (380px), chat area has subtle background, messages are instant (user bubble appears immediately on send)
+- AI Studio: clickable suggestion chips in empty state ("SaaS invoice with line items", etc.)
+- AI Studio: input area redesigned as a contained box with rounded border, credits shown inline
+
 ## [0.35.0] — 2026-02-24
 ### Added
 - AI Studio: chat-based template refinement — iterate with AI to perfect templates, not just one-shot
