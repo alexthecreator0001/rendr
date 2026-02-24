@@ -16,11 +16,11 @@ export function Hero() {
         <SpiralBackground />
       </div>
 
-      {/* Hero image — absolutely positioned on the RIGHT */}
+      {/* Hero image — absolutely positioned on the RIGHT (desktop) */}
       <div className="pointer-events-none absolute inset-0 z-[2] hidden lg:block">
         <div className="absolute right-0 inset-y-0 w-[50%]">
           <img
-            src="/hero.png"
+            src="/hero.webp"
             alt=""
             className="absolute right-0 bottom-0 w-full max-w-none h-auto select-none"
             draggable={false}
@@ -85,15 +85,17 @@ export function Hero() {
           </p>
         </div>
 
-        {/* Mobile: show hero image below text — full bleed, touching edges */}
+        {/* Mobile: hero image anchored to bottom-right, 90% width */}
         <div className="animate-fade-up delay-200 relative mt-12 -mx-6 lg:hidden">
-          <img
-            src="/hero.png"
-            alt="Rendr Dashboard"
-            className="w-full h-auto block select-none"
-            draggable={false}
-          />
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[50%] bg-gradient-to-t from-zinc-950 via-zinc-950/70 to-transparent" />
+          <div className="relative overflow-hidden">
+            <img
+              src="/hero.webp"
+              alt="Rendr Dashboard"
+              className="block w-[90%] h-auto ml-auto select-none"
+              draggable={false}
+            />
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[40%] bg-gradient-to-t from-zinc-950 via-zinc-950/60 to-transparent" />
+          </div>
         </div>
       </div>
 

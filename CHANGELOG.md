@@ -2,6 +2,11 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.35.3] — 2026-02-24
+### Changed
+- Hero: new hero image (hero.webp), mobile layout anchored bottom-right at 90% width
+- Auth pages (login/register): replaced gradient orbs with animated spiral background + radial vignette
+
 ## [0.35.2] — 2026-02-24
 ### Added
 - AI Studio: load existing templates — browse saved templates in the empty state and load them into AI Studio to continue refining via chat
