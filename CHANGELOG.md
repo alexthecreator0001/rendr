@@ -2,6 +2,12 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.35.4] — 2026-02-24
+### Fixed
+- Hero mobile: image now touches bottom border (removed bottom fade/padding, negative margin cancels section padding)
+- Hero desktop: image width increased to 52%
+- Auth spiral: opacity tripled (0.06 → 0.18), vignette softened so spiral is clearly visible
+
 ## [0.35.3] — 2026-02-24
 ### Changed
 - Hero: new hero image (hero.webp), mobile layout anchored bottom-right at 90% width

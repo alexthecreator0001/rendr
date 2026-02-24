@@ -18,7 +18,7 @@ export function Hero() {
 
       {/* Hero image — absolutely positioned on the RIGHT (desktop) */}
       <div className="pointer-events-none absolute inset-0 z-[2] hidden lg:block">
-        <div className="absolute right-0 inset-y-0 w-[50%]">
+        <div className="absolute right-0 inset-y-0 w-[52%]">
           <img
             src="/hero.webp"
             alt=""
@@ -85,22 +85,16 @@ export function Hero() {
           </p>
         </div>
 
-        {/* Mobile: hero image anchored to bottom-right, 90% width */}
-        <div className="animate-fade-up delay-200 relative mt-12 -mx-6 lg:hidden">
-          <div className="relative overflow-hidden">
-            <img
-              src="/hero.webp"
-              alt="Rendr Dashboard"
-              className="block w-[90%] h-auto ml-auto select-none"
-              draggable={false}
-            />
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[40%] bg-gradient-to-t from-zinc-950 via-zinc-950/60 to-transparent" />
-          </div>
+        {/* Mobile: hero image anchored to bottom-right, 90% width, flush to section bottom */}
+        <div className="animate-fade-up delay-200 relative -mx-6 -mb-24 mt-12 lg:hidden lg:-mb-32">
+          <img
+            src="/hero.webp"
+            alt="Rendr Dashboard"
+            className="block w-[90%] h-auto ml-auto select-none"
+            draggable={false}
+          />
         </div>
       </div>
-
-      {/* Bottom fade */}
-      <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-zinc-950 to-transparent" />
     </section>
   );
 }
