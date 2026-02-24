@@ -2,6 +2,15 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.42.0] — 2026-02-24
+### Added
+- **Forgot password flow**: "Forgot password?" link on login page, email with reset link (1h expiry), set new password page
+- `PasswordResetToken` Prisma model with migration `20260224000003`
+- Server actions: `forgotPasswordAction`, `resetPasswordAction` with rate limiting and anti-enumeration
+- Pages: `/forgot-password`, `/reset-password?token=...`
+### Fixed
+- Features page build error: escaped JSX braces in code block
+
 ## [0.41.0] — 2026-02-24
 ### Added
 - **Light theme**: dashboard (`/app`) and docs (`/docs`) now support light/dark toggle via sun/moon button in the topbar

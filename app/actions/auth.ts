@@ -4,9 +4,9 @@ import { signIn, signOut } from "@/auth";
 import { prisma } from "@/lib/db";
 import { hashPassword, verifyPassword } from "@/lib/auth-utils";
 import { seedStarterTemplates } from "@/lib/starter-templates";
-import { sendWelcomeEmail, sendVerificationEmail } from "@/lib/email";
+import { sendWelcomeEmail, sendVerificationEmail, sendPasswordResetEmail } from "@/lib/email";
 import { z } from "zod";
-import { randomInt } from "node:crypto";
+import crypto, { randomInt } from "node:crypto";
 import { AuthError } from "next-auth";
 import { auth } from "@/auth";
 
@@ -308,6 +308,79 @@ export async function changePasswordAction(
 
   const hash = await hashPassword(next);
   await prisma.user.update({ where: { id: session.user.id }, data: { passwordHash: hash } });
+
+  return { success: true };
+}
+
+// ─── Forgot password (request reset) ────────────────────────────────────────
+
+export async function forgotPasswordAction(
+  _prevState: { error?: string; success?: boolean } | null,
+  formData: FormData
+): Promise<{ error?: string; success?: boolean }> {
+  const email = (formData.get("email") as string)?.trim().toLowerCase();
+
+  if (!email || !z.string().email().safeParse(email).success) {
+    return { error: "Please enter a valid email address." };
+  }
+
+  if (!checkAuthRateLimit(`reset:${email}`)) {
+    return { error: "Too many attempts. Please try again later." };
+  }
+
+  // Always return success to prevent email enumeration
+  const user = await prisma.user.findUnique({ where: { email }, select: { id: true } });
+
+  if (user) {
+    // Delete any existing tokens for this email
+    await prisma.passwordResetToken.deleteMany({ where: { email } });
+
+    const token = crypto.randomBytes(32).toString("base64url");
+    await prisma.passwordResetToken.create({
+      data: {
+        email,
+        token,
+        expiresAt: new Date(Date.now() + 60 * 60 * 1000), // 1 hour
+      },
+    });
+
+    sendPasswordResetEmail(email, token).catch(() => {});
+  }
+
+  return { success: true };
+}
+
+// ─── Reset password (with token) ────────────────────────────────────────────
+
+export async function resetPasswordAction(
+  _prevState: { error?: string; success?: boolean } | null,
+  formData: FormData
+): Promise<{ error?: string; success?: boolean }> {
+  const token = (formData.get("token") as string)?.trim();
+  const password = (formData.get("password") as string) ?? "";
+  const confirm = (formData.get("confirm") as string) ?? "";
+
+  if (!token) return { error: "Invalid reset link." };
+  if (password.length < 8) return { error: "Password must be at least 8 characters." };
+  if (password !== confirm) return { error: "Passwords don't match." };
+
+  const record = await prisma.passwordResetToken.findUnique({ where: { token } });
+
+  if (!record || record.expiresAt < new Date()) {
+    // Clean up expired token
+    if (record) await prisma.passwordResetToken.delete({ where: { id: record.id } });
+    return { error: "This reset link has expired. Please request a new one." };
+  }
+
+  const passwordHash = await hashPassword(password);
+
+  await Promise.all([
+    prisma.user.update({
+      where: { email: record.email },
+      data: { passwordHash },
+    }),
+    prisma.passwordResetToken.delete({ where: { id: record.id } }),
+  ]);
 
   return { success: true };
 }
