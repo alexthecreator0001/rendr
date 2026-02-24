@@ -6,6 +6,7 @@ import { prisma } from "@/lib/db"
 import { getQueue } from "@/lib/queue"
 import { apiError, ApiError } from "@/lib/errors"
 import { assertSafeUrl } from "@/lib/ssrf-guard"
+import { getPlanRenderLimit } from "@/lib/plans"
 
 const HTML_MAX_BYTES = 5 * 1024 * 1024 // 5 MB
 
@@ -103,9 +104,32 @@ export async function POST(req: NextRequest) {
 
     const { input, options, variables, webhook_url } = parsed.data
 
+    // Enforce monthly plan render limit
+    const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1)
+    const monthlyUsage = await prisma.job.count({
+      where: { userId: user.id, createdAt: { gte: monthStart } },
+    })
+    const renderLimit = getPlanRenderLimit(user.plan)
+    if (monthlyUsage >= renderLimit) {
+      return apiError(
+        429,
+        `Monthly render limit reached (${renderLimit} on ${user.plan} plan). Upgrade for more.`,
+        "plan_limit_exceeded"
+      )
+    }
+
     // Enforce HTML payload size limit
     if (input.type === "html" && input.content && input.content.length > HTML_MAX_BYTES) {
       return apiError(413, "HTML content exceeds the 5 MB limit", "payload_too_large")
+    }
+
+    // SSRF guard on URL input
+    if (input.type === "url" && input.content) {
+      try {
+        await assertSafeUrl(input.content)
+      } catch (e) {
+        return apiError(400, e instanceof Error ? e.message : "Invalid URL", "invalid_request")
+      }
     }
 
     // SSRF guard on webhook_url

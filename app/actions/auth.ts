@@ -6,8 +6,55 @@ import { hashPassword, verifyPassword } from "@/lib/auth-utils";
 import { seedStarterTemplates } from "@/lib/starter-templates";
 import { sendWelcomeEmail, sendVerificationEmail } from "@/lib/email";
 import { z } from "zod";
+import { randomInt } from "node:crypto";
 import { AuthError } from "next-auth";
 import { auth } from "@/auth";
+
+// ─── Simple IP-based rate limiter for auth endpoints ─────────────────────────
+const AUTH_RATE_STORE = new Map<string, { count: number; resetAt: number }>();
+const AUTH_RATE_LIMIT = 10; // max attempts per window
+const AUTH_RATE_WINDOW = 15 * 60 * 1000; // 15 minutes
+
+function checkAuthRateLimit(key: string): boolean {
+  const now = Date.now();
+  const entry = AUTH_RATE_STORE.get(key);
+  if (!entry || entry.resetAt < now) {
+    AUTH_RATE_STORE.set(key, { count: 1, resetAt: now + AUTH_RATE_WINDOW });
+    return true;
+  }
+  if (entry.count >= AUTH_RATE_LIMIT) return false;
+  entry.count++;
+  return true;
+}
+
+// Clean up expired entries periodically
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, entry] of AUTH_RATE_STORE.entries()) {
+    if (entry.resetAt < now) AUTH_RATE_STORE.delete(key);
+  }
+}, 5 * 60_000);
+
+// Verification code attempt tracking (max 5 failed attempts per user)
+const VERIFY_ATTEMPTS = new Map<string, { count: number; resetAt: number }>();
+const VERIFY_MAX_ATTEMPTS = 5;
+const VERIFY_WINDOW = 15 * 60 * 1000; // 15 minutes
+
+function checkVerifyRateLimit(userId: string): boolean {
+  const now = Date.now();
+  const entry = VERIFY_ATTEMPTS.get(userId);
+  if (!entry || entry.resetAt < now) {
+    VERIFY_ATTEMPTS.set(userId, { count: 1, resetAt: now + VERIFY_WINDOW });
+    return true;
+  }
+  if (entry.count >= VERIFY_MAX_ATTEMPTS) return false;
+  entry.count++;
+  return true;
+}
+
+function clearVerifyAttempts(userId: string) {
+  VERIFY_ATTEMPTS.delete(userId);
+}
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -27,7 +74,7 @@ async function createVerificationCode(userId: string): Promise<string> {
   await prisma.verificationToken.deleteMany({ where: { userId } });
 
   for (let attempt = 0; attempt < 5; attempt++) {
-    const code = String(Math.floor(100000 + Math.random() * 900000));
+    const code = String(randomInt(100000, 1000000));
     try {
       await prisma.verificationToken.create({
         data: {
@@ -57,6 +104,11 @@ export async function loginAction(
 
   if (!parsed.success) {
     return { error: "Invalid email or password." };
+  }
+
+  // Rate limit login attempts by email
+  if (!checkAuthRateLimit(`login:${parsed.data.email}`)) {
+    return { error: "Too many login attempts. Please try again later." };
   }
 
   try {
@@ -89,6 +141,11 @@ export async function registerAction(
   if (!parsed.success) {
     const issues = parsed.error.issues.map((i) => i.message).join(", ");
     return { error: issues };
+  }
+
+  // Rate limit registration attempts by email
+  if (!checkAuthRateLimit(`register:${parsed.data.email}`)) {
+    return { error: "Too many attempts. Please try again later." };
   }
 
   const existing = await prisma.user.findUnique({
@@ -171,6 +228,11 @@ export async function verifyEmailCodeAction(
     return { error: "Please enter the complete 6-digit code." };
   }
 
+  // Rate limit verification attempts per user
+  if (!checkVerifyRateLimit(session.user.id)) {
+    return { error: "Too many attempts. Please request a new code." };
+  }
+
   const record = await prisma.verificationToken.findFirst({
     where: {
       userId: session.user.id,
@@ -182,6 +244,8 @@ export async function verifyEmailCodeAction(
   if (!record) {
     return { error: "Invalid or expired code. Request a new one below." };
   }
+
+  clearVerifyAttempts(session.user.id);
 
   await Promise.all([
     prisma.user.update({

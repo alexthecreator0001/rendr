@@ -36,8 +36,11 @@ function isPrivateIp(ip: string): boolean {
  * Throws if the URL is unsafe to fetch (non-http/https, or resolves to a
  * private / loopback / link-local address). Call this before any user-supplied
  * URL is fetched server-side (webhooks, URL-to-PDF, etc.).
+ *
+ * Returns the resolved IP address so callers can pin DNS resolution
+ * (prevents DNS rebinding / TOCTOU attacks).
  */
-export async function assertSafeUrl(rawUrl: string): Promise<void> {
+export async function assertSafeUrl(rawUrl: string): Promise<{ resolvedIp: string | null }> {
   let parsed: URL
   try {
     parsed = new URL(rawUrl)
@@ -67,7 +70,7 @@ export async function assertSafeUrl(rawUrl: string): Promise<void> {
     if (isPrivateIp(bare)) {
       throw new Error("URL points to a private or reserved IP address")
     }
-    return
+    return { resolvedIp: bare }
   }
 
   // Resolve hostname → IPs and check each one
@@ -83,4 +86,16 @@ export async function assertSafeUrl(rawUrl: string): Promise<void> {
       throw new Error("URL resolves to a private or reserved IP address")
     }
   }
+
+  // Return the first resolved IP for DNS-pinning by the caller
+  return { resolvedIp: addresses[0]?.address ?? null }
+}
+
+/**
+ * Build Chromium --host-resolver-rules arg that pins a hostname to its
+ * pre-resolved IP, preventing DNS rebinding between assertSafeUrl and
+ * Chromium's own DNS resolution.
+ */
+export function buildHostResolverRules(hostname: string, resolvedIp: string): string {
+  return `MAP ${hostname} ${resolvedIp}`
 }

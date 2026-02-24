@@ -2,6 +2,25 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.36.1] — 2026-02-24
+### Fixed (Security)
+- **CRITICAL:** Banned users now blocked from login (auth.ts) and API access (require-api-key.ts)
+- **CRITICAL:** SSRF DNS rebinding prevented — Chromium launched with `--host-resolver-rules` to pin resolved IP
+- **CRITICAL:** SSRF guard added at API layer for URL inputs in both `/convert` and `/convert-async` routes
+- **HIGH:** Webhook URL updates now validated with `assertSafeUrl` (server actions + API route)
+- **HIGH:** Auth rate limiting added — login, register, and email verification endpoints (15min window, 10 attempts)
+- **HIGH:** Verification codes now use `crypto.randomInt()` instead of `Math.random()`
+- **HIGH:** Template variable values HTML-escaped before substitution (prevents script injection in Chromium)
+- **HIGH:** Monthly plan render limits enforced on API routes (not just dashboard)
+- **HIGH:** AI chat input validated with Zod — roles restricted to user/assistant, message sizes capped
+- **HIGH:** Upload file serving now requires authentication
+- **MEDIUM:** Stripe webhook secret checked for existence before use (no more `!` assertion)
+- **MEDIUM:** Template/webhook API routes now support team-scoped access (not just owner)
+- **MEDIUM:** Content-Security-Policy header added to all responses
+- **MEDIUM:** Webhook event types validated in server actions (restricted to job.completed/job.failed)
+- **LOW:** CSRF origin check added to Stripe checkout and portal POST routes
+- **LOW:** OpenAI error response body no longer logged (prevents potential key leakage)
+
 ## [0.36.0] — 2026-02-24
 ### Changed
 - Hero spiral background: increased opacity ~2.5x (0.04±0.012 → 0.09±0.035) for better visibility

@@ -5,6 +5,13 @@ import { getStripe } from "@/lib/stripe";
 import { getPriceId, type Currency } from "@/lib/currency";
 
 export async function POST(req: NextRequest) {
+  // CSRF protection: verify the request originates from our own site
+  const origin = req.headers.get("origin");
+  const expectedOrigin = process.env.NEXTAUTH_URL ?? process.env.AUTH_URL;
+  if (origin && expectedOrigin && !expectedOrigin.startsWith(origin)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

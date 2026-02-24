@@ -3,7 +3,7 @@ import crypto from "node:crypto"
 import { prisma } from "@/lib/db"
 import { saveFile } from "@/lib/storage"
 import { deliverWebhooks } from "@/lib/webhook"
-import { assertSafeUrl } from "@/lib/ssrf-guard"
+import { assertSafeUrl, buildHostResolverRules } from "@/lib/ssrf-guard"
 import { getPlanSizeLimit } from "@/lib/plans"
 
 const TIMEOUT = parseInt(process.env.PLAYWRIGHT_TIMEOUT_MS ?? "30000", 10)
@@ -25,9 +25,20 @@ export async function processJob(jobId: string): Promise<void> {
 
   let browser
   try {
-    browser = await chromium.launch({
-      args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage"],
-    })
+    // Determine extra Chromium args for DNS pinning (prevents DNS rebinding)
+    const launchArgs = ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage"]
+
+    let resolvedUrlIp: string | null = null
+    if (job.inputType === "url" && job.inputContent) {
+      const { resolvedIp } = await assertSafeUrl(job.inputContent)
+      resolvedUrlIp = resolvedIp
+      if (resolvedIp) {
+        const hostname = new URL(job.inputContent).hostname
+        launchArgs.push(`--host-resolver-rules=${buildHostResolverRules(hostname, resolvedIp)}`)
+      }
+    }
+
+    browser = await chromium.launch({ args: launchArgs })
 
     const context = await browser.newContext()
     const page = await context.newPage()
@@ -41,8 +52,7 @@ export async function processJob(jobId: string): Promise<void> {
       await page.setContent(job.inputContent, { waitUntil: "networkidle" })
     } else if (job.inputType === "url") {
       if (!job.inputContent) throw new Error("inputContent is required for url jobs")
-      // SSRF guard: block private/internal URLs before passing to Playwright
-      await assertSafeUrl(job.inputContent)
+      // DNS is pinned via --host-resolver-rules above, preventing rebinding
       await page.goto(job.inputContent, { waitUntil: "networkidle" })
     } else if (job.inputType === "template") {
       if (!job.template) throw new Error("Template not found")
@@ -50,7 +60,14 @@ export async function processJob(jobId: string): Promise<void> {
       for (const [key, val] of Object.entries(variables)) {
         // Escape regex metacharacters in the key to prevent ReDoS
         const safeKey = key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
-        html = html.replace(new RegExp(`\\{\\{\\s*${safeKey}\\s*\\}\\}`, "g"), val)
+        // HTML-escape variable values to prevent script injection
+        const safeVal = val
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;")
+        html = html.replace(new RegExp(`\\{\\{\\s*${safeKey}\\s*\\}\\}`, "g"), safeVal)
       }
       await page.setContent(html, { waitUntil: "networkidle" })
     } else {

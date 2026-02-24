@@ -15,9 +15,11 @@ async function getSession() {
   return session;
 }
 
+const VALID_EVENTS = ["job.completed", "job.failed"] as const;
+
 const createSchema = z.object({
   url: z.string().url(),
-  events: z.array(z.string()).min(1),
+  events: z.array(z.enum(VALID_EVENTS)).min(1),
 });
 
 export async function createWebhookAction(
@@ -66,6 +68,15 @@ export async function updateWebhookAction(
 
   const rawEvents = formData.getAll("events") as string[];
   const url = formData.get("url") as string;
+
+  // SSRF guard on updated URL
+  if (url) {
+    try {
+      await assertSafeUrl(url);
+    } catch (e) {
+      return { error: e instanceof Error ? e.message : "Invalid webhook URL." };
+    }
+  }
 
   await prisma.webhook.update({
     where: { id },
@@ -170,6 +181,15 @@ export async function updateTeamWebhookAction(
 
   const rawEvents = formData.getAll("events") as string[];
   const url = formData.get("url") as string;
+
+  // SSRF guard on updated URL
+  if (url) {
+    try {
+      await assertSafeUrl(url);
+    } catch (e) {
+      return { error: e instanceof Error ? e.message : "Invalid webhook URL." };
+    }
+  }
 
   await prisma.webhook.update({
     where: { id },

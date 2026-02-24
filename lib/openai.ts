@@ -137,8 +137,7 @@ export async function generateTemplate(
     });
 
     if (!res.ok) {
-      const body = await res.text();
-      console.error("[openai] API error:", res.status, body);
+      console.error("[openai] API error:", res.status);
       return { error: "AI generation failed. Please try again." };
     }
 

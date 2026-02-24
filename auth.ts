@@ -54,10 +54,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         const user = await prisma.user.findUnique({
           where: { email: parsed.data.email },
-          select: { id: true, email: true, passwordHash: true, role: true, emailVerified: true },
+          select: { id: true, email: true, passwordHash: true, role: true, emailVerified: true, bannedAt: true },
         })
 
         if (!user) return null
+
+        // Block banned users from logging in
+        if (user.bannedAt) return null
 
         const valid = await verifyPassword(parsed.data.password, user.passwordHash)
         if (!valid) return null

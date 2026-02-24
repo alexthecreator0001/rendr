@@ -40,6 +40,11 @@ export async function requireApiKey(
     )
   }
 
+  // Block banned users
+  if (apiKey.user.bannedAt) {
+    throw new ApiError(403, "Account suspended", "account_suspended")
+  }
+
   // Update lastUsedAt in the background — don't block the request
   prisma.apiKey
     .update({

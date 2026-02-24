@@ -9,10 +9,13 @@ const updateSchema = z.object({
   html: z.string().min(1).optional(),
 })
 
-async function getOwned(userId: string, id: string) {
+async function getOwned(userId: string, id: string, teamId: string | null) {
   const tmpl = await prisma.template.findUnique({ where: { id } })
-  if (!tmpl || tmpl.userId !== userId) return null
-  return tmpl
+  if (!tmpl) return null
+  // Allow access if user owns it directly OR it belongs to their team
+  if (teamId && tmpl.teamId === teamId) return tmpl
+  if (tmpl.userId === userId && !tmpl.teamId) return tmpl
+  return null
 }
 
 export async function GET(
@@ -20,9 +23,9 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { user } = await requireApiKey(req)
+    const { user, teamId } = await requireApiKey(req)
     const { id } = await params
-    const tmpl = await getOwned(user.id, id)
+    const tmpl = await getOwned(user.id, id, teamId)
     if (!tmpl) return apiError(404, "Template not found", "not_found")
     return Response.json({ template: tmpl })
   } catch (e) {
@@ -36,9 +39,9 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { user } = await requireApiKey(req)
+    const { user, teamId } = await requireApiKey(req)
     const { id } = await params
-    const tmpl = await getOwned(user.id, id)
+    const tmpl = await getOwned(user.id, id, teamId)
     if (!tmpl) return apiError(404, "Template not found", "not_found")
 
     const body = await req.json().catch(() => null)
@@ -64,9 +67,9 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { user } = await requireApiKey(req)
+    const { user, teamId } = await requireApiKey(req)
     const { id } = await params
-    const tmpl = await getOwned(user.id, id)
+    const tmpl = await getOwned(user.id, id, teamId)
     if (!tmpl) return apiError(404, "Template not found", "not_found")
     await prisma.template.delete({ where: { id } })
     return new Response(null, { status: 204 })

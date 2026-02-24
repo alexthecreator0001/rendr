@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { readFile } from "fs/promises";
 import path from "path";
+import { auth } from "@/auth";
 
 const EXT_TYPES: Record<string, string> = {
   jpg: "image/jpeg",
@@ -15,6 +16,12 @@ export async function GET(
   _: NextRequest,
   { params }: { params: Promise<{ filename: string }> }
 ) {
+  // Require authentication to access uploaded files
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const { filename } = await params;
   // Prevent path traversal — basename only
   const safe = path.basename(filename);
@@ -28,7 +35,7 @@ export async function GET(
     return new NextResponse(buf, {
       headers: {
         "Content-Type": contentType,
-        "Cache-Control": "public, max-age=31536000, immutable",
+        "Cache-Control": "private, max-age=3600",
       },
     });
   } catch {

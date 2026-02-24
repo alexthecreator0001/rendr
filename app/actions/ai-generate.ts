@@ -23,18 +23,31 @@ export interface GenerateResult {
   error?: string;
 }
 
-interface ChatInput {
-  messages: AiMessage[];
-  newMessage: string;
-  documentType?: string;
-  style?: string;
-  hasLogo?: boolean;
-}
+const aiMessageSchema = z.object({
+  role: z.enum(["user", "assistant"]),
+  content: z.string().max(50000),
+});
+
+const chatInputSchema = z.object({
+  messages: z.array(aiMessageSchema).max(50),
+  newMessage: z.string().min(1).max(5000),
+  documentType: z.string().max(100).optional(),
+  style: z.string().max(100).optional(),
+  hasLogo: z.boolean().optional(),
+});
+
+type ChatInput = z.infer<typeof chatInputSchema>;
 
 export async function chatGenerateAction(
-  input: ChatInput
+  rawInput: unknown
 ): Promise<GenerateResult> {
   const session = await getSession();
+
+  const parsed = chatInputSchema.safeParse(rawInput);
+  if (!parsed.success) {
+    return { error: "Invalid input." };
+  }
+  const input = parsed.data;
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
