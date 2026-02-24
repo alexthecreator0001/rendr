@@ -2,6 +2,13 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.38.0] — 2026-02-24
+### Added
+- **PDF merge endpoint**: `POST /api/v1/merge` — combine 2–50 existing PDFs into a single document with optional metadata and custom filename
+- **Features page**: new "All capabilities" section listing 24 features across 4 categories (Rendering, Post-processing, Delivery & Integration, Platform)
+- Merge schema added to shared `lib/schemas.ts`
+- Merge endpoint added to API reference docs with request/response examples
+
 ## [0.37.0] — 2026-02-24
 ### Added
 - **waitForSelector**: Wait for a CSS selector to appear before PDF capture (10s timeout, more reliable than fixed delay)

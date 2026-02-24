@@ -109,6 +109,32 @@ const templateResponse = `{
   // "html" is NOT returned here — use GET /templates/:id to retrieve HTML
 }`;
 
+const mergeBody = `{
+  // Array of download tokens from previously rendered PDFs (2–50)
+  "sources": [
+    "Xt7mK2nP...",   // token from job 1's pdf_url
+    "Yb8nL3qR...",   // token from job 2's pdf_url
+    "Zc9oM4rS..."    // token from job 3's pdf_url
+  ],
+
+  // Optional — metadata for the merged document
+  "metadata": {
+    "title": "Combined Report",
+    "author": "Acme Corp"
+  },
+
+  // Optional — custom download filename
+  "filename": "combined-report.pdf"
+}`;
+
+const mergeResponse = `{
+  "job_id": "cm7xyz789...",
+  "status": "succeeded",
+  "pdf_url": "${BASE}/files/Ab1cD2eF...",
+  "pages": 15,
+  "size_bytes": 245760
+}`;
+
 const webhookBody = `{
   "url": "https://your-site.com/hooks/rendr",   // required — HTTPS endpoint
   "events": ["job.completed", "job.failed"],    // default: both events
@@ -210,6 +236,7 @@ const endpoints = [
   { method: "POST",   path: "/convert",         auth: true,  description: "Sync render. Waits up to 8 s. Returns 200 with pdf_url or 202 if still processing." },
   { method: "POST",   path: "/convert-async",   auth: true,  description: "Async render. Always returns 202 with job_id immediately. Poll or use webhooks." },
   { method: "GET",    path: "/jobs/:id",         auth: true,  description: "Get job status. Returns full job object including pdf_url when succeeded." },
+  { method: "POST",   path: "/merge",            auth: true,  description: "Merge 2–50 existing PDFs into one. Synchronous — returns merged pdf_url." },
   { method: "GET",    path: "/files/:token",     auth: false, description: "Download rendered PDF. The token is the credential — no API key needed." },
   { method: "GET",    path: "/templates",        auth: true,  description: "List your templates. HTML excluded from list — fetch by ID to get HTML." },
   { method: "POST",   path: "/templates",        auth: true,  description: "Create a template. Body: { name, html }. Returns template object (no HTML)." },
@@ -337,6 +364,33 @@ export default function ApiReferencePage() {
           </p>
         </Prose>
         <CodeBlock code={jobResponse} language="json" />
+      </section>
+
+      {/* Merge */}
+      <section id="merge">
+        <Prose>
+          <h2>POST /merge</h2>
+          <p>
+            Combine 2–50 existing PDFs into a single document. Pass an array of download tokens
+            (the last path segment of each <code>pdf_url</code>) in the order you want pages
+            to appear. The merge is synchronous — you get the result immediately.
+          </p>
+          <p>
+            All source PDFs must belong to the authenticated user and have status{" "}
+            <code>succeeded</code>. The merged result is saved as a new job and gets its own
+            download token.
+          </p>
+        </Prose>
+        <div className="space-y-3">
+          <div>
+            <p className="mb-1.5 text-xs font-medium text-muted-foreground">Request body</p>
+            <CodeBlock code={mergeBody} language="json" />
+          </div>
+          <div>
+            <p className="mb-1.5 text-xs font-medium text-muted-foreground">Response</p>
+            <CodeBlock code={mergeResponse} language="json" />
+          </div>
+        </div>
       </section>
 
       {/* Templates */}

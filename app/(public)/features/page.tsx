@@ -7,6 +7,24 @@ import {
   Webhook,
   Layers,
   Type,
+  FileText,
+  Globe,
+  Lock,
+  Timer,
+  MousePointerClick,
+  Merge,
+  Stamp,
+  FileSignature,
+  Network,
+  BarChart2,
+  Key,
+  Repeat,
+  Shield,
+  MonitorSmartphone,
+  Palette,
+  Users,
+  CreditCard,
+  CheckCircle2,
 } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -249,6 +267,136 @@ export default function FeaturesPage() {
           </div>
         </Container>
       </Section>
+      {/* ── All capabilities ───────────────────────────────────────────── */}
+      <section className="bg-zinc-950 py-24 sm:py-32">
+        <Container>
+          <div className="mb-14 max-w-xl">
+            <p className="mb-3 text-sm font-semibold uppercase tracking-[0.15em] text-blue-400">
+              Capabilities
+            </p>
+            <h2 className="text-3xl font-extrabold tracking-[-0.03em] text-white sm:text-4xl">
+              Everything in one API
+            </h2>
+            <p className="mt-4 text-base text-zinc-400 leading-relaxed">
+              Every feature a production PDF service needs — from rendering to
+              post-processing to delivery. All available via a single REST API.
+            </p>
+          </div>
+
+          {/* Category grid */}
+          <div className="space-y-16">
+
+            {/* ── Rendering ── */}
+            <div>
+              <h3 className="mb-6 text-xs font-semibold uppercase tracking-[0.15em] text-zinc-500">
+                Rendering
+              </h3>
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {([
+                  { icon: FileText,            title: "HTML to PDF",          desc: "Send raw HTML, get a pixel-perfect PDF back. Full CSS support, web fonts, flexbox, grid." },
+                  { icon: Globe,               title: "URL to PDF",           desc: "Point us at any URL. We load it in headless Chromium and capture the fully rendered page." },
+                  { icon: Layers,              title: "Template rendering",   desc: "Store HTML templates with {{variables}}. Render them with different data each time." },
+                  { icon: Timer,               title: "Render delay",         desc: "Wait 0–10 seconds for JavaScript to execute before capturing. For SPAs and dynamic charts." },
+                  { icon: MousePointerClick,   title: "waitForSelector",      desc: "Wait for a specific CSS selector to appear in the DOM before capture. More precise than a fixed delay." },
+                  { icon: Network,             title: "Custom HTTP headers",  desc: "Pass Authorization, Cookie, or any custom headers when rendering URLs behind authentication." },
+                ] as const).map((f) => (
+                  <div key={f.title} className="group flex gap-4 rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 transition-colors hover:border-white/[0.1] hover:bg-white/[0.04]">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-blue-500/20 bg-blue-500/10">
+                      <f.icon className="h-4 w-4 text-blue-400" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-white">{f.title}</p>
+                      <p className="mt-1 text-[13px] leading-relaxed text-zinc-500">{f.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* ── Post-processing ── */}
+            <div>
+              <h3 className="mb-6 text-xs font-semibold uppercase tracking-[0.15em] text-zinc-500">
+                Post-processing
+              </h3>
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {([
+                  { icon: Merge,          title: "PDF merge",         desc: "Combine 2–50 existing PDFs into a single document in one API call. Preserves page order." },
+                  { icon: Stamp,          title: "Watermark",         desc: "Overlay text on every page. Customize color, opacity, font size, and rotation. Great for DRAFT or CONFIDENTIAL stamps." },
+                  { icon: FileSignature,  title: "PDF metadata",      desc: "Set title, author, subject, and keywords. Shows up in File > Properties in every PDF viewer." },
+                  { icon: FileText,       title: "Custom filename",   desc: "Control the download filename. No more rendr-cm7abc123.pdf — name it invoice-42.pdf instead." },
+                  { icon: Palette,        title: "Full PDF options",  desc: "Format, margins, orientation, scale, page ranges, headers/footers, tagged PDF, outline — everything Chromium supports." },
+                  { icon: Type,           title: "Custom fonts",      desc: "Use any Google Font or self-hosted TTF/WOFF2. Chromium renders them natively — consistent across all viewers." },
+                ] as const).map((f) => (
+                  <div key={f.title} className="group flex gap-4 rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 transition-colors hover:border-white/[0.1] hover:bg-white/[0.04]">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-violet-500/20 bg-violet-500/10">
+                      <f.icon className="h-4 w-4 text-violet-400" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-white">{f.title}</p>
+                      <p className="mt-1 text-[13px] leading-relaxed text-zinc-500">{f.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* ── Delivery & Integration ── */}
+            <div>
+              <h3 className="mb-6 text-xs font-semibold uppercase tracking-[0.15em] text-zinc-500">
+                Delivery & integration
+              </h3>
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {([
+                  { icon: Zap,       title: "Sync & async modes",   desc: "POST /convert waits up to 8s for a result. POST /convert-async returns immediately — poll or use webhooks." },
+                  { icon: Webhook,   title: "Webhook delivery",     desc: "HMAC-signed payloads pushed to your server on job.completed and job.failed. Retries with exponential backoff." },
+                  { icon: Webhook,   title: "Per-job webhooks",     desc: "Pass a webhook_url on any render for a one-off notification. No permanent endpoint setup required." },
+                  { icon: Lock,      title: "Signed download URLs", desc: "Credential-free download links. Share them directly — no auth middleware needed to download the PDF." },
+                  { icon: Repeat,    title: "Idempotency",          desc: "Pass an idempotency key to prevent duplicate renders. Safe retries for invoices and critical documents." },
+                  { icon: BarChart2, title: "Usage analytics",      desc: "Track render volume, latency, and success rates per API key. Usage warnings at 80% and 100% of your plan." },
+                ] as const).map((f) => (
+                  <div key={f.title} className="group flex gap-4 rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 transition-colors hover:border-white/[0.1] hover:bg-white/[0.04]">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-emerald-500/20 bg-emerald-500/10">
+                      <f.icon className="h-4 w-4 text-emerald-400" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-white">{f.title}</p>
+                      <p className="mt-1 text-[13px] leading-relaxed text-zinc-500">{f.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* ── Platform ── */}
+            <div>
+              <h3 className="mb-6 text-xs font-semibold uppercase tracking-[0.15em] text-zinc-500">
+                Platform
+              </h3>
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {([
+                  { icon: Key,                 title: "API key management",  desc: "Create, rotate, and revoke keys from the dashboard. SHA-256 hashed — we never store the plaintext." },
+                  { icon: Shield,              title: "Security built-in",   desc: "SSRF protection, DNS pinning, input validation, rate limiting, HTML escaping — all on by default." },
+                  { icon: Users,               title: "Teams",               desc: "Invite collaborators, share templates and API keys. Team-scoped billing and usage tracking." },
+                  { icon: MonitorSmartphone,    title: "Studio UI",           desc: "Visual PDF playground in the dashboard. Test URL, HTML, and template renders with a live inspector." },
+                  { icon: CreditCard,          title: "Usage-based billing",  desc: "Free tier with 100 renders/month. Growth and Business plans for higher volumes. No per-page fees." },
+                  { icon: CheckCircle2,        title: "99.9% uptime",        desc: "Deployed on dedicated infrastructure with PM2 process management, health checks, and auto-restart." },
+                ] as const).map((f) => (
+                  <div key={f.title} className="group flex gap-4 rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 transition-colors hover:border-white/[0.1] hover:bg-white/[0.04]">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-amber-500/20 bg-amber-500/10">
+                      <f.icon className="h-4 w-4 text-amber-400" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-white">{f.title}</p>
+                      <p className="mt-1 text-[13px] leading-relaxed text-zinc-500">{f.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+          </div>
+        </Container>
+      </section>
     </>
   );
 }

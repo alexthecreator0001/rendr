@@ -104,3 +104,33 @@ export const convertSchema = z.object({
   // F6: per-job webhook URL
   webhook_url: z.string().url().optional(),
 })
+
+// ── PDF Merge ────────────────────────────────────────────────────────────────
+
+export const mergeSchema = z.object({
+  // Array of file tokens from previously rendered PDFs
+  sources: z
+    .array(z.string().min(1))
+    .min(2, "At least 2 PDFs are required to merge")
+    .max(50, "Maximum 50 PDFs per merge"),
+
+  // Optional metadata for the merged PDF
+  metadata: z
+    .object({
+      title: z.string().max(500).optional(),
+      author: z.string().max(500).optional(),
+      subject: z.string().max(500).optional(),
+      keywords: z.string().max(1000).optional(),
+    })
+    .optional(),
+
+  // Custom download filename
+  filename: z
+    .string()
+    .max(255)
+    .regex(
+      /^[a-zA-Z0-9._-]+$/,
+      "filename must contain only letters, numbers, dots, hyphens, and underscores"
+    )
+    .optional(),
+})
