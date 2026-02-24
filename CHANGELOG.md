@@ -2,6 +2,10 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.32.5] — 2026-02-24
+### Changed
+- Hero image on the right side at 50% width, text on the left
+
 ## [0.32.4] — 2026-02-24
 ### Changed
 - Hero image moved to left side at 40% width, text pushed to right via `ml-auto`
