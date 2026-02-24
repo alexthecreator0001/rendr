@@ -2,6 +2,11 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.33.2] — 2026-02-24
+### Changed
+- Hero image: only bottom fade, removed all side/top fades
+- Hero spiral background opacity reduced (0.05 → 0.03 base)
+
 ## [0.33.1] — 2026-02-24
 ### Changed
 - Hero image back to 55% width (was too small at 45%)
