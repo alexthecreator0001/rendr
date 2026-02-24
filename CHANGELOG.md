@@ -2,6 +2,14 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.33.0] — 2026-02-24
+### Changed
+- Hero image 10% smaller (55% → 45% width), no longer overlapping text
+- Hero: removed npm install box and "Read the docs" button
+- Hero: "No credit card" text color fixed (zinc-700 → zinc-500) for readability
+- Features page: animated fire ASCII art next to "What Rendr actually does" heading
+- Footer ASCII art 10% smaller (70% → 63% width)
+
 ## [0.32.15] — 2026-02-24
 ### Changed
 - Hero image fades significantly reduced — less black overlay on all edges

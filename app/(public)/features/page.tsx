@@ -3,6 +3,7 @@ import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
 import { ImagePlaceholder } from "@/components/media/image-placeholder";
 import { FeaturesGrid } from "@/components/marketing/features-grid";
+import { FireAscii } from "@/components/marketing/fire-ascii";
 import {
   Zap,
   Webhook,
@@ -56,17 +57,22 @@ export default function FeaturesPage() {
       {/* Header */}
       <Section size="md">
         <Container>
-          <div className="max-w-2xl">
-            <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-primary">
-              Features
-            </p>
-            <h1 className="text-4xl font-extrabold tracking-[-0.03em] sm:text-5xl">
-              What Rendr actually does.
-            </h1>
-            <p className="mt-5 text-lg text-muted-foreground leading-relaxed">
-              No marketing fluff. Here&apos;s a plain walkthrough of what you
-              get when you integrate Rendr.
-            </p>
+          <div className="flex items-start gap-6">
+            <div className="max-w-2xl">
+              <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-primary">
+                Features
+              </p>
+              <h1 className="text-4xl font-extrabold tracking-[-0.03em] sm:text-5xl">
+                What Rendr actually does.
+              </h1>
+              <p className="mt-5 text-lg text-muted-foreground leading-relaxed">
+                No marketing fluff. Here&apos;s a plain walkthrough of what you
+                get when you integrate Rendr.
+              </p>
+            </div>
+            <div className="hidden lg:block pt-4">
+              <FireAscii />
+            </div>
           </div>
         </Container>
       </Section>

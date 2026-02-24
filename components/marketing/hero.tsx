@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, BookOpen, Check, Terminal } from "lucide-react";
+import { ArrowRight, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SpiralBackground } from "@/components/marketing/spiral-background";
 
@@ -21,7 +21,7 @@ export function Hero() {
 
       {/* Hero image — absolutely positioned on the RIGHT */}
       <div className="pointer-events-none absolute inset-0 z-[2] hidden lg:block">
-        <div className="absolute right-0 inset-y-0 w-[55%]">
+        <div className="absolute right-0 inset-y-0 w-[45%]">
           <img
             src="/hero.png"
             alt=""
@@ -87,30 +87,9 @@ export function Hero() {
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>
-            <Button
-              size="lg"
-              variant="ghost"
-              asChild
-              className="h-11 rounded-xl px-6 text-sm text-white/50 hover:bg-white/[0.06] hover:text-white gap-2"
-            >
-              <Link href="/docs">
-                <BookOpen className="h-4 w-4" />
-                Read the docs
-              </Link>
-            </Button>
           </div>
 
-          <div className="animate-fade-up delay-400 mt-6">
-            <div className="inline-flex items-center gap-2.5 rounded-xl border border-white/[0.07] bg-zinc-900/60 px-4 py-2.5 backdrop-blur-sm">
-              <Terminal className="h-3.5 w-3.5 shrink-0 text-zinc-500" />
-              <span className="font-mono text-sm text-zinc-400">
-                npm install{" "}
-                <span className="text-white">@rendr/sdk</span>
-              </span>
-            </div>
-          </div>
-
-          <p className="animate-fade-up delay-500 mt-5 text-[11px] tracking-[0.02em] text-zinc-700">
+          <p className="animate-fade-up delay-400 mt-6 text-[11px] tracking-[0.02em] text-zinc-500">
             No credit card required · Free tier forever
           </p>
         </div>

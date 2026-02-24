@@ -62,7 +62,7 @@ export function FooterAsciiArt() {
       const w = container.clientWidth;
       // Scale font so the art fills 70% of the container width
       const baseCharWidth = 0.6;
-      fontSize = (w * 0.7) / (maxCols * baseCharWidth);
+      fontSize = (w * 0.63) / (maxCols * baseCharWidth);
       // Clamp to reasonable range
       fontSize = Math.max(4, Math.min(fontSize, 20));
       lineHeight = fontSize * 1.15;
