@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { AsciiBackground } from "@/components/marketing/ascii-background";
+import { FooterAsciiArt } from "@/components/marketing/footer-ascii-art";
 
 const footerLinks = {
   Product: [
@@ -35,9 +35,8 @@ const footerLinks = {
 
 export function Footer() {
   return (
-    <footer className="relative overflow-hidden bg-zinc-950">
-      <AsciiBackground />
-      <div className="relative z-10 mx-auto max-w-7xl px-6 pt-16 pb-12 sm:px-8 lg:px-10">
+    <footer className="overflow-hidden bg-zinc-950">
+      <div className="mx-auto max-w-7xl px-6 pt-16 pb-12 sm:px-8 lg:px-10">
         <div className="grid grid-cols-2 gap-10 sm:grid-cols-3 lg:grid-cols-6">
           {/* Brand */}
           <div className="col-span-2 sm:col-span-3 lg:col-span-2">
@@ -75,15 +74,25 @@ export function Footer() {
           ))}
         </div>
 
-        <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-white/[0.06] pt-8 sm:flex-row">
-          <p className="text-xs text-zinc-600">
-            © {new Date().getFullYear()} Rendr. All rights reserved.
+        {/* Divider */}
+        <div className="mt-12 flex items-center gap-3">
+          <span className="text-zinc-700">+</span>
+          <div className="flex-1 border-t border-dashed border-zinc-800" />
+          <span className="text-zinc-700">+</span>
+        </div>
+
+        <div className="mt-8 flex flex-col items-center justify-between gap-3 sm:flex-row">
+          <p className="text-xs text-zinc-600 uppercase tracking-wider font-mono">
+            &copy; {new Date().getFullYear()} Rendr. All rights reserved.
           </p>
           <p className="text-xs text-zinc-600">
             Made for developers who ship fast.
           </p>
         </div>
       </div>
+
+      {/* Large ASCII art "Rendr" below footer content */}
+      <FooterAsciiArt />
     </footer>
   );
 }

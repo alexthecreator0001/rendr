@@ -2,6 +2,13 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.32.7] — 2026-02-24
+### Changed
+- Hero spiral ASCII background now scales dynamically to fill the entire hero section
+- Footer ASCII art redesigned: large "Rendr" text rendered below footer content (Pandawa-style), white at 8% opacity, scales to full width
+- Footer divider changed to dashed line with corner markers
+- Old subtle canvas-overlay footer background removed
+
 ## [0.32.6] — 2026-02-24
 ### Changed
 - Hero background replaced with animated spiral ASCII art (from ascii-art file) instead of grid lines

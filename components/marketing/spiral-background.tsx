@@ -129,18 +129,30 @@ export function SpiralBackground() {
       }
     }
 
-    const fontSize = 5;
-    const lineHeight = fontSize * 1.15;
-    const charWidth = fontSize * 0.6;
+    const baseFontSize = 5;
+    const baseLineHeight = baseFontSize * 1.15;
+    const baseCharWidth = baseFontSize * 0.6;
 
-    const artWidth = maxCols * charWidth;
-    const artHeight = SPIRAL_ART.length * lineHeight;
+    const baseArtWidth = maxCols * baseCharWidth;
+    const baseArtHeight = SPIRAL_ART.length * baseLineHeight;
+
+    let fontSize = baseFontSize;
+    let lineHeight = baseLineHeight;
+    let charWidth = baseCharWidth;
 
     const resize = () => {
       const parent = canvas.parentElement;
       if (!parent) return;
       canvas.width = parent.clientWidth;
       canvas.height = parent.clientHeight;
+
+      // Scale font to fill the container
+      const scaleX = canvas.width / baseArtWidth;
+      const scaleY = canvas.height / baseArtHeight;
+      const scale = Math.max(scaleX, scaleY) * 1.1;
+      fontSize = baseFontSize * scale;
+      lineHeight = fontSize * 1.15;
+      charWidth = fontSize * 0.6;
     };
 
     resize();
