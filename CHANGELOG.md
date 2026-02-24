@@ -2,6 +2,22 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.32.0] — 2026-02-24
+### Added
+- Full team workspaces: teams now have their own API keys, jobs, templates, webhooks, and usage pages
+- Team-scoped pages under `/app/teams/[teamId]/*` (jobs, api-keys, templates, webhooks, usage, convert)
+- Sidebar navigation dynamically scopes links based on current workspace (personal vs team)
+- Team layout with membership gate — all team sub-pages verify membership automatically
+- Team API keys: create and revoke keys scoped to a team, shared across all members
+- Team webhooks: receive notifications for team job events
+- Team Studio: render PDFs using team templates, jobs attributed to the team
+- Team usage page: view render stats without per-user quota bar (billing stays per-user)
+- Team dashboard now shows job count and API key count stat cards
+- `teamId` column added to ApiKey, Job, Webhook, and UsageEvent models
+- Worker passes `teamId` through to webhook delivery and usage tracking
+- API routes (`/api/v1/*`) now scope templates, webhooks, jobs by team when using a team API key
+- `lib/team-auth.ts` helper for verifying team membership in server actions
+
 ## [0.31.0] — 2026-02-24
 ### Fixed
 - Pricing cards now show correct prices from `lib/currency.ts` ($9.90/$49.90 instead of $49/$199)

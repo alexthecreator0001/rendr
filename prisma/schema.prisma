@@ -49,6 +49,7 @@ model VerificationToken {
 model ApiKey {
   id         String    @id @default(cuid())
   userId     String
+  teamId     String?
   name       String
   keyPrefix  String
   keyHash    String    @unique
@@ -57,6 +58,7 @@ model ApiKey {
   lastUsedAt DateTime?
 
   user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  team        Team?        @relation(fields: [teamId], references: [id], onDelete: SetNull)
   jobs        Job[]
   usageEvents UsageEvent[]
 }
@@ -77,6 +79,7 @@ enum InputType {
 model Job {
   id             String    @id @default(uuid())
   userId         String
+  teamId         String?
   apiKeyId       String?
   status         JobStatus @default(queued)
   inputType      InputType
@@ -93,11 +96,13 @@ model Job {
   updatedAt      DateTime  @updatedAt
 
   user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  team     Team?     @relation(fields: [teamId], references: [id], onDelete: SetNull)
   apiKey   ApiKey?   @relation(fields: [apiKeyId], references: [id])
   template Template? @relation(fields: [templateId], references: [id])
 
   @@unique([userId, idempotencyKey])
   @@index([userId, createdAt(sort: Desc)])
+  @@index([teamId, createdAt(sort: Desc)])
   @@index([status])
 }
 
@@ -119,27 +124,32 @@ model Template {
 model Webhook {
   id        String   @id @default(cuid())
   userId    String
+  teamId    String?
   url       String
   secret    String
   enabled   Boolean  @default(true)
   events    String[]
   createdAt DateTime @default(now())
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  team Team? @relation(fields: [teamId], references: [id], onDelete: SetNull)
 }
 
 model UsageEvent {
   id         String   @id @default(cuid())
   userId     String
+  teamId     String?
   apiKeyId   String?
   endpoint   String
   statusCode Int
   createdAt  DateTime @default(now())
 
   user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  team   Team?   @relation(fields: [teamId], references: [id], onDelete: SetNull)
   apiKey ApiKey? @relation(fields: [apiKeyId], references: [id])
 
   @@index([userId, createdAt(sort: Desc)])
+  @@index([teamId, createdAt(sort: Desc)])
 }
 
 model SupportTicket {
@@ -187,10 +197,14 @@ model Team {
   ownerId   String
   createdAt DateTime @default(now())
 
-  owner     User         @relation("OwnedTeams", fields: [ownerId], references: [id], onDelete: Cascade)
-  members   TeamMember[]
-  invites   TeamInvite[]
-  templates Template[]
+  owner       User         @relation("OwnedTeams", fields: [ownerId], references: [id], onDelete: Cascade)
+  members     TeamMember[]
+  invites     TeamInvite[]
+  templates   Template[]
+  apiKeys     ApiKey[]
+  jobs        Job[]
+  webhooks    Webhook[]
+  usageEvents UsageEvent[]
 }
 
 model TeamMember {

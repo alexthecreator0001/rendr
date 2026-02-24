@@ -22,27 +22,29 @@ import {
 import { signOutAction } from "@/app/actions/auth";
 import { useSidebar } from "@/components/providers/sidebar-provider";
 
-const navGroups = [
-  [
-    { href: "/app",          label: "Overview",       icon: LayoutDashboard, exact: true },
-    { href: "/app/convert",  label: "Studio",         icon: Wand2 },
-    { href: "/app/jobs",     label: "Jobs",           icon: BriefcaseBusiness },
-    { href: "/app/usage",    label: "Usage",          icon: BarChart2 },
-  ],
-  [
-    { href: "/app/api-keys",  label: "API Keys",   icon: Key },
-    { href: "/app/templates", label: "Templates",  icon: Layers },
-    { href: "/app/webhooks",  label: "Webhooks",   icon: Webhook },
-    { href: "/app/teams",     label: "Teams",      icon: Users2 },
-  ],
-  [
-    { href: "/app/support",   label: "Support",         icon: Headphones },
-    { href: "/app/features",  label: "Feature Requests", icon: Lightbulb },
-  ],
-  [
-    { href: "/docs",         label: "Documentation",  icon: BookOpen, external: true },
-  ],
-] as const;
+function buildNavGroups(base: string) {
+  return [
+    [
+      { href: base || "/app",    label: "Overview",       icon: LayoutDashboard, exact: true },
+      { href: `${base}/convert`, label: "Studio",         icon: Wand2 },
+      { href: `${base}/jobs`,    label: "Jobs",           icon: BriefcaseBusiness },
+      { href: `${base}/usage`,   label: "Usage",          icon: BarChart2 },
+    ],
+    [
+      { href: `${base}/api-keys`,  label: "API Keys",   icon: Key },
+      { href: `${base}/templates`, label: "Templates",  icon: Layers },
+      { href: `${base}/webhooks`,  label: "Webhooks",   icon: Webhook },
+      { href: "/app/teams",        label: "Teams",      icon: Users2 },
+    ],
+    [
+      { href: "/app/support",   label: "Support",         icon: Headphones },
+      { href: "/app/features",  label: "Feature Requests", icon: Lightbulb },
+    ],
+    [
+      { href: "/docs",         label: "Documentation",  icon: BookOpen, external: true },
+    ],
+  ];
+}
 
 const adminNavItems = [
   { href: "/admin",                   label: "Overview",       icon: BarChart3, exact: true },
@@ -91,6 +93,10 @@ export function AppSidebar({ user, usage, plan, role, teams = [] }: AppSidebarPr
   const currentTeamId = teamMatch?.[1] ?? null;
   const currentTeam = currentTeamId ? teams.find((t) => t.id === currentTeamId) : null;
   const currentWorkspaceName = currentTeam?.name ?? "Personal";
+
+  // Build dynamic nav links based on current workspace
+  const base = currentTeamId ? `/app/teams/${currentTeamId}` : "/app";
+  const navGroups = buildNavGroups(base);
 
   return (
     <>

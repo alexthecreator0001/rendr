@@ -63,7 +63,7 @@ function InspectorRow({ label, children }: { label: string; children: React.Reac
 }
 
 // ── Main component ────────────────────────────────────────────────────────────
-export function ConvertClient({ templates, plan = "starter" }: { templates: ConvertTemplate[]; plan?: string }) {
+export function ConvertClient({ templates, plan = "starter", teamId }: { templates: ConvertTemplate[]; plan?: string; teamId?: string }) {
   const [state, action, pending] = useActionState<ConvertState, FormData>(
     convertUrlAction, null
   );
@@ -190,6 +190,7 @@ export function ConvertClient({ templates, plan = "starter" }: { templates: Conv
 
       {/* Hidden PDF option inputs */}
       <input type="hidden" name="mode" value={mode} />
+      {teamId && <input type="hidden" name="teamId" value={teamId} />}
       <input type="hidden" name="format" value={format} />
       <input type="hidden" name="customWidth" value={customWidth} />
       <input type="hidden" name="customHeight" value={customHeight} />

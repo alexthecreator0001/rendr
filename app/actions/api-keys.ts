@@ -3,6 +3,7 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
 import { generateApiKey } from "@/lib/api-key";
+import { requireTeamMember } from "@/lib/team-auth";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
@@ -70,5 +71,62 @@ export async function revokeApiKeyAction(
   });
 
   revalidatePath("/app/api-keys");
+  return {};
+}
+
+export async function createTeamApiKeyAction(
+  _prevState: { error?: string; key?: string; id?: string } | null,
+  formData: FormData
+): Promise<{ error?: string; key?: string; id?: string }> {
+  const session = await getSession();
+  const teamId = formData.get("teamId") as string;
+  if (!teamId) return { error: "Missing team." };
+
+  const result = await requireTeamMember(teamId, session.user.id);
+  if (result.error) return { error: result.error };
+
+  const parsed = createSchema.safeParse({ name: formData.get("name") });
+  if (!parsed.success) return { error: "Name is required." };
+
+  const { key, keyHash, keyPrefix } = generateApiKey();
+
+  const apiKey = await prisma.apiKey.create({
+    data: {
+      userId: session.user.id,
+      teamId,
+      name: parsed.data.name,
+      keyHash,
+      keyPrefix,
+    },
+  });
+
+  revalidatePath(`/app/teams/${teamId}/api-keys`);
+  return { key, id: apiKey.id };
+}
+
+export async function revokeTeamApiKeyAction(
+  _prevState: unknown,
+  formData: FormData
+): Promise<{ error?: string }> {
+  const session = await getSession();
+  const id = formData.get("id") as string;
+  const teamId = formData.get("teamId") as string;
+  if (!id || !teamId) return { error: "Missing parameters." };
+
+  const result = await requireTeamMember(teamId, session.user.id);
+  if (result.error) return { error: result.error };
+
+  const existing = await prisma.apiKey.findFirst({
+    where: { id, teamId },
+  });
+  if (!existing) return { error: "Not found." };
+  if (existing.revokedAt) return { error: "Already revoked." };
+
+  await prisma.apiKey.update({
+    where: { id },
+    data: { revokedAt: new Date() },
+  });
+
+  revalidatePath(`/app/teams/${teamId}/api-keys`);
   return {};
 }

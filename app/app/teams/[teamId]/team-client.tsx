@@ -148,7 +148,9 @@ function DangerZone({ team, isOwner }: { team: Team; isOwner: boolean }) {
   );
 }
 
-export function TeamClient({ team, userId, isOwner }: { team: Team; userId: string; isOwner: boolean }) {
+export function TeamClient({ team, userId, isOwner, jobCount = 0, apiKeyCount = 0 }: { team: Team; userId: string; isOwner: boolean; jobCount?: number; apiKeyCount?: number }) {
+  const base = `/app/teams/${team.id}`;
+
   return (
     <div className="space-y-8">
       {/* Team dashboard header */}
@@ -163,7 +165,7 @@ export function TeamClient({ team, userId, isOwner }: { team: Team; userId: stri
       </div>
 
       {/* Quick stats */}
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-2xl border border-border bg-card p-5">
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm text-muted-foreground">Members</span>
@@ -172,6 +174,15 @@ export function TeamClient({ team, userId, isOwner }: { team: Team; userId: stri
             </div>
           </div>
           <p className="text-3xl font-bold tracking-tight">{team.members.length}</p>
+        </div>
+        <div className="rounded-2xl border border-border bg-card p-5">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-sm text-muted-foreground">Jobs</span>
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500/10">
+              <Wand2 className="h-4 w-4 text-amber-400" />
+            </div>
+          </div>
+          <p className="text-3xl font-bold tracking-tight">{jobCount}</p>
         </div>
         <div className="rounded-2xl border border-border bg-card p-5">
           <div className="flex items-center justify-between mb-3">
@@ -184,14 +195,15 @@ export function TeamClient({ team, userId, isOwner }: { team: Team; userId: stri
         </div>
         <div className="rounded-2xl border border-border bg-card p-5">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-sm text-muted-foreground">Quick action</span>
+            <span className="text-sm text-muted-foreground">API Keys</span>
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10">
               <Wand2 className="h-4 w-4 text-emerald-400" />
             </div>
           </div>
+          <p className="text-3xl font-bold tracking-tight">{apiKeyCount}</p>
           <Link
-            href="/app/convert"
-            className="text-sm font-medium text-primary hover:underline underline-offset-2"
+            href={`${base}/convert`}
+            className="text-xs font-medium text-primary hover:underline underline-offset-2 mt-1 inline-block"
           >
             Open Studio
           </Link>
@@ -216,7 +228,7 @@ export function TeamClient({ team, userId, isOwner }: { team: Team; userId: stri
               <div key={t.id} className="flex items-center justify-between px-5 py-3.5 gap-4">
                 <p className="text-sm truncate">{t.name}</p>
                 <Link
-                  href={`/app/convert?template=${t.id}`}
+                  href={`${base}/convert?template=${t.id}`}
                   className="text-xs text-primary hover:underline shrink-0"
                 >
                   Open in Studio

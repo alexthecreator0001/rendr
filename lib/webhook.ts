@@ -22,20 +22,25 @@ export function signPayload(secret: string, body: string): string {
 }
 
 /**
- * Find all enabled webhooks for a user that subscribe to this event,
- * and deliver the payload to each one with retries.
+ * Find all enabled webhooks for a user (and optionally a team) that subscribe
+ * to this event, and deliver the payload to each one with retries.
  */
 export async function deliverWebhooks(
   userId: string,
   event: string,
-  payload: Record<string, unknown>
+  payload: Record<string, unknown>,
+  teamId?: string | null
 ): Promise<void> {
+  // Fetch personal webhooks + team webhooks (if teamId is set)
   const webhooks = await prisma.webhook.findMany({
-    where: {
-      userId,
-      enabled: true,
-      events: { has: event },
-    },
+    where: teamId
+      ? {
+          OR: [
+            { userId, teamId: null, enabled: true, events: { has: event } },
+            { teamId, enabled: true, events: { has: event } },
+          ],
+        }
+      : { userId, enabled: true, events: { has: event } },
   })
 
   // Fire deliveries in parallel, don't fail if one fails

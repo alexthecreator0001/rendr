@@ -12,10 +12,10 @@ const createSchema = z.object({
 
 export async function GET(req: NextRequest) {
   try {
-    const { user } = await requireApiKey(req)
+    const { user, teamId } = await requireApiKey(req)
 
     const templates = await prisma.template.findMany({
-      where: { userId: user.id },
+      where: teamId ? { teamId } : { userId: user.id },
       orderBy: { createdAt: "desc" },
       select: { id: true, name: true, createdAt: true, updatedAt: true },
     })
@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const { user, apiKey } = await requireApiKey(req)
+    const { user, apiKey, teamId } = await requireApiKey(req)
 
     const rl = checkRateLimit(apiKey.id)
     if (!rl.ok) return apiError(429, "Rate limit exceeded", "rate_limit_exceeded")
@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
     }
 
     const template = await prisma.template.create({
-      data: { userId: user.id, ...parsed.data },
+      data: { userId: user.id, teamId, ...parsed.data },
     })
 
     return Response.json({ template }, { status: 201 })

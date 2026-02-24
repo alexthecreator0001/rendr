@@ -3,6 +3,7 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
 import { getQueue } from "@/lib/queue";
+import { requireTeamMember } from "@/lib/team-auth";
 import { sendUsageWarningEmail, sendUsageLimitReachedEmail } from "@/lib/email";
 import { getPlanRenderLimit } from "@/lib/plans";
 import { z } from "zod";
@@ -78,6 +79,13 @@ export async function convertUrlAction(
     }
   }
 
+  // Optional team scope
+  const teamId = (formData.get("teamId") as string) || null;
+  if (teamId) {
+    const result = await requireTeamMember(teamId, session.user.id);
+    if (result.error) return { error: result.error };
+  }
+
   const mode = formData.get("mode") as string;
 
   // ── Layout options ──────────────────────────────────────
@@ -137,6 +145,7 @@ export async function convertUrlAction(
     if (!parsed.success) return { error: parsed.error.issues[0].message };
     jobData = {
       userId: session.user.id,
+      teamId,
       inputType: "url",
       inputContent: parsed.data,
       optionsJson: pdfOptions,
@@ -147,6 +156,7 @@ export async function convertUrlAction(
     if (!parsed.success) return { error: parsed.error.issues[0].message };
     jobData = {
       userId: session.user.id,
+      teamId,
       inputType: "html",
       inputContent: parsed.data,
       optionsJson: pdfOptions,
@@ -156,7 +166,7 @@ export async function convertUrlAction(
     if (!templateId) return { error: "Please select a template." };
 
     const template = await prisma.template.findFirst({
-      where: { id: templateId, userId: session.user.id },
+      where: { id: templateId, ...(teamId ? { teamId } : { userId: session.user.id }) },
       select: { id: true },
     });
     if (!template) return { error: "Template not found." };
@@ -171,6 +181,7 @@ export async function convertUrlAction(
 
     jobData = {
       userId: session.user.id,
+      teamId,
       inputType: "template",
       inputContent: "",
       templateId,

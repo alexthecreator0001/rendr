@@ -78,7 +78,7 @@ function formatJob(job: {
 
 export async function POST(req: NextRequest) {
   try {
-    const { user, apiKey } = await requireApiKey(req)
+    const { user, apiKey, teamId } = await requireApiKey(req)
 
     const rateLimit = checkRateLimit(apiKey.id)
     if (!rateLimit.ok) {
@@ -132,7 +132,7 @@ export async function POST(req: NextRequest) {
       if (!input.template_id)
         return apiError(400, "template_id is required when type is template", "invalid_request")
       const tmpl = await prisma.template.findFirst({
-        where: { id: input.template_id, userId: user.id },
+        where: { id: input.template_id, ...(teamId ? { teamId } : { userId: user.id }) },
       })
       if (!tmpl) return apiError(404, "Template not found", "template_not_found")
     }
@@ -141,6 +141,7 @@ export async function POST(req: NextRequest) {
     const job = await prisma.job.create({
       data: {
         userId: user.id,
+        teamId,
         apiKeyId: apiKey.id,
         inputType: input.type,
         inputContent: input.type !== "template" ? input.content : null,
@@ -154,6 +155,7 @@ export async function POST(req: NextRequest) {
     await prisma.usageEvent.create({
       data: {
         userId: user.id,
+        teamId,
         apiKeyId: apiKey.id,
         endpoint: "/api/v1/convert",
         statusCode: 202,

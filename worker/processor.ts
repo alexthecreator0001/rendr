@@ -137,6 +137,7 @@ export async function processJob(jobId: string): Promise<void> {
     await prisma.usageEvent.create({
       data: {
         userId: job.userId,
+        teamId: job.teamId,
         apiKeyId: job.apiKeyId,
         endpoint: "pdf-render",
         statusCode: 200,
@@ -147,7 +148,7 @@ export async function processJob(jobId: string): Promise<void> {
       job_id: job.id,
       status: "succeeded",
       pdf_url: resultUrl,
-    })
+    }, job.teamId)
 
     console.log(`[worker] Job ${jobId} succeeded`)
   } catch (err) {
@@ -177,7 +178,7 @@ export async function processJob(jobId: string): Promise<void> {
       job_id: job.id,
       status: "failed",
       error: { code: "render_failed", message: errorMessage },
-    })
+    }, job.teamId)
 
     throw err
   }

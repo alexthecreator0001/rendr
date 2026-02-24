@@ -5,7 +5,7 @@ import { ApiError } from "./errors"
 
 export async function requireApiKey(
   req: Request
-): Promise<{ user: User; apiKey: ApiKey }> {
+): Promise<{ user: User; apiKey: ApiKey; teamId: string | null }> {
   const authHeader = req.headers.get("authorization")
 
   if (!authHeader?.startsWith("Bearer ")) {
@@ -51,5 +51,5 @@ export async function requireApiKey(
     })
 
   const { user, ...keyWithoutUser } = apiKey as ApiKey & { user: User }
-  return { user, apiKey: keyWithoutUser }
+  return { user, apiKey: keyWithoutUser, teamId: keyWithoutUser.teamId ?? null }
 }

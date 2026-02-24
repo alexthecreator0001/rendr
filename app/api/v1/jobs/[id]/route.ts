@@ -10,12 +10,16 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { user } = await requireApiKey(req)
+    const { user, teamId } = await requireApiKey(req)
     const { id } = await params
 
     const job = await prisma.job.findUnique({ where: { id } })
 
-    if (!job || job.userId !== user.id) {
+    if (!job) return apiError(404, "Job not found", "not_found")
+
+    // Allow access if job belongs to user or to the team of the API key
+    const hasAccess = job.userId === user.id || (teamId && job.teamId === teamId)
+    if (!hasAccess) {
       return apiError(404, "Job not found", "not_found")
     }
 

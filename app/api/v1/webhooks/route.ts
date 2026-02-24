@@ -15,9 +15,9 @@ const createSchema = z.object({
 
 export async function GET(req: NextRequest) {
   try {
-    const { user } = await requireApiKey(req)
+    const { user, teamId } = await requireApiKey(req)
     const webhooks = await prisma.webhook.findMany({
-      where: { userId: user.id },
+      where: teamId ? { teamId } : { userId: user.id },
       orderBy: { createdAt: "desc" },
       select: { id: true, url: true, events: true, enabled: true, createdAt: true },
     })
@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const { user } = await requireApiKey(req)
+    const { user, teamId } = await requireApiKey(req)
     const body = await req.json().catch(() => null)
     const parsed = createSchema.safeParse(body)
     if (!parsed.success) {
@@ -41,6 +41,7 @@ export async function POST(req: NextRequest) {
     const webhook = await prisma.webhook.create({
       data: {
         userId: user.id,
+        teamId,
         url: parsed.data.url,
         events: parsed.data.events,
         enabled: parsed.data.enabled,
