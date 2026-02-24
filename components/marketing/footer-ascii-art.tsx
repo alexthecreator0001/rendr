@@ -60,9 +60,9 @@ export function FooterAsciiArt() {
 
     const resize = () => {
       const w = container.clientWidth;
-      // Scale font so the art fills the container width
+      // Scale font so the art fills 70% of the container width
       const baseCharWidth = 0.6;
-      fontSize = w / (maxCols * baseCharWidth);
+      fontSize = (w * 0.7) / (maxCols * baseCharWidth);
       // Clamp to reasonable range
       fontSize = Math.max(4, Math.min(fontSize, 20));
       lineHeight = fontSize * 1.15;
@@ -110,7 +110,7 @@ export function FooterAsciiArt() {
         const y = pos.row * lineHeight;
 
         if (x >= -charWidth && x <= canvas.width) {
-          ctx.fillStyle = "rgba(255, 255, 255, 0.08)";
+          ctx.fillStyle = "rgba(255, 255, 255, 0.15)";
           ctx.fillText(SYMBOLS[state.current], x, y);
         }
       }

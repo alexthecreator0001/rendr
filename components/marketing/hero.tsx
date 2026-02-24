@@ -8,15 +8,19 @@ import { SpiralBackground } from "@/components/marketing/spiral-background";
 export function Hero() {
   return (
     <section className="relative overflow-hidden bg-zinc-950">
-      {/* Background */}
-      <div className="pointer-events-none absolute inset-0">
+      {/* Background layers */}
+      <div className="pointer-events-none absolute inset-0 z-0">
         <div className="absolute left-0 top-0 h-[700px] w-[700px] -translate-x-1/3 -translate-y-1/4 rounded-full bg-blue-600/10 blur-[140px]" />
         <div className="absolute right-0 top-1/2 h-[500px] w-[500px] translate-x-1/3 rounded-full bg-violet-600/8 blur-[120px]" />
       </div>
-      <SpiralBackground />
+
+      {/* Animated spiral ASCII art background */}
+      <div className="pointer-events-none absolute inset-0 z-[1]">
+        <SpiralBackground />
+      </div>
 
       {/* Hero image — absolutely positioned on the RIGHT */}
-      <div className="pointer-events-none absolute inset-0 hidden lg:block">
+      <div className="pointer-events-none absolute inset-0 z-[2] hidden lg:block">
         <div className="absolute inset-0">
           <img
             src="/hero.png"

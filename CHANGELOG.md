@@ -2,6 +2,15 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.32.8] — 2026-02-24
+### Fixed
+- Hero spiral ASCII background was invisible due to broken variable references and missing z-index layering
+- Added proper z-index stacking: glow orbs (z-0) → spiral ASCII (z-1) → hero image (z-2) → content (z-10)
+
+### Changed
+- Footer ASCII art opacity increased from 8% to 15% for better visibility
+- Footer ASCII art width reduced to 70% of container (30% smaller)
+
 ## [0.32.7] — 2026-02-24
 ### Changed
 - Hero spiral ASCII background now scales dynamically to fill the entire hero section

@@ -176,8 +176,10 @@ export function SpiralBackground() {
       ctx.textBaseline = "top";
 
       // Center the art
-      const offsetX = (canvas.width - artWidth) / 2;
-      const offsetY = (canvas.height - artHeight) / 2;
+      const currentArtWidth = maxCols * charWidth;
+      const currentArtHeight = SPIRAL_ART.length * lineHeight;
+      const offsetX = (canvas.width - currentArtWidth) / 2;
+      const offsetY = (canvas.height - currentArtHeight) / 2;
 
       for (let i = 0; i < charPositions.length; i++) {
         const pos = charPositions[i];
