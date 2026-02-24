@@ -3,7 +3,7 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
 import { getPlanAiLimit } from "@/lib/plans";
-import { generateTemplate } from "@/lib/openai";
+import { generateTemplate, type AiMessage } from "@/lib/openai";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
@@ -14,17 +14,26 @@ async function getSession() {
   return session;
 }
 
-export interface GenerateState {
+export interface GenerateResult {
   html?: string;
+  sampleData?: Record<string, string>;
+  assistantContent?: string;
   creditsUsed?: number;
   creditsLimit?: number;
   error?: string;
 }
 
-export async function generateTemplateAction(
-  _prevState: GenerateState | null,
-  formData: FormData
-): Promise<GenerateState> {
+interface ChatInput {
+  messages: AiMessage[];
+  newMessage: string;
+  documentType?: string;
+  style?: string;
+  hasLogo?: boolean;
+}
+
+export async function chatGenerateAction(
+  input: ChatInput
+): Promise<GenerateResult> {
   const session = await getSession();
 
   const user = await prisma.user.findUnique({
@@ -34,7 +43,6 @@ export async function generateTemplateAction(
   const plan = user?.plan ?? "starter";
   const limit = getPlanAiLimit(plan);
 
-  // Count this month's AI generations
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
@@ -54,17 +62,31 @@ export async function generateTemplateAction(
     };
   }
 
-  const documentType = (formData.get("documentType") as string) || "Document";
-  const style = (formData.get("style") as string) || "Professional";
-  const description = (formData.get("description") as string) || "";
-
-  if (!description.trim()) {
-    return { error: "Please describe the template you want to generate." };
+  if (!input.newMessage.trim()) {
+    return { error: "Please describe what you want." };
   }
 
-  const prompt = `Document type: ${documentType}\nDesign style: ${style}\n\nUser request: ${description}\n\nGenerate a complete, professional ${documentType.toLowerCase()} with realistic sample data filled in. The design style should be "${style.toLowerCase()}".`;
+  // Build the user message content
+  let userContent = input.newMessage;
 
-  const result = await generateTemplate(prompt);
+  // First message: include document type and style context
+  if (input.messages.length === 0) {
+    const docType = input.documentType || "Document";
+    const style = input.style || "Professional";
+    userContent = `Document type: ${docType}\nDesign style: ${style}\n\n${input.newMessage}`;
+  }
+
+  // Add logo instruction if user uploaded one
+  if (input.hasLogo) {
+    userContent += "\n\nNote: The user has uploaded a logo image. Use {{ logo_url }} as the src attribute of an <img> tag where the logo should appear.";
+  }
+
+  const allMessages: AiMessage[] = [
+    ...input.messages,
+    { role: "user", content: userContent },
+  ];
+
+  const result = await generateTemplate(allMessages);
 
   if ("error" in result) {
     return { error: result.error };
@@ -81,6 +103,8 @@ export async function generateTemplateAction(
 
   return {
     html: result.html,
+    sampleData: result.sampleData,
+    assistantContent: result.rawContent,
     creditsUsed: used + 1,
     creditsLimit: limit,
   };

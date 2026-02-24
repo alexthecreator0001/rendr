@@ -2,6 +2,18 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.35.0] — 2026-02-24
+### Added
+- AI Studio: chat-based template refinement — iterate with AI to perfect templates, not just one-shot
+- AI Studio: templates now use {{ variable }} placeholders with realistic sample data for preview
+- AI Studio: logo upload — upload your logo and it's embedded into the template via {{ logo_url }}
+- AI Studio: saved templates preserve raw {{ variables }} for use with the rendering API
+
+### Changed
+- AI Studio: complete UI redesign — left panel is now a chat interface, right panel is A4 preview
+- OpenAI wrapper now accepts conversation history for multi-turn chat
+- Server action rewritten as direct async call (chatGenerateAction) for better chat flow
+
 ## [0.34.1] — 2026-02-24
 ### Changed
 - AI Studio: preview now renders in A4 paper format (centered page) instead of fullscreen
