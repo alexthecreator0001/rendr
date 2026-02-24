@@ -62,6 +62,7 @@ const loginSchema = z.object({
 });
 
 const registerSchema = z.object({
+  name: z.string().min(1).max(100).optional(),
   email: z.string().email(),
   password: z.string().min(8),
 });
@@ -133,7 +134,9 @@ export async function registerAction(
   _prevState: { error?: string } | null,
   formData: FormData
 ): Promise<{ error?: string }> {
+  const rawName = (formData.get("name") as string)?.trim();
   const parsed = registerSchema.safeParse({
+    name: rawName || undefined,
     email: formData.get("email"),
     password: formData.get("password"),
   });
@@ -163,6 +166,7 @@ export async function registerAction(
 
   const newUser = await prisma.user.create({
     data: {
+      name: parsed.data.name ?? null,
       email: parsed.data.email,
       passwordHash,
       // Auto-verify immediately if no email service configured

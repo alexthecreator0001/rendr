@@ -157,7 +157,7 @@ export default async function AppOverviewPage() {
   // Time-aware greeting
   const hour = now.getHours();
   const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
-  const name = session.user.email?.split("@")[0] ?? "there";
+  const name = session.user.name || session.user.email?.split("@")[0] || "there";
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8 space-y-8">

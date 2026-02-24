@@ -93,69 +93,93 @@ export default function FeaturesPage() {
         </Container>
       </section>
 
-      {/* ── How it works — 3 step ────────────────────────────────────── */}
+      {/* ── How it works ─────────────────────────────────────────────── */}
       <section className="border-b border-white/[0.06] bg-zinc-950 py-20 sm:py-24">
         <Container>
-          <div className="mb-14 text-center">
-            <p className="mb-3 text-sm font-semibold uppercase tracking-[0.15em] text-emerald-400">
-              How it works
-            </p>
-            <h2 className="text-3xl font-extrabold tracking-[-0.03em] text-white sm:text-4xl">
-              Three steps. That&apos;s it.
-            </h2>
-          </div>
-
-          <div className="mx-auto grid max-w-4xl grid-cols-1 gap-6 sm:grid-cols-3">
-            {[
-              {
-                step: "1",
-                title: "Send HTML or a URL",
-                desc: "POST your HTML string, a live URL, or a template ID to the /convert endpoint.",
-                color: "blue",
-              },
-              {
-                step: "2",
-                title: "We render the PDF",
-                desc: "Headless Chromium captures a pixel-perfect PDF. Apply watermarks, metadata, and more.",
-                color: "violet",
-              },
-              {
-                step: "3",
-                title: "Download or webhook",
-                desc: "Get the PDF back inline, poll for it, or receive a webhook when it's ready.",
-                color: "emerald",
-              },
-            ].map((s) => (
-              <div
-                key={s.step}
-                className="group relative rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 transition-colors hover:border-white/[0.1] hover:bg-white/[0.04]"
-              >
-                <span className={`inline-flex h-8 w-8 items-center justify-center rounded-lg text-sm font-bold ${
-                  s.color === "blue" ? "bg-blue-500/15 text-blue-400" :
-                  s.color === "violet" ? "bg-violet-500/15 text-violet-400" :
-                  "bg-emerald-500/15 text-emerald-400"
-                }`}>
-                  {s.step}
-                </span>
-                <h3 className="mt-4 text-base font-semibold text-white">{s.title}</h3>
-                <p className="mt-2 text-[13px] leading-relaxed text-zinc-500">{s.desc}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* Code snippet */}
-          <div className="mx-auto mt-10 max-w-2xl rounded-xl border border-white/[0.06] bg-zinc-900/80 p-5 font-mono text-xs">
-            <div className="mb-3 flex items-center gap-2 text-zinc-500">
-              <span className="h-2.5 w-2.5 rounded-full bg-emerald-500/80" />
-              <span>curl example</span>
+          <div className="mx-auto max-w-5xl">
+            <div className="mb-16 max-w-xl">
+              <p className="mb-3 text-sm font-semibold uppercase tracking-[0.15em] text-emerald-400">
+                How it works
+              </p>
+              <h2 className="text-3xl font-extrabold tracking-[-0.03em] text-white sm:text-4xl">
+                From HTML to PDF in one call
+              </h2>
+              <p className="mt-4 text-base text-zinc-400 leading-relaxed">
+                No setup, no infrastructure. Send a request, get a PDF.
+              </p>
             </div>
-            <pre className="overflow-x-auto text-zinc-400 leading-relaxed"><code>{`curl -X POST https://rendrpdf.com/api/v1/convert \\
-  -H "Authorization: Bearer rk_live_..." \\
-  -H "Content-Type: application/json" \\
-  -d '{
-    "input": { "type": "html", "html": "<h1>Hello</h1>" },
-    "options": { "format": "A4" }
-  }'`}</code></pre>
+
+            <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1fr_1.1fr] lg:gap-16 lg:items-start">
+              {/* Left — steps */}
+              <div className="relative space-y-0">
+                {[
+                  {
+                    step: "1",
+                    title: "Send your content",
+                    desc: "POST raw HTML, a live URL, or a stored template name to the /convert endpoint. Pass any PDF options — format, margins, watermarks, metadata.",
+                    accent: "border-blue-500/40 bg-blue-500/10 text-blue-400",
+                    line: "from-blue-500/40 to-violet-500/40",
+                  },
+                  {
+                    step: "2",
+                    title: "Chromium renders it",
+                    desc: "Headless Chromium loads your content with full CSS, JS, and web font support. We handle the queue, timeouts, and retries.",
+                    accent: "border-violet-500/40 bg-violet-500/10 text-violet-400",
+                    line: "from-violet-500/40 to-emerald-500/40",
+                  },
+                  {
+                    step: "3",
+                    title: "Get the PDF back",
+                    desc: "Download inline (sync), poll the status URL, or receive a webhook the moment it's ready. Your choice.",
+                    accent: "border-emerald-500/40 bg-emerald-500/10 text-emerald-400",
+                    line: "",
+                  },
+                ].map((s, i) => (
+                  <div key={s.step} className="relative flex gap-5 pb-10 last:pb-0">
+                    {/* Vertical connector line */}
+                    <div className="flex flex-col items-center">
+                      <span className={`relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border text-sm font-bold ${s.accent}`}>
+                        {s.step}
+                      </span>
+                      {i < 2 && (
+                        <div className={`mt-1 h-full w-px bg-gradient-to-b ${s.line}`} />
+                      )}
+                    </div>
+                    {/* Text */}
+                    <div className="pt-1.5">
+                      <h3 className="text-base font-semibold text-white">{s.title}</h3>
+                      <p className="mt-1.5 text-[13px] leading-relaxed text-zinc-500">{s.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Right — code example */}
+              <div className="rounded-2xl border border-white/[0.06] bg-zinc-900/60 overflow-hidden">
+                {/* Tab bar */}
+                <div className="flex items-center gap-1 border-b border-white/[0.06] px-4 py-2.5">
+                  <span className="rounded-md bg-white/[0.08] px-2.5 py-1 text-[11px] font-medium text-white">cURL</span>
+                  <span className="rounded-md px-2.5 py-1 text-[11px] font-medium text-zinc-600">Node.js</span>
+                  <span className="rounded-md px-2.5 py-1 text-[11px] font-medium text-zinc-600">Python</span>
+                </div>
+                {/* Code */}
+                <div className="p-5 font-mono text-[12px] leading-[1.7]">
+                  <pre className="overflow-x-auto"><code><span className="text-emerald-400">curl</span>{" "}<span className="text-zinc-500">-X POST</span>{" "}<span className="text-blue-400">https://rendrpdf.com/api/v1/convert</span>{" \\\n  "}<span className="text-zinc-500">-H</span>{" "}<span className="text-amber-300">{'"Authorization: Bearer rk_live_..."'}</span>{" \\\n  "}<span className="text-zinc-500">-H</span>{" "}<span className="text-amber-300">{'"Content-Type: application/json"'}</span>{" \\\n  "}<span className="text-zinc-500">-d</span>{" "}<span className="text-amber-300">{"'"}</span>
+<span className="text-zinc-400">{"{"}</span>
+<span className="text-zinc-400">{"  "}</span><span className="text-emerald-400">{'"input"'}</span><span className="text-zinc-400">:</span>{" "}{"{"}{" "}<span className="text-emerald-400">{'"type"'}</span><span className="text-zinc-400">:</span>{" "}<span className="text-amber-300">{'"html"'}</span><span className="text-zinc-400">,</span>{" "}<span className="text-emerald-400">{'"html"'}</span><span className="text-zinc-400">:</span>{" "}<span className="text-amber-300">{'"<h1>Invoice #42</h1>"'}</span>{" "},
+<span className="text-zinc-400">{"  "}</span><span className="text-emerald-400">{'"options"'}</span><span className="text-zinc-400">:</span>{" "}{"{"}{" "}<span className="text-emerald-400">{'"format"'}</span><span className="text-zinc-400">:</span>{" "}<span className="text-amber-300">{'"A4"'}</span><span className="text-zinc-400">,</span>{" "}<span className="text-emerald-400">{'"margin"'}</span><span className="text-zinc-400">:</span>{" "}<span className="text-amber-300">{'"20mm"'}</span>{" }{"}"}
+<span className="text-zinc-400">{"}"}</span><span className="text-amber-300">{"'"}</span></code></pre>
+                </div>
+                {/* Response preview */}
+                <div className="border-t border-white/[0.06] px-5 py-3.5 flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <span className="flex h-5 items-center rounded-full bg-emerald-500/15 px-2 text-[10px] font-semibold text-emerald-400">200</span>
+                    <span className="text-[11px] text-zinc-500">application/json · 340ms</span>
+                  </div>
+                  <span className="font-mono text-[11px] text-zinc-600">{"{ pdf_url, job_id, pages }"}</span>
+                </div>
+              </div>
+            </div>
           </div>
         </Container>
       </section>

@@ -1,9 +1,8 @@
 import Link from "next/link";
-import { Search } from "lucide-react";
 import { DocsSidebar } from "@/components/layout/docs-sidebar";
 import { DocsToc } from "@/components/layout/docs-toc";
+import { DocsSearch } from "@/components/layout/docs-search";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -20,10 +19,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
             Docs
           </Link>
 
-          <div className="relative ml-4 hidden flex-1 max-w-xs sm:block">
-            <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
-            <Input placeholder="Search docs…" className="h-8 pl-9 text-sm rounded-lg bg-muted border-0" aria-label="Search documentation" />
-          </div>
+          <DocsSearch />
 
           <div className="ml-auto flex items-center gap-2">
             <ThemeToggle />

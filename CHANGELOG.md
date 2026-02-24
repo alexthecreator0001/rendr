@@ -2,6 +2,17 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.40.0] — 2026-02-24
+### Changed
+- **Hero image**: replaced with new dashboard screenshot (hero.png)
+- **Features page "How it works"**: redesigned from generic 3-card grid to vertical timeline with syntax-highlighted code example and response preview
+- **Docs search**: replaced static placeholder input with working client-side search across all docs pages, keyboard navigation, and results dropdown
+### Added
+- **Name field on registration**: new optional name input on sign-up form, stored in User model, displayed in dashboard greeting ("Good morning, Joe")
+- Prisma migration `20260224000002_add_user_name`
+### Fixed
+- **Docs search not working**: the input was purely decorative with no event handlers — now fully functional
+
 ## [0.39.0] — 2026-02-24
 ### Changed
 - **Features page redesign**: replaced bento grid + deep dives with clean hero, 3-step "how it works" section, curl example, and bottom CTA — kept "Everything in one API" capabilities grid

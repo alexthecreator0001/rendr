@@ -20,7 +20,7 @@ export function Hero() {
       <div className="pointer-events-none absolute inset-0 z-[2] hidden lg:block">
         <div className="absolute right-0 inset-y-0 w-[52%]">
           <img
-            src="/hero.webp"
+            src="/hero.png"
             alt=""
             className="absolute right-0 bottom-0 w-full max-w-none h-auto select-none"
             draggable={false}
@@ -88,7 +88,7 @@ export function Hero() {
         {/* Mobile: hero image anchored to bottom-right, 90% width, flush to section bottom */}
         <div className="animate-fade-up delay-200 relative -mx-6 -mb-24 mt-12 lg:hidden lg:-mb-32">
           <img
-            src="/hero.webp"
+            src="/hero.png"
             alt="Rendr Dashboard"
             className="block w-[90%] h-auto ml-auto select-none"
             draggable={false}

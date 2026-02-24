@@ -54,7 +54,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         const user = await prisma.user.findUnique({
           where: { email: parsed.data.email },
-          select: { id: true, email: true, passwordHash: true, role: true, emailVerified: true, bannedAt: true },
+          select: { id: true, name: true, email: true, passwordHash: true, role: true, emailVerified: true, bannedAt: true },
         })
 
         if (!user) return null
@@ -67,6 +67,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         return {
           id: user.id,
+          name: user.name,
           email: user.email,
           role: user.role,
           emailVerified: user.emailVerified,
@@ -78,12 +79,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   callbacks: {
     jwt({ token, user }) {
       if (user?.id) token.id = user.id
+      if (user?.name) token.name = user.name
       if ((user as { role?: string })?.role) token.role = (user as { role?: string }).role
       if ("emailVerified" in (user ?? {})) token.emailVerified = (user as { emailVerified?: Date | null }).emailVerified
       return token
     },
     session({ session, token }) {
       if (token.id) session.user.id = token.id as string
+      if (token.name) session.user.name = token.name as string
       if (token.role) session.user.role = token.role as string
       session.user.emailVerified = (token.emailVerified as Date | null) ?? null
       return session
