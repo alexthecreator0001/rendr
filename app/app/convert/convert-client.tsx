@@ -103,6 +103,11 @@ export function ConvertClient({ templates, plan = "starter", teamId }: { templat
   const [tagged, setTagged] = useState(false);
   const [outline, setOutline] = useState(false);
   const [waitFor, setWaitFor] = useState(0);
+  const [waitForSelector, setWaitForSelector] = useState("");
+  const [filename, setFilename] = useState("");
+  const [metaTitle, setMetaTitle] = useState("");
+  const [metaAuthor, setMetaAuthor] = useState("");
+  const [watermarkText, setWatermarkText] = useState("");
 
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -209,6 +214,11 @@ export function ConvertClient({ templates, plan = "starter", teamId }: { templat
       <input type="hidden" name="tagged" value={String(tagged)} />
       <input type="hidden" name="outline" value={String(outline)} />
       <input type="hidden" name="waitFor" value={String(waitFor)} />
+      <input type="hidden" name="waitForSelector" value={waitForSelector} />
+      <input type="hidden" name="filename" value={filename} />
+      <input type="hidden" name="metaTitle" value={metaTitle} />
+      <input type="hidden" name="metaAuthor" value={metaAuthor} />
+      <input type="hidden" name="watermarkText" value={watermarkText} />
 
       {/* ── Studio shell ─────────────────────────────────────────────────────── */}
       <div className="flex flex-1 overflow-hidden">
@@ -626,6 +636,15 @@ export function ConvertClient({ templates, plan = "starter", teamId }: { templat
                   <span className="text-[10px] text-muted-foreground/40">s</span>
                 </div>
               </InspectorRow>
+              <InspectorRow label="Wait selector">
+                <input
+                  value={waitForSelector}
+                  onChange={(e) => setWaitForSelector(e.target.value)}
+                  placeholder="#ready"
+                  disabled={isActive}
+                  className={ctrl}
+                />
+              </InspectorRow>
             </div>
 
             <div className="border-t border-border/70" />
@@ -763,6 +782,15 @@ export function ConvertClient({ templates, plan = "starter", teamId }: { templat
             {/* Output */}
             <div>
               <InspectorSection title="Output" />
+              <InspectorRow label="Filename">
+                <input
+                  value={filename}
+                  onChange={(e) => setFilename(e.target.value)}
+                  placeholder="report.pdf"
+                  disabled={isActive}
+                  className={ctrl}
+                />
+              </InspectorRow>
               <InspectorRow label="Tagged PDF">
                 <Switch
                   checked={tagged}
@@ -777,6 +805,33 @@ export function ConvertClient({ templates, plan = "starter", teamId }: { templat
                   onCheckedChange={setOutline}
                   disabled={isActive}
                   className="scale-[0.75]"
+                />
+              </InspectorRow>
+              <InspectorRow label="Title">
+                <input
+                  value={metaTitle}
+                  onChange={(e) => setMetaTitle(e.target.value)}
+                  placeholder="PDF title"
+                  disabled={isActive}
+                  className={ctrl}
+                />
+              </InspectorRow>
+              <InspectorRow label="Author">
+                <input
+                  value={metaAuthor}
+                  onChange={(e) => setMetaAuthor(e.target.value)}
+                  placeholder="Author name"
+                  disabled={isActive}
+                  className={ctrl}
+                />
+              </InspectorRow>
+              <InspectorRow label="Watermark">
+                <input
+                  value={watermarkText}
+                  onChange={(e) => setWatermarkText(e.target.value)}
+                  placeholder="DRAFT"
+                  disabled={isActive}
+                  className={ctrl}
                 />
               </InspectorRow>
               <InspectorRow label="Compression">

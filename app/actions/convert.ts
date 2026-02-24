@@ -119,6 +119,19 @@ export async function convertUrlAction(
   // ── Render delay ────────────────────────────────────────
   const waitFor = Math.min(Math.max(parseNumber(formData.get("waitFor"), 0), 0), 10);
 
+  // F1: waitForSelector
+  const waitForSelector = (formData.get("waitForSelector") as string)?.trim() || "";
+
+  // F2: filename
+  const filename = (formData.get("filename") as string)?.trim() || "";
+
+  // F4: metadata
+  const metaTitle = (formData.get("metaTitle") as string)?.trim() || "";
+  const metaAuthor = (formData.get("metaAuthor") as string)?.trim() || "";
+
+  // F5: watermark
+  const watermarkText = (formData.get("watermarkText") as string)?.trim() || "";
+
   const pdfOptions = {
     // Paper size
     ...(customWidth || customHeight
@@ -135,7 +148,16 @@ export async function convertUrlAction(
     tagged,
     outline,
     waitFor,
+    ...(waitForSelector ? { waitForSelector } : {}),
+    ...(metaTitle || metaAuthor
+      ? { metadata: { ...(metaTitle ? { title: metaTitle } : {}), ...(metaAuthor ? { author: metaAuthor } : {}) } }
+      : {}),
+    ...(watermarkText ? { watermark: { text: watermarkText } } : {}),
   };
+
+  // F2: filename stored at top level of optionsJson
+  const extraOpts: Record<string, unknown> = {};
+  if (filename) extraOpts.filename = filename;
 
   let jobData: Parameters<typeof prisma.job.create>[0]["data"];
 
@@ -148,7 +170,7 @@ export async function convertUrlAction(
       teamId,
       inputType: "url",
       inputContent: parsed.data,
-      optionsJson: pdfOptions,
+      optionsJson: { ...pdfOptions, ...extraOpts },
     };
   } else if (mode === "html") {
     const raw = (formData.get("input") as string) ?? "";
@@ -159,7 +181,7 @@ export async function convertUrlAction(
       teamId,
       inputType: "html",
       inputContent: parsed.data,
-      optionsJson: pdfOptions,
+      optionsJson: { ...pdfOptions, ...extraOpts },
     };
   } else if (mode === "template") {
     const templateId = (formData.get("templateId") as string) ?? "";
@@ -185,7 +207,7 @@ export async function convertUrlAction(
       inputType: "template",
       inputContent: "",
       templateId,
-      optionsJson: { ...pdfOptions, variables },
+      optionsJson: { ...pdfOptions, ...extraOpts, variables },
     };
   } else {
     return { error: "Invalid mode." };

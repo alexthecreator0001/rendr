@@ -140,7 +140,7 @@ curl -X POST ${BASE}/api/v1/convert \\
 const pdfOptions = `{
   "input": { "type": "html", "content": "<h1>Doc</h1>" },
   "options": {
-    "format": "A4",          // A4 | Letter | Legal | Tabloid | A3 | A5 | A6
+    "format": "A4",              // A4 | Letter | Legal | Tabloid | A3 | A5 | A6
     "landscape": false,
     "printBackground": true,
     "margin": {
@@ -148,13 +148,22 @@ const pdfOptions = `{
       "bottom": "20mm", "left": "15mm"
     },
     "displayHeaderFooter": true,
-    "headerTemplate": "<div style='font-size:9px;padding:0 20px;width:100%;text-align:right'><span class='pageNumber'></span>/<span class='totalPages'></span></div>",
-    "footerTemplate": "<div style='font-size:9px;padding:0 20px;width:100%;color:#999'><span class='title'></span></div>",
-    "scale": 1,              // 0.1–2
-    "waitFor": 0,            // seconds to wait for JS (0–10)
-    "tagged": false,         // PDF/UA accessibility tags
-    "outline": false         // embed document outline
-  }
+    "headerTemplate": "<div style='font-size:9px;...'>page numbers</div>",
+    "footerTemplate": "<div style='font-size:9px;...'>title</div>",
+    "scale": 1,                  // 0.1–2
+    "waitFor": 0,                // seconds to wait for JS (0–10)
+    "waitForSelector": "#ready", // wait for element before capture
+    "tagged": false,             // PDF/UA accessibility tags
+    "outline": false,            // embed document outline
+    "metadata": {                // PDF document properties
+      "title": "My Report",
+      "author": "Acme Corp"
+    },
+    "watermark": {               // text watermark on every page
+      "text": "DRAFT"
+    }
+  },
+  "filename": "my-report.pdf"   // custom download filename
 }`;
 
 export default function QuickStartPage() {
@@ -264,8 +273,11 @@ export default function QuickStartPage() {
         <CodeBlock code={pdfOptions} language="json" />
         <Prose>
           <p>
-            Use <code>waitFor</code> (seconds) if your page has JavaScript that needs to run before
-            capture. Use <code>type: "url"</code> to render any public URL instead of raw HTML.
+            Use <code>waitFor</code> (seconds) or <code>waitForSelector</code> (CSS selector) if
+            your page has JavaScript that needs to run before capture. Use <code>type: "url"</code>{" "}
+            to render any public URL — pass custom <code>headers</code> for authenticated pages.
+            Set <code>metadata</code> for PDF properties, <code>watermark</code> for overlay text,
+            and <code>filename</code> for custom download names.
           </p>
         </Prose>
       </section>
@@ -278,8 +290,11 @@ export default function QuickStartPage() {
             <li><a href="/app/templates">Create reusable templates</a> in the dashboard</li>
             <li><a href="/app/webhooks">Set up a webhook</a> for async job notifications</li>
             <li><a href="/app/api-keys">Manage API keys</a> — rotate, revoke, view usage</li>
+            <li><a href="/docs/api#wait-for-selector">waitForSelector</a> — wait for dynamic content before capture</li>
+            <li><a href="/docs/api#custom-headers">Custom headers</a> — render authenticated pages</li>
+            <li><a href="/docs/api#pdf-metadata">PDF metadata</a> — set title, author, and keywords</li>
+            <li><a href="/docs/api#watermark">Watermarks</a> — overlay text on every page</li>
             <li><a href="/docs/api">Full API reference</a> — every endpoint and field</li>
-            <li><a href="/docs/templates">Templates guide</a> — variables, best practices</li>
           </ul>
         </Prose>
       </section>

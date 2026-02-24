@@ -51,6 +51,20 @@ export async function deliverWebhooks(
   )
 }
 
+/**
+ * Deliver a per-job webhook to a user-supplied URL.
+ * Signed with NEXTAUTH_SECRET (shared app secret) since there's no per-webhook secret.
+ */
+export async function deliverJobWebhook(
+  url: string,
+  event: string,
+  payload: Record<string, unknown>
+): Promise<void> {
+  const secret = process.env.NEXTAUTH_SECRET ?? ""
+  if (!secret) return
+  await deliverSingle(url, secret, event, payload)
+}
+
 async function deliverSingle(
   url: string,
   secret: string,

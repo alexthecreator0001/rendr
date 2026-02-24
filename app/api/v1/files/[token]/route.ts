@@ -26,12 +26,20 @@ export async function GET(
     return new NextResponse("Not found", { status: 404 })
   }
 
+  // F2: custom filename from optionsJson
+  const opts = (job.optionsJson as Record<string, unknown>) ?? {}
+  let downloadFilename = `rendr-${job.id}.pdf`
+  if (typeof opts.filename === "string" && opts.filename.length > 0) {
+    // Ensure .pdf extension
+    downloadFilename = opts.filename.endsWith(".pdf") ? opts.filename : `${opts.filename}.pdf`
+  }
+
   try {
     const fileBuffer = await fs.readFile(resolvedPath)
     return new NextResponse(fileBuffer, {
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": `inline; filename="rendr-${job.id}.pdf"`,
+        "Content-Disposition": `inline; filename="${downloadFilename}"`,
         "Content-Length": fileBuffer.length.toString(),
         "Cache-Control": "private, max-age=3600",
       },

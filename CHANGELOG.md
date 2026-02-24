@@ -2,6 +2,21 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.37.0] — 2026-02-24
+### Added
+- **waitForSelector**: Wait for a CSS selector to appear before PDF capture (10s timeout, more reliable than fixed delay)
+- **Custom filename**: Set `filename` to control the download filename in Content-Disposition header
+- **Custom HTTP headers**: Pass `input.headers` for URL renders to authenticate with target pages (max 20, dangerous headers blocked)
+- **PDF metadata**: Set title, author, subject, and keywords via `options.metadata` using pdf-lib
+- **Watermark**: Overlay text watermark on every page via `options.watermark` with customizable color, opacity, size, and rotation
+- **Per-job webhook**: `webhook_url` now properly stored and delivered on both success and failure (SSRF-guarded)
+- New `lib/schemas.ts` — shared Zod schemas extracted from duplicated route code
+- Studio UI: new inspector controls for waitForSelector, filename, metadata (title/author), and watermark
+- Docs: API reference and quick-start updated with all 6 new features
+
+### Changed
+- Both `/convert` and `/convert-async` now import schemas from shared `lib/schemas.ts`
+
 ## [0.36.2] — 2026-02-24
 ### Fixed
 - CodeTabs component now renders page-specific `tabs` prop (was silently falling through to default examples)

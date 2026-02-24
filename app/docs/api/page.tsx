@@ -20,7 +20,13 @@ const convertBody = `{
 
     "content": "<h1>Hello {{name}}</h1>",  // required for type: html or url
     "template_id": "clxyz...",             // required for type: template
-    "variables": { "name": "World" }       // {{var}} substitution (any type)
+    "variables": { "name": "World" },      // {{var}} substitution (any type)
+
+    // Custom HTTP headers — only allowed when type: "url"
+    "headers": {                           // max 20 entries; Host, Content-Length blocked
+      "Authorization": "Bearer tok_...",
+      "Cookie": "session=abc123"
+    }
   },
 
   // ── options (all optional) ─────────────────────────────────────────────────
@@ -46,18 +52,37 @@ const convertBody = `{
 
     // Running headers/footers (uses Chromium template HTML)
     "displayHeaderFooter": false,
-    "headerTemplate": "<div style='font-size:9px;padding:0 20px;width:100%;text-align:right'><span class='pageNumber'></span>/<span class='totalPages'></span></div>",
-    "footerTemplate": "<div style='font-size:9px;padding:0 20px;width:100%;color:#999'><span class='title'></span></div>",
+    "headerTemplate": "<div style='font-size:9px;...'>...</div>",
+    "footerTemplate": "<div style='font-size:9px;...'>...</div>",
 
-    "tagged": false,   // PDF/UA accessibility tagging
-    "outline": false,  // embed document outline (table of contents)
+    "tagged": false,             // PDF/UA accessibility tagging
+    "outline": false,            // embed document outline (table of contents)
 
-    "waitFor": 0       // seconds to wait for JS before capture (0–10)
+    "waitFor": 0,                // seconds to wait for JS before capture (0–10)
+    "waitForSelector": "#ready", // CSS selector to wait for before capture (10s timeout)
+
+    // PDF metadata — embedded in the PDF document properties
+    "metadata": {
+      "title": "Invoice #42",
+      "author": "Acme Corp",
+      "subject": "Monthly invoice",
+      "keywords": "invoice, billing, acme"
+    },
+
+    // Text watermark — overlaid on every page
+    "watermark": {
+      "text": "DRAFT",          // required
+      "color": "gray",          // CSS color (default: gray)
+      "opacity": 0.15,          // 0–1 (default: 0.15)
+      "fontSize": 72,           // px (default: 72)
+      "rotation": -45            // degrees (default: -45)
+    }
   },
 
   // ── extras ────────────────────────────────────────────────────────────────
-  "webhook_url": "https://your-site.com/hooks/rendr",  // one-off webhook for this job
-  "idempotency_key": "invoice-INV-0042"                 // prevent duplicate renders
+  "filename": "invoice-42.pdf",                          // custom download filename
+  "webhook_url": "https://your-site.com/hooks/rendr",   // one-off webhook for this job
+  "idempotency_key": "invoice-INV-0042"                  // prevent duplicate renders
 }`;
 
 const jobResponse = `{
@@ -388,6 +413,107 @@ export default function ApiReferencePage() {
             { label: "Python", code: webhookVerifyPython, language: "python" },
           ]}
         />
+      </section>
+
+      {/* waitForSelector */}
+      <section id="wait-for-selector">
+        <Prose>
+          <h2>waitForSelector</h2>
+          <p>
+            Pass <code>options.waitForSelector</code> with a CSS selector string. Rendr waits up to
+            10 seconds for that selector to appear in the DOM before capturing the PDF. More reliable
+            than a fixed <code>waitFor</code> delay for pages with async JavaScript rendering.
+          </p>
+          <p>
+            Example: <code>{'"waitForSelector": "#chart-loaded"'}</code> — waits until an element
+            with id <code>chart-loaded</code> is present.
+          </p>
+        </Prose>
+      </section>
+
+      {/* filename */}
+      <section id="filename">
+        <Prose>
+          <h2>Custom filename</h2>
+          <p>
+            Set <code>filename</code> at the top level (not inside <code>options</code>) to control
+            the download filename in the <code>Content-Disposition</code> header. Only alphanumeric
+            characters, dots, hyphens, and underscores are allowed. A <code>.pdf</code> extension
+            is appended automatically if missing.
+          </p>
+          <p>
+            Example: <code>{'"filename": "invoice-42.pdf"'}</code>
+          </p>
+        </Prose>
+      </section>
+
+      {/* Custom headers */}
+      <section id="custom-headers">
+        <Prose>
+          <h2>Custom HTTP headers</h2>
+          <p>
+            When using <code>type: "url"</code>, pass <code>input.headers</code> to include custom
+            HTTP headers in the request to the target URL. Useful for passing authentication tokens,
+            cookies, or other credentials to render pages behind auth.
+          </p>
+          <p>
+            Max 20 headers. Dangerous headers (<code>Host</code>, <code>Content-Length</code>,{" "}
+            <code>Transfer-Encoding</code>, etc.) are blocked. Headers are only allowed when{" "}
+            <code>type</code> is <code>"url"</code>.
+          </p>
+        </Prose>
+      </section>
+
+      {/* PDF metadata */}
+      <section id="pdf-metadata">
+        <Prose>
+          <h2>PDF metadata</h2>
+          <p>
+            Set <code>options.metadata</code> to embed document properties in the PDF. These appear
+            in <em>File → Properties</em> in PDF viewers. All fields are optional.
+          </p>
+          <ul>
+            <li><code>title</code> — document title (max 500 chars)</li>
+            <li><code>author</code> — author name (max 500 chars)</li>
+            <li><code>subject</code> — document subject (max 500 chars)</li>
+            <li><code>keywords</code> — comma-separated keywords (max 1000 chars)</li>
+          </ul>
+        </Prose>
+      </section>
+
+      {/* Watermark */}
+      <section id="watermark">
+        <Prose>
+          <h2>Watermark</h2>
+          <p>
+            Add a text watermark overlaid on every page. Pass <code>options.watermark</code> with
+            at minimum a <code>text</code> field.
+          </p>
+          <ul>
+            <li><code>text</code> — watermark text (required, max 200 chars)</li>
+            <li><code>color</code> — CSS color (default: <code>"gray"</code>)</li>
+            <li><code>opacity</code> — 0–1 (default: <code>0.15</code>)</li>
+            <li><code>fontSize</code> — pixels, 8–200 (default: <code>72</code>)</li>
+            <li><code>rotation</code> — degrees, -360–360 (default: <code>-45</code>)</li>
+          </ul>
+        </Prose>
+      </section>
+
+      {/* Per-job webhook */}
+      <section id="per-job-webhook">
+        <Prose>
+          <h2>Per-job webhook</h2>
+          <p>
+            Pass <code>webhook_url</code> at the top level to receive a webhook notification for
+            this specific job — both on success (<code>job.completed</code>) and failure
+            (<code>job.failed</code>). The payload is identical to registered webhooks and is signed
+            with the application secret. This is useful for one-off notifications without setting up
+            a permanent webhook endpoint.
+          </p>
+          <p>
+            The URL is SSRF-guarded — private/internal addresses are blocked.
+          </p>
+        </Prose>
       </section>
 
       {/* Usage */}

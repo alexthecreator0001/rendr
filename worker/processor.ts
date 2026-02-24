@@ -1,8 +1,9 @@
 import { chromium } from "playwright"
 import crypto from "node:crypto"
+import { PDFDocument } from "pdf-lib"
 import { prisma } from "@/lib/db"
 import { saveFile } from "@/lib/storage"
-import { deliverWebhooks } from "@/lib/webhook"
+import { deliverWebhooks, deliverJobWebhook } from "@/lib/webhook"
 import { assertSafeUrl, buildHostResolverRules } from "@/lib/ssrf-guard"
 import { getPlanSizeLimit } from "@/lib/plans"
 
@@ -47,6 +48,12 @@ export async function processJob(jobId: string): Promise<void> {
     const opts = (job.optionsJson as Record<string, unknown>) ?? {}
     const variables = (opts.variables as Record<string, string>) ?? {}
 
+    // F3: custom headers for URL renders
+    const customHeaders = (opts.headers as Record<string, string>) ?? null
+    if (customHeaders && job.inputType === "url") {
+      await page.setExtraHTTPHeaders(customHeaders)
+    }
+
     if (job.inputType === "html") {
       if (!job.inputContent) throw new Error("inputContent is required for html jobs")
       await page.setContent(job.inputContent, { waitUntil: "networkidle" })
@@ -81,6 +88,59 @@ export async function processJob(jobId: string): Promise<void> {
         : 0
     if (waitForMs > 0) {
       await page.waitForTimeout(waitForMs)
+    }
+
+    // F1: waitForSelector — wait for a CSS selector to appear before capture
+    const waitForSelector = typeof opts.waitForSelector === "string" ? opts.waitForSelector : null
+    if (waitForSelector) {
+      await page.waitForSelector(waitForSelector, { timeout: 10_000 })
+    }
+
+    // F5: watermark — inject fixed-position overlay before capture
+    const watermark = opts.watermark as {
+      text?: string; color?: string; opacity?: number; fontSize?: number; rotation?: number
+    } | null
+    if (watermark?.text) {
+      await page.evaluate((wm) => {
+        const el = document.createElement("div")
+        // HTML-escape the watermark text
+        const safe = wm.text
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+        const color = (wm.color || "gray").replace(/[^a-zA-Z0-9#,.()\s%-]/g, "")
+        const opacity = wm.opacity ?? 0.15
+        const fontSize = wm.fontSize ?? 72
+        const rotation = wm.rotation ?? -45
+        el.innerHTML = safe
+        el.style.cssText = [
+          "position: fixed",
+          "top: 0",
+          "left: 0",
+          "width: 100vw",
+          "height: 100vh",
+          "display: flex",
+          "align-items: center",
+          "justify-content: center",
+          `font-size: ${fontSize}px`,
+          "font-family: sans-serif",
+          "font-weight: bold",
+          `color: ${color}`,
+          `opacity: ${opacity}`,
+          `transform: rotate(${rotation}deg)`,
+          "pointer-events: none",
+          "z-index: 2147483647",
+          "user-select: none",
+        ].join("; ")
+        document.body.appendChild(el)
+      }, {
+        text: watermark.text,
+        color: watermark.color,
+        opacity: watermark.opacity,
+        fontSize: watermark.fontSize,
+        rotation: watermark.rotation,
+      })
     }
 
     // Build Playwright PDF options from stored optionsJson
@@ -121,6 +181,21 @@ export async function processJob(jobId: string): Promise<void> {
       }) ?? { top: "20mm", right: "15mm", bottom: "20mm", left: "15mm" },
     })
 
+    // F4: PDF metadata — set title, author, subject, keywords using pdf-lib
+    let finalPdf: Buffer | Uint8Array = pdfBuffer
+    const metadata = opts.metadata as {
+      title?: string; author?: string; subject?: string; keywords?: string
+    } | null
+    if (metadata && (metadata.title || metadata.author || metadata.subject || metadata.keywords)) {
+      const pdfDoc = await PDFDocument.load(pdfBuffer)
+      if (metadata.title) pdfDoc.setTitle(metadata.title)
+      if (metadata.author) pdfDoc.setAuthor(metadata.author)
+      if (metadata.subject) pdfDoc.setSubject(metadata.subject)
+      if (metadata.keywords) pdfDoc.setKeywords([metadata.keywords])
+      pdfDoc.setProducer("Rendr PDF")
+      finalPdf = await pdfDoc.save()
+    }
+
     await context.close()
     await browser.close()
     browser = undefined
@@ -131,13 +206,13 @@ export async function processJob(jobId: string): Promise<void> {
       select: { plan: true },
     }))?.plan ?? "starter"
     const sizeLimit = getPlanSizeLimit(userPlan)
-    if (pdfBuffer.length > sizeLimit) {
-      const sizeMb = (pdfBuffer.length / 1024 / 1024).toFixed(1)
+    if (finalPdf.length > sizeLimit) {
+      const sizeMb = (finalPdf.length / 1024 / 1024).toFixed(1)
       const limitMb = (sizeLimit / 1024 / 1024).toFixed(0)
       throw new Error(`PDF is ${sizeMb} MB — exceeds the ${limitMb} MB limit on the Free plan. Upgrade to remove this limit.`)
     }
 
-    const { path: resultPath } = await saveFile(job.id, Buffer.from(pdfBuffer))
+    const { path: resultPath } = await saveFile(job.id, Buffer.from(finalPdf))
     const downloadToken = crypto.randomBytes(32).toString("base64url")
     const resultUrl = `${BASE_URL}/api/v1/files/${downloadToken}`
 
@@ -166,6 +241,16 @@ export async function processJob(jobId: string): Promise<void> {
       status: "succeeded",
       pdf_url: resultUrl,
     }, job.teamId)
+
+    // F6: per-job webhook
+    const jobWebhookUrl = typeof opts.webhook_url === "string" ? opts.webhook_url : null
+    if (jobWebhookUrl) {
+      await deliverJobWebhook(jobWebhookUrl, "job.completed", {
+        job_id: job.id,
+        status: "succeeded",
+        pdf_url: resultUrl,
+      }).catch((err) => console.error(`[worker] Per-job webhook failed: ${err}`))
+    }
 
     console.log(`[worker] Job ${jobId} succeeded`)
   } catch (err) {
@@ -196,6 +281,17 @@ export async function processJob(jobId: string): Promise<void> {
       status: "failed",
       error: { code: "render_failed", message: errorMessage },
     }, job.teamId)
+
+    // F6: per-job webhook on failure
+    const failOpts = (job?.optionsJson as Record<string, unknown>) ?? {}
+    const failWebhookUrl = typeof failOpts.webhook_url === "string" ? failOpts.webhook_url : null
+    if (failWebhookUrl) {
+      await deliverJobWebhook(failWebhookUrl, "job.failed", {
+        job_id: job.id,
+        status: "failed",
+        error: { code: "render_failed", message: errorMessage },
+      }).catch((err) => console.error(`[worker] Per-job webhook failed: ${err}`))
+    }
 
     throw err
   }

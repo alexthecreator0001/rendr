@@ -1,5 +1,4 @@
 import { NextRequest } from "next/server"
-import { z } from "zod"
 import { requireApiKey } from "@/lib/require-api-key"
 import { checkRateLimit } from "@/lib/rate-limit"
 import { prisma } from "@/lib/db"
@@ -7,46 +6,7 @@ import { getQueue } from "@/lib/queue"
 import { apiError, ApiError } from "@/lib/errors"
 import { assertSafeUrl } from "@/lib/ssrf-guard"
 import { getPlanRenderLimit } from "@/lib/plans"
-
-const HTML_MAX_BYTES = 5 * 1024 * 1024 // 5 MB
-
-const pdfOptionsSchema = z
-  .object({
-    format: z.enum(["A4", "Letter", "Legal", "Tabloid", "A3", "A5", "A6"]).optional(),
-    width: z.string().optional(),
-    height: z.string().optional(),
-    landscape: z.boolean().optional(),
-    printBackground: z.boolean().optional(),
-    preferCSSPageSize: z.boolean().optional(),
-    scale: z.number().min(0.1).max(2).optional(),
-    pageRanges: z.string().optional(),
-    margin: z
-      .object({
-        top: z.string().optional(),
-        right: z.string().optional(),
-        bottom: z.string().optional(),
-        left: z.string().optional(),
-      })
-      .optional(),
-    displayHeaderFooter: z.boolean().optional(),
-    headerTemplate: z.string().optional(),
-    footerTemplate: z.string().optional(),
-    tagged: z.boolean().optional(),
-    outline: z.boolean().optional(),
-    waitFor: z.number().min(0).max(10).optional(),
-  })
-  .optional()
-
-const convertSchema = z.object({
-  input: z.object({
-    type: z.enum(["html", "url", "template"]),
-    content: z.string().optional(),
-    template_id: z.string().optional(),
-  }),
-  options: pdfOptionsSchema,
-  variables: z.record(z.string()).optional(),
-  webhook_url: z.string().url().optional(),
-})
+import { convertSchema, HTML_MAX_BYTES } from "@/lib/schemas"
 
 function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms))
@@ -102,7 +62,12 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const { input, options, variables, webhook_url } = parsed.data
+    const { input, options, variables, webhook_url, filename } = parsed.data
+
+    // F3: headers only allowed with type: "url"
+    if (input.headers && input.type !== "url") {
+      return apiError(400, "headers are only allowed when input.type is \"url\"", "invalid_request")
+    }
 
     // Enforce monthly plan render limit
     const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1)
@@ -170,7 +135,13 @@ export async function POST(req: NextRequest) {
         inputType: input.type,
         inputContent: input.type !== "template" ? input.content : null,
         templateId: input.type === "template" ? input.template_id : null,
-        optionsJson: { ...options, variables: variables ?? {} },
+        optionsJson: {
+          ...options,
+          variables: variables ?? {},
+          ...(filename ? { filename } : {}),
+          ...(webhook_url ? { webhook_url } : {}),
+          ...(input.headers ? { headers: input.headers } : {}),
+        },
         idempotencyKey,
       },
     })
