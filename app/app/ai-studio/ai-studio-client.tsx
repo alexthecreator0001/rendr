@@ -36,6 +36,8 @@ import {
   X,
   RotateCcw,
   Bot,
+  FileCode,
+  FolderOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -66,13 +68,16 @@ interface ChatEntry {
   text: string;
 }
 
+type SavedTemplate = { id: string; name: string; html: string };
+
 interface Props {
   plan: string;
   creditsUsed: number;
   creditsLimit: number;
+  templates?: SavedTemplate[];
 }
 
-export function AiStudioClient({ plan, creditsUsed: initialUsed, creditsLimit }: Props) {
+export function AiStudioClient({ plan, creditsUsed: initialUsed, creditsLimit, templates = [] }: Props) {
   const [saveState, saveAction, savePending] = useActionState<
     { error?: string; success?: boolean } | null,
     FormData
@@ -102,6 +107,8 @@ export function AiStudioClient({ plan, creditsUsed: initialUsed, creditsLimit }:
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const logoInputRef = useRef<HTMLInputElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  const [loadedTemplateName, setLoadedTemplateName] = useState<string | null>(null);
 
   const creditsLeft = creditsLimit - creditsUsed;
   const noCredits = creditsLeft <= 0;
@@ -206,6 +213,26 @@ export function AiStudioClient({ plan, creditsUsed: initialUsed, creditsLimit }:
     setLogoName(null);
   }
 
+  function loadTemplate(t: SavedTemplate) {
+    startOver();
+    setHtml(t.html);
+    setTemplateName(t.name);
+    setLoadedTemplateName(t.name);
+    // Seed conversation context so AI knows the current template when refining
+    setMessages([
+      {
+        role: "assistant",
+        content: t.html,
+      },
+    ]);
+    setChatEntries([
+      {
+        role: "assistant",
+        text: `Loaded "${t.name}" — tell me what to change`,
+      },
+    ]);
+  }
+
   function startOver() {
     setMessages([]);
     setChatEntries([]);
@@ -214,6 +241,7 @@ export function AiStudioClient({ plan, creditsUsed: initialUsed, creditsLimit }:
     setError(null);
     setInput("");
     setTemplateName("");
+    setLoadedTemplateName(null);
   }
 
   async function handleCopy() {
@@ -233,14 +261,21 @@ export function AiStudioClient({ plan, creditsUsed: initialUsed, creditsLimit }:
           <Sparkles className="h-3.5 w-3.5 text-primary" />
           <span className="text-[13px] font-semibold">AI Studio</span>
           {hasGenerated && (
-            <button
-              type="button"
-              onClick={startOver}
-              className="flex items-center gap-1 ml-2 text-[11px] text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <RotateCcw className="h-3 w-3" />
-              New
-            </button>
+            <>
+              {loadedTemplateName && (
+                <span className="ml-2 text-[11px] text-muted-foreground/60 truncate max-w-[160px]">
+                  · {loadedTemplateName}
+                </span>
+              )}
+              <button
+                type="button"
+                onClick={startOver}
+                className="flex items-center gap-1 ml-2 text-[11px] text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <RotateCcw className="h-3 w-3" />
+                New
+              </button>
+            </>
           )}
         </div>
         <div className="flex items-center gap-3">
@@ -348,33 +383,73 @@ export function AiStudioClient({ plan, creditsUsed: initialUsed, creditsLimit }:
           {/* ── Chat area ──────────────────────────────────────────────────── */}
           <div className="flex-1 overflow-y-auto min-h-0 bg-muted/20">
             {chatEntries.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full px-6 text-center">
-                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/10 mb-3">
-                  <Sparkles className="h-5 w-5 text-primary" />
+              <div className="flex flex-col h-full px-5 py-5 overflow-y-auto">
+                {/* New template section */}
+                <div className="text-center mb-5">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/10 mb-3 mx-auto">
+                    <Sparkles className="h-5 w-5 text-primary" />
+                  </div>
+                  <p className="text-[13px] font-medium text-foreground mb-1">
+                    What template do you need?
+                  </p>
+                  <p className="text-[11px] text-muted-foreground leading-relaxed">
+                    Describe below or load an existing template to refine.
+                  </p>
+                  <div className="flex flex-wrap justify-center gap-1.5 mt-3">
+                    {[
+                      "SaaS invoice with line items",
+                      "Minimalist receipt",
+                      "Modern resume",
+                      "Professional certificate",
+                    ].map((suggestion) => (
+                      <button
+                        key={suggestion}
+                        type="button"
+                        onClick={() => setInput(suggestion)}
+                        className="rounded-full border border-border bg-background px-3 py-1 text-[10px] text-muted-foreground hover:text-foreground hover:border-foreground/20 transition-colors"
+                      >
+                        {suggestion}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-                <p className="text-[13px] font-medium text-foreground mb-1">
-                  What template do you need?
-                </p>
-                <p className="text-[11px] text-muted-foreground leading-relaxed max-w-[260px]">
-                  Describe your document below. After generating, you can keep chatting to refine colors, layout, sections, and more.
-                </p>
-                <div className="flex flex-wrap justify-center gap-1.5 mt-4">
-                  {[
-                    "SaaS invoice with line items",
-                    "Minimalist receipt",
-                    "Modern resume",
-                    "Professional certificate",
-                  ].map((suggestion) => (
-                    <button
-                      key={suggestion}
-                      type="button"
-                      onClick={() => setInput(suggestion)}
-                      className="rounded-full border border-border bg-background px-3 py-1 text-[10px] text-muted-foreground hover:text-foreground hover:border-foreground/20 transition-colors"
-                    >
-                      {suggestion}
-                    </button>
-                  ))}
-                </div>
+
+                {/* Saved templates section */}
+                {templates.length > 0 && (
+                  <div className="border-t border-border/50 pt-4">
+                    <div className="flex items-center gap-2 mb-3 px-1">
+                      <FolderOpen className="h-3.5 w-3.5 text-muted-foreground/50" />
+                      <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/50">
+                        Load existing template
+                      </span>
+                    </div>
+                    <div className="space-y-1">
+                      {templates.map((t) => {
+                        const varCount = (t.html.match(/\{\{\s*\w+\s*\}\}/g) || []).length;
+                        return (
+                          <button
+                            key={t.id}
+                            type="button"
+                            onClick={() => loadTemplate(t)}
+                            className="w-full flex items-center gap-2.5 rounded-lg px-3 py-2 text-left hover:bg-muted/60 transition-colors group"
+                          >
+                            <FileCode className="h-3.5 w-3.5 shrink-0 text-muted-foreground/40 group-hover:text-foreground/60 transition-colors" />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-[12px] font-medium text-foreground truncate">
+                                {t.name}
+                              </p>
+                            </div>
+                            {varCount > 0 && (
+                              <span className="text-[10px] text-muted-foreground/40 shrink-0 tabular-nums">
+                                {varCount} var{varCount !== 1 ? "s" : ""}
+                              </span>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="px-4 py-4 space-y-4">

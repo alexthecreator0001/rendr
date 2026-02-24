@@ -2,6 +2,12 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.35.2] — 2026-02-24
+### Added
+- AI Studio: load existing templates — browse saved templates in the empty state and load them into AI Studio to continue refining via chat
+- Loaded template HTML is seeded into the AI conversation context so the AI knows the current template when you ask for changes
+- Toolbar shows loaded template name for context
+
 ## [0.35.1] — 2026-02-24
 ### Changed
 - AI Studio: completely redesigned chat UI — large message bubbles, gradient AI avatar, typing indicator with animated dots, proper spacing

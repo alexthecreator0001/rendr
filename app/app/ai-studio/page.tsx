@@ -10,10 +10,17 @@ export default async function AiStudioPage() {
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: { plan: true },
-  });
+  const [user, templates] = await Promise.all([
+    prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { plan: true },
+    }),
+    prisma.template.findMany({
+      where: { userId: session.user.id, teamId: null },
+      orderBy: { updatedAt: "desc" },
+      select: { id: true, name: true, html: true },
+    }),
+  ]);
 
   const plan = user?.plan ?? "starter";
   const limit = getPlanAiLimit(plan);
@@ -31,7 +38,12 @@ export default async function AiStudioPage() {
 
   return (
     <div className="h-full overflow-hidden">
-      <AiStudioClient plan={plan} creditsUsed={used} creditsLimit={limit} />
+      <AiStudioClient
+        plan={plan}
+        creditsUsed={used}
+        creditsLimit={limit}
+        templates={templates}
+      />
     </div>
   );
 }
