@@ -12,10 +12,11 @@ async function main() {
   const passwordHash = await bcrypt.hash("demo1234", 12)
   const user = await prisma.user.upsert({
     where: { email: "demo@rendr.dev" },
-    update: {},
+    update: { emailVerified: new Date() },
     create: {
       email: "demo@rendr.dev",
       passwordHash,
+      emailVerified: new Date(),
     },
   })
 
@@ -53,11 +54,12 @@ async function main() {
   const testHash = await bcrypt.hash("test1234", 12)
   const testUser = await prisma.user.upsert({
     where: { email: "test@test.sk" },
-    update: { plan: "pro" },
+    update: { plan: "growth", emailVerified: new Date() },
     create: {
       email: "test@test.sk",
       passwordHash: testHash,
-      plan: "pro",
+      plan: "growth",
+      emailVerified: new Date(),
     },
   })
   console.log(`Test user: ${testUser.email} (plan: ${testUser.plan})`)

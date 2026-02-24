@@ -3,11 +3,18 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CodeBlock } from "@/components/docs/code-block";
 
+interface TabItem {
+  label: string;
+  code: string;
+  language?: string;
+}
+
 interface CodeTabsProps {
   curl?: string;
   node?: string;
   python?: string;
   php?: string;
+  tabs?: TabItem[];
 }
 
 const defaultExamples = {
@@ -71,7 +78,45 @@ $job = $client->render->create([
 echo $job->id; // job_7f3k2m`,
 };
 
-export function CodeTabs({ curl, node, python, php }: CodeTabsProps) {
+export function CodeTabs({ curl, node, python, php, tabs }: CodeTabsProps) {
+  // If `tabs` array is provided, use it directly
+  if (tabs && tabs.length > 0) {
+    const defaultTab = tabs[0].label.toLowerCase().replace(/[^a-z0-9]/g, "");
+    return (
+      <Tabs defaultValue={defaultTab} className="my-6">
+        <TabsList className="bg-zinc-950 border border-white/10 rounded-t-xl rounded-b-none h-auto p-1 w-full justify-start gap-0.5">
+          {tabs.map((tab) => {
+            const key = tab.label.toLowerCase().replace(/[^a-z0-9]/g, "");
+            return (
+              <TabsTrigger
+                key={key}
+                value={key}
+                className="text-xs rounded-lg data-[state=active]:bg-white/10 data-[state=active]:text-zinc-100 text-zinc-400 hover:text-zinc-200 px-3 py-1.5"
+              >
+                {tab.label}
+              </TabsTrigger>
+            );
+          })}
+        </TabsList>
+        {tabs.map((tab) => {
+          const key = tab.label.toLowerCase().replace(/[^a-z0-9]/g, "");
+          return (
+            <TabsContent key={key} value={key} className="mt-0">
+              <div className="rounded-t-none rounded-b-xl border border-white/10 bg-zinc-950 overflow-hidden">
+                <CodeBlock
+                  code={tab.code}
+                  language={tab.language ?? key}
+                  className="border-0 rounded-none my-0"
+                />
+              </div>
+            </TabsContent>
+          );
+        })}
+      </Tabs>
+    );
+  }
+
+  // Fallback: individual props
   const examples = {
     curl: curl ?? defaultExamples.curl,
     node: node ?? defaultExamples.node,

@@ -2,6 +2,14 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.36.2] — 2026-02-24
+### Fixed
+- CodeTabs component now renders page-specific `tabs` prop (was silently falling through to default examples)
+- DocsToc auto-detects h2/h3 headings from the page DOM (was hardcoded to 5 generic items)
+- Removed broken `/changelog` link from docs sidebar
+- Seed script: demo and test users now have `emailVerified` set (fixes /verify-email redirect)
+- Seed script: test user plan changed from "pro" to "growth" (valid plan name)
+
 ## [0.36.1] — 2026-02-24
 ### Fixed (Security)
 - **CRITICAL:** Banned users now blocked from login (auth.ts) and API access (require-api-key.ts)

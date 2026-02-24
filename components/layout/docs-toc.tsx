@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import { useEffect, useState } from "react";
 
 interface TocItem {
   id: string;
@@ -8,19 +9,28 @@ interface TocItem {
   depth: number;
 }
 
-interface DocsTocProps {
-  items?: TocItem[];
-}
+export function DocsToc() {
+  const [items, setItems] = useState<TocItem[]>([]);
 
-const defaultItems: TocItem[] = [
-  { id: "overview", title: "Overview", depth: 2 },
-  { id: "authentication", title: "Authentication", depth: 2 },
-  { id: "request", title: "Making a request", depth: 2 },
-  { id: "response", title: "Response format", depth: 2 },
-  { id: "errors", title: "Error handling", depth: 2 },
-];
+  useEffect(() => {
+    const headings = document.querySelectorAll("main h2[id], main h3[id]");
+    const tocItems: TocItem[] = [];
+    headings.forEach((el) => {
+      const id = el.getAttribute("id");
+      const text = el.textContent?.trim();
+      if (id && text) {
+        tocItems.push({
+          id,
+          title: text,
+          depth: el.tagName === "H3" ? 3 : 2,
+        });
+      }
+    });
+    setItems(tocItems);
+  }, []);
 
-export function DocsToc({ items = defaultItems }: DocsTocProps) {
+  if (items.length === 0) return null;
+
   return (
     <nav className="py-6">
       <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground">

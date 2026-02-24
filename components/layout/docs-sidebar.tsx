@@ -46,7 +46,6 @@ const docsNav: NavItem[] = [
     items: [
       { title: "SDKs", href: "/docs/api#sdks" },
       { title: "Rate limits", href: "/docs/api#rate-limits" },
-      { title: "Changelog", href: "/changelog" },
     ],
   },
 ];
