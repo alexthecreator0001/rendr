@@ -7,7 +7,6 @@ const footerLinks = {
     { href: "/solutions", label: "Solutions" },
     { href: "/pricing", label: "Pricing" },
     { href: "/blog", label: "Blog" },
-    { href: "/changelog", label: "Changelog" },
   ],
   Solutions: [
     { href: "/solutions/invoicing", label: "Invoicing" },
@@ -26,7 +25,6 @@ const footerLinks = {
     { href: "/docs/templates", label: "Templates" },
   ],
   Company: [
-    { href: "/about", label: "About" },
     { href: "/privacy", label: "Privacy" },
     { href: "/terms", label: "Terms" },
     { href: "mailto:hello@rendrpdf.com", label: "Contact" },
