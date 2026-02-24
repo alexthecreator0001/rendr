@@ -2,6 +2,12 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.32.3] — 2026-02-24
+### Changed
+- Hero image now massive and absolutely positioned, bleeding across the right side of the viewport with gradient fades on all edges
+- Removed "Now in beta · 100 free renders/month" badge from hero
+- Footer ASCII art animation 3x larger (font size 6→18)
+
 ## [0.32.2] — 2026-02-24
 ### Changed
 - Hero section: left/right grid layout with text on left, product screenshot on right with soft glow and edge fades (no card wrapper)
