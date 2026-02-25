@@ -96,7 +96,7 @@ export default function RegisterPage() {
                 name="name"
                 type="text"
                 autoComplete="name"
-                placeholder="Joe"
+                placeholder="Your name"
                 className="h-11 rounded-xl border-white/[0.08] bg-white/[0.04] text-white placeholder:text-zinc-600 focus-visible:border-blue-500/60 focus-visible:ring-blue-500/20"
               />
             </div>

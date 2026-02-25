@@ -22,22 +22,26 @@ export default function LoginPage() {
           </Link>
 
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-blue-400 mb-4">
-              Trusted by developers
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-blue-400 mb-3">
+              Welcome back
             </p>
-            <blockquote className="text-[17px] font-medium leading-relaxed text-white">
-              &ldquo;Rendr replaced our entire Puppeteer setup in a weekend.
-              PDF generation that just&nbsp;works.&rdquo;
-            </blockquote>
-            <div className="mt-5 flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-cyan-400 text-xs font-bold text-white">
-                JD
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-white">James D.</p>
-                <p className="text-xs text-zinc-500">Lead Engineer, Acme Corp</p>
-              </div>
-            </div>
+            <h2 className="text-2xl font-bold leading-tight tracking-tight text-white">
+              HTML to PDF,
+              <br />
+              <span
+                style={{
+                  background: "linear-gradient(115deg, #60a5fa, #22d3ee)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                }}
+              >
+                one API call.
+              </span>
+            </h2>
+            <p className="mt-3 text-sm leading-relaxed text-zinc-400">
+              Pick up where you left off — your templates, API keys, and renders are waiting.
+            </p>
           </div>
 
           <div className="space-y-3">
