@@ -2,6 +2,10 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.48.1] — 2026-02-25
+### Added
+- Google Ads conversion tracking tag (AW-17977237081) via `next/script`
+
 ## [0.48.0] — 2026-02-25
 ### Added
 - **PDF compression**: Select dropdown (Off/Low/Medium/High) replaces decorative toggle in Studio — Low uses pdf-lib object streams (5-15% reduction), Medium/High also reduce image quality (75%/50% JPEG) before capture. Growth+ plans only.
