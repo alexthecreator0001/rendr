@@ -2,6 +2,11 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.48.2] — 2026-02-25
+### Added
+- GDPR cookie consent banner — Accept/Decline with 1-year cookie persistence
+- Google Ads gtag now only loads after user accepts cookies (was unconditional)
+
 ## [0.48.1] — 2026-02-25
 ### Added
 - Google Ads conversion tracking tag (AW-17977237081) via `next/script`
