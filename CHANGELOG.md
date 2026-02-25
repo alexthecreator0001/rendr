@@ -2,6 +2,16 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.48.0] — 2026-02-25
+### Added
+- **PDF compression**: Select dropdown (Off/Low/Medium/High) replaces decorative toggle in Studio — Low uses pdf-lib object streams (5-15% reduction), Medium/High also reduce image quality (75%/50% JPEG) before capture. Growth+ plans only.
+- **Watermark customization**: collapsible settings panel (color, opacity, font size, rotation) appears when watermark text is entered. Growth+ plans only; text input remains available on all plans.
+- `compression` field added to Zod schema — API consumers can now pass `compression: "low" | "medium" | "high"` in options
+
+### Changed
+- Worker `processor.ts`: pdf-lib save now uses `useObjectStreams` when compression is enabled; image quality reduction runs via `page.evaluate` before PDF capture
+- Server action `convert.ts`: parses 5 new form fields (compression, watermarkColor, watermarkOpacity, watermarkFontSize, watermarkRotation) with plan gating
+
 ## [0.47.2] — 2026-02-25
 ### Fixed
 - Replaced fake testimonial ("James D., Acme Corp") on login page with real product messaging

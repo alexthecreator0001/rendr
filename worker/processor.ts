@@ -143,6 +143,33 @@ export async function processJob(jobId: string): Promise<void> {
       })
     }
 
+    // Compression: reduce image quality for medium/high
+    const compression = typeof opts.compression === "string" ? opts.compression : "off"
+    if (compression === "medium" || compression === "high") {
+      const quality = compression === "high" ? 0.5 : 0.75
+      await page.evaluate((q) => {
+        const imgs = document.querySelectorAll("img")
+        imgs.forEach((img) => {
+          try {
+            // Skip tiny images, SVGs, and unloaded images
+            if (img.naturalWidth < 50 || img.naturalHeight < 50) return
+            if (img.src.endsWith(".svg") || img.src.startsWith("data:image/svg")) return
+
+            const canvas = document.createElement("canvas")
+            canvas.width = img.naturalWidth
+            canvas.height = img.naturalHeight
+            const ctx = canvas.getContext("2d")
+            if (!ctx) return
+            ctx.drawImage(img, 0, 0)
+            const dataUrl = canvas.toDataURL("image/jpeg", q)
+            img.src = dataUrl
+          } catch {
+            // CORS-tainted or other errors — skip
+          }
+        })
+      }, quality)
+    }
+
     // Build Playwright PDF options from stored optionsJson
     const hasCustomDimensions = !!(opts.width || opts.height)
     const scale = typeof opts.scale === "number" ? opts.scale : 1
@@ -181,19 +208,21 @@ export async function processJob(jobId: string): Promise<void> {
       }) ?? { top: "20mm", right: "15mm", bottom: "20mm", left: "15mm" },
     })
 
-    // F4: PDF metadata — set title, author, subject, keywords using pdf-lib
+    // F4: PDF metadata + compression via pdf-lib
     let finalPdf: Buffer | Uint8Array = pdfBuffer
     const metadata = opts.metadata as {
       title?: string; author?: string; subject?: string; keywords?: string
     } | null
-    if (metadata && (metadata.title || metadata.author || metadata.subject || metadata.keywords)) {
+    const hasMetadata = metadata && (metadata.title || metadata.author || metadata.subject || metadata.keywords)
+    const needsCompression = compression !== "off"
+    if (hasMetadata || needsCompression) {
       const pdfDoc = await PDFDocument.load(pdfBuffer)
-      if (metadata.title) pdfDoc.setTitle(metadata.title)
-      if (metadata.author) pdfDoc.setAuthor(metadata.author)
-      if (metadata.subject) pdfDoc.setSubject(metadata.subject)
-      if (metadata.keywords) pdfDoc.setKeywords([metadata.keywords])
-      pdfDoc.setProducer("Rendr PDF")
-      finalPdf = await pdfDoc.save()
+      if (metadata?.title) pdfDoc.setTitle(metadata.title)
+      if (metadata?.author) pdfDoc.setAuthor(metadata.author)
+      if (metadata?.subject) pdfDoc.setSubject(metadata.subject)
+      if (metadata?.keywords) pdfDoc.setKeywords([metadata.keywords])
+      if (hasMetadata) pdfDoc.setProducer("Rendr PDF")
+      finalPdf = await pdfDoc.save(needsCompression ? { useObjectStreams: true } : {})
     }
 
     await context.close()

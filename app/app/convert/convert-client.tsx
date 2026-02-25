@@ -108,6 +108,12 @@ export function ConvertClient({ templates, plan = "starter", teamId }: { templat
   const [metaTitle, setMetaTitle] = useState("");
   const [metaAuthor, setMetaAuthor] = useState("");
   const [watermarkText, setWatermarkText] = useState("");
+  const [compression, setCompression] = useState<"off" | "low" | "medium" | "high">("off");
+  const [watermarkColor, setWatermarkColor] = useState("gray");
+  const [watermarkOpacity, setWatermarkOpacity] = useState("0.15");
+  const [watermarkFontSize, setWatermarkFontSize] = useState("72");
+  const [watermarkRotation, setWatermarkRotation] = useState("-45");
+  const [showWatermarkSettings, setShowWatermarkSettings] = useState(false);
 
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -219,6 +225,11 @@ export function ConvertClient({ templates, plan = "starter", teamId }: { templat
       <input type="hidden" name="metaTitle" value={metaTitle} />
       <input type="hidden" name="metaAuthor" value={metaAuthor} />
       <input type="hidden" name="watermarkText" value={watermarkText} />
+      <input type="hidden" name="compression" value={compression} />
+      <input type="hidden" name="watermarkColor" value={watermarkColor} />
+      <input type="hidden" name="watermarkOpacity" value={watermarkOpacity} />
+      <input type="hidden" name="watermarkFontSize" value={watermarkFontSize} />
+      <input type="hidden" name="watermarkRotation" value={watermarkRotation} />
 
       {/* ── Studio shell ─────────────────────────────────────────────────────── */}
       <div className="flex flex-1 overflow-hidden">
@@ -834,6 +845,76 @@ export function ConvertClient({ templates, plan = "starter", teamId }: { templat
                   className={ctrl}
                 />
               </InspectorRow>
+              {watermarkText && (
+                <div className="px-3 pb-2 space-y-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowWatermarkSettings((p) => !p)}
+                    className="flex items-center gap-1 text-[10px] text-muted-foreground/60 hover:text-foreground transition-colors"
+                  >
+                    <ChevronDown className={cn("h-3 w-3 transition-transform", showWatermarkSettings && "rotate-180")} />
+                    {showWatermarkSettings ? "Hide" : "Edit"} settings
+                    {plan === "starter" && (
+                      <Badge variant="secondary" className="text-[9px] rounded-full px-1.5 h-[14px] font-medium ml-1">
+                        Pro
+                      </Badge>
+                    )}
+                  </button>
+                  {showWatermarkSettings && (
+                    <div className="space-y-1.5">
+                      <InspectorRow label="Color">
+                        <input
+                          value={watermarkColor}
+                          onChange={(e) => setWatermarkColor(e.target.value)}
+                          placeholder="gray"
+                          disabled={isActive || plan === "starter"}
+                          className={cn(ctrl, plan === "starter" && "opacity-40")}
+                        />
+                      </InspectorRow>
+                      <InspectorRow label="Opacity">
+                        <input
+                          value={watermarkOpacity}
+                          onChange={(e) => setWatermarkOpacity(e.target.value)}
+                          type="number"
+                          min={0}
+                          max={1}
+                          step={0.05}
+                          disabled={isActive || plan === "starter"}
+                          className={cn(ctrl, plan === "starter" && "opacity-40")}
+                        />
+                      </InspectorRow>
+                      <InspectorRow label="Font size">
+                        <div className="flex items-center gap-1">
+                          <input
+                            value={watermarkFontSize}
+                            onChange={(e) => setWatermarkFontSize(e.target.value)}
+                            type="number"
+                            min={8}
+                            max={200}
+                            disabled={isActive || plan === "starter"}
+                            className={cn(ctrl, "w-[52px]", plan === "starter" && "opacity-40")}
+                          />
+                          <span className="text-[10px] text-muted-foreground/40">px</span>
+                        </div>
+                      </InspectorRow>
+                      <InspectorRow label="Rotation">
+                        <div className="flex items-center gap-1">
+                          <input
+                            value={watermarkRotation}
+                            onChange={(e) => setWatermarkRotation(e.target.value)}
+                            type="number"
+                            min={-360}
+                            max={360}
+                            disabled={isActive || plan === "starter"}
+                            className={cn(ctrl, "w-[52px]", plan === "starter" && "opacity-40")}
+                          />
+                          <span className="text-[10px] text-muted-foreground/40">deg</span>
+                        </div>
+                      </InspectorRow>
+                    </div>
+                  )}
+                </div>
+              )}
               <InspectorRow label="Compression">
                 <div className="flex items-center gap-1.5">
                   {plan === "starter" && (
@@ -841,10 +922,24 @@ export function ConvertClient({ templates, plan = "starter", teamId }: { templat
                       Pro
                     </Badge>
                   )}
-                  <Switch
+                  <Select
+                    value={compression}
+                    onValueChange={(v) => setCompression(v as typeof compression)}
                     disabled={isActive || plan === "starter"}
-                    className={cn("scale-[0.75]", plan === "starter" && "opacity-25")}
-                  />
+                  >
+                    <SelectTrigger className={cn(
+                      "h-6 w-[72px] rounded border-border/60 bg-muted/50 text-[11px] shadow-none px-2",
+                      plan === "starter" && "opacity-40"
+                    )}>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="off" className="text-[11px]">Off</SelectItem>
+                      <SelectItem value="low" className="text-[11px]">Low</SelectItem>
+                      <SelectItem value="medium" className="text-[11px]">Medium</SelectItem>
+                      <SelectItem value="high" className="text-[11px]">High</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </InspectorRow>
             </div>

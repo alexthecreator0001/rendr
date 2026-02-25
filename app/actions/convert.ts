@@ -131,6 +131,15 @@ export async function convertUrlAction(
 
   // F5: watermark
   const watermarkText = (formData.get("watermarkText") as string)?.trim() || "";
+  const watermarkColor = (formData.get("watermarkColor") as string)?.trim() || "gray";
+  const watermarkOpacity = parseNumber(formData.get("watermarkOpacity"), 0.15);
+  const watermarkFontSize = parseNumber(formData.get("watermarkFontSize"), 72);
+  const watermarkRotation = parseNumber(formData.get("watermarkRotation"), -45);
+
+  // Compression (plan-gated: starter forced to "off")
+  const userPlan = userForLimit?.plan ?? "starter";
+  const rawCompression = (formData.get("compression") as string)?.trim() || "off";
+  const compression = userPlan === "starter" ? "off" : (["off", "low", "medium", "high"].includes(rawCompression) ? rawCompression : "off");
 
   const pdfOptions = {
     // Paper size
@@ -152,7 +161,18 @@ export async function convertUrlAction(
     ...(metaTitle || metaAuthor
       ? { metadata: { ...(metaTitle ? { title: metaTitle } : {}), ...(metaAuthor ? { author: metaAuthor } : {}) } }
       : {}),
-    ...(watermarkText ? { watermark: { text: watermarkText } } : {}),
+    ...(watermarkText ? {
+      watermark: {
+        text: watermarkText,
+        ...(userPlan !== "starter" ? {
+          color: watermarkColor,
+          opacity: Math.min(Math.max(watermarkOpacity, 0), 1),
+          fontSize: Math.min(Math.max(Math.round(watermarkFontSize), 8), 200),
+          rotation: Math.min(Math.max(watermarkRotation, -360), 360),
+        } : {}),
+      },
+    } : {}),
+    ...(compression !== "off" ? { compression } : {}),
   };
 
   // F2: filename stored at top level of optionsJson

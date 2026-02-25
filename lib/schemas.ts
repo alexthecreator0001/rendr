@@ -55,6 +55,9 @@ export const pdfOptionsSchema = z
       })
       .optional(),
 
+    // Compression
+    compression: z.enum(["off", "low", "medium", "high"]).optional(),
+
     // F5: watermark
     watermark: z
       .object({
