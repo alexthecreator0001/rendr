@@ -179,8 +179,16 @@ Navbar: scroll-aware — transparent over dark hero on `/`, frosted glass (`bg-z
 | `RESEND_FROM` | Sender address e.g. `Rendr <noreply@rendrpdf.com>` |
 | `STRIPE_SECRET_KEY` | Stripe API key (`sk_live_...` or `sk_test_...`) |
 | `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret (`whsec_...`) |
-| `STRIPE_GROWTH_PRICE_ID` | Stripe Price ID for Growth plan ($49/mo) |
-| `STRIPE_BUSINESS_PRICE_ID` | Stripe Price ID for Business plan ($199/mo) |
+| `STRIPE_GROWTH_PRICE_ID` | Legacy single Growth price ID (fallback) |
+| `STRIPE_BUSINESS_PRICE_ID` | Legacy single Business price ID (fallback) |
+| `STRIPE_GROWTH_MONTHLY_EUR_PRICE_ID` | Growth monthly EUR Stripe Price ID |
+| `STRIPE_GROWTH_YEARLY_EUR_PRICE_ID` | Growth yearly EUR Stripe Price ID |
+| `STRIPE_GROWTH_MONTHLY_USD_PRICE_ID` | Growth monthly USD Stripe Price ID |
+| `STRIPE_GROWTH_YEARLY_USD_PRICE_ID` | Growth yearly USD Stripe Price ID |
+| `STRIPE_BUSINESS_MONTHLY_EUR_PRICE_ID` | Business monthly EUR Stripe Price ID |
+| `STRIPE_BUSINESS_YEARLY_EUR_PRICE_ID` | Business yearly EUR Stripe Price ID |
+| `STRIPE_BUSINESS_MONTHLY_USD_PRICE_ID` | Business monthly USD Stripe Price ID |
+| `STRIPE_BUSINESS_YEARLY_USD_PRICE_ID` | Business yearly USD Stripe Price ID |
 | `API_RATE_LIMIT_PER_MINUTE` | Per-API-key rate limit (default 60) |
 | `STORAGE_LOCAL_DIR` | PDF storage path (default `/data`) |
 | `PLAYWRIGHT_TIMEOUT_MS` | Chromium render timeout (default 30000) |

@@ -20,12 +20,16 @@ export function planFromPriceId(priceId: string | null | undefined): string {
     process.env.STRIPE_GROWTH_YEARLY_EUR_PRICE_ID,
     process.env.STRIPE_GROWTH_MONTHLY_USD_PRICE_ID,
     process.env.STRIPE_GROWTH_YEARLY_USD_PRICE_ID,
+    // Legacy single-price env var
+    process.env.STRIPE_GROWTH_PRICE_ID,
   ];
   const businessIds = [
     process.env.STRIPE_BUSINESS_MONTHLY_EUR_PRICE_ID,
     process.env.STRIPE_BUSINESS_YEARLY_EUR_PRICE_ID,
     process.env.STRIPE_BUSINESS_MONTHLY_USD_PRICE_ID,
     process.env.STRIPE_BUSINESS_YEARLY_USD_PRICE_ID,
+    // Legacy single-price env var
+    process.env.STRIPE_BUSINESS_PRICE_ID,
   ];
   if (growthIds.includes(priceId)) return "growth";
   if (businessIds.includes(priceId)) return "business";

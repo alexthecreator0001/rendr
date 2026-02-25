@@ -836,10 +836,15 @@ export function ConvertClient({ templates, plan = "starter", teamId }: { templat
               </InspectorRow>
               <InspectorRow label="Compression">
                 <div className="flex items-center gap-1.5">
-                  <Badge variant="secondary" className="text-[9px] rounded-full px-1.5 h-[14px] font-medium">
-                    Pro
-                  </Badge>
-                  <Switch disabled className="scale-[0.75] opacity-25" />
+                  {plan === "starter" && (
+                    <Badge variant="secondary" className="text-[9px] rounded-full px-1.5 h-[14px] font-medium">
+                      Pro
+                    </Badge>
+                  )}
+                  <Switch
+                    disabled={isActive || plan === "starter"}
+                    className={cn("scale-[0.75]", plan === "starter" && "opacity-25")}
+                  />
                 </div>
               </InspectorRow>
             </div>

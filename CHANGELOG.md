@@ -2,6 +2,13 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.47.0] — 2026-02-25
+### Fixed
+- PDF preview in Studio now works — changed `X-Frame-Options` from `DENY` to `SAMEORIGIN` and added `'self'` to CSP `frame-src`
+- Compression toggle in Studio now enabled for Growth and Business plans (was hardcoded disabled for all)
+- Plan detection in Stripe webhook: `planFromPriceId()` now also checks legacy `STRIPE_GROWTH_PRICE_ID` / `STRIPE_BUSINESS_PRICE_ID` env vars as fallback
+- Updated CLAUDE.md with all multi-currency Stripe price env vars
+
 ## [0.46.0] — 2026-02-25
 ### Changed
 - Removed light theme entirely — site is dark-only again (`forcedTheme="dark"`)
