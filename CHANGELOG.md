@@ -2,6 +2,10 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.43.2] — 2026-02-25
+### Added
+- Theme toggle (sun/moon) in the landing page navbar header — visible on both desktop and mobile
+
 ## [0.43.1] — 2026-02-25
 ### Changed
 - **"How it works" section redesign**: replaced 3-card grid with clean vertical timeline + live code example (cURL request + JSON response), works well on mobile too
