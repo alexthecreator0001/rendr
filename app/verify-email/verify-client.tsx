@@ -1,8 +1,9 @@
 "use client";
 
-import { useActionState, useRef, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { verifyEmailCodeAction, resendVerificationCodeAction } from "@/app/actions/auth";
+import { trackConversion } from "@/components/cookie-banner";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, Loader2, Mail, RefreshCw } from "lucide-react";
 
@@ -13,6 +14,9 @@ export function VerifyEmailClient({ email }: { email: string }) {
   const [state, action, pending] = useActionState<State, FormData>(verifyEmailCodeAction, null);
   const [resendStatus, setResendStatus] = useState<"idle" | "sending" | "sent">("idle");
   const inputs = useRef<(HTMLInputElement | null)[]>([]);
+
+  // Fire Google Ads conversion on registration (this page = just registered)
+  useEffect(() => { trackConversion(); }, []);
 
   if (state?.success) {
     setTimeout(() => router.push("/app"), 1500);

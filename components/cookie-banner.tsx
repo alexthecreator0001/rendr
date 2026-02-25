@@ -17,6 +17,18 @@ function setCookie(name: string, value: string, maxAge: number) {
   document.cookie = `${name}=${encodeURIComponent(value)}; path=/; max-age=${maxAge}; SameSite=Lax; Secure`;
 }
 
+/** Fire Google Ads conversion event (only works if consent accepted + gtag loaded) */
+export function trackConversion() {
+  const w = window as Record<string, unknown>;
+  if (typeof w.gtag === "function") {
+    (w.gtag as Function)("event", "conversion", {
+      send_to: `${GTAG_ID}/zf6WCITqgv8bENm8m_xC`,
+      value: 1.0,
+      currency: "EUR",
+    });
+  }
+}
+
 export function CookieBanner() {
   const [consent, setConsent] = useState<"accepted" | "declined" | null>(null);
   const [visible, setVisible] = useState(false);
