@@ -1,56 +1,30 @@
 const steps = [
   {
     number: "01",
-    title: "Send your template",
+    title: "Send a request",
     description:
-      "POST your HTML string or a stored template ID to /v1/convert. Pass variables as JSON.",
-    code: `POST /v1/convert
-Authorization: Bearer rk_live_••••••••
-
-{
-  "template": "invoice-pro",
-  "variables": {
-    "client": "Acme Corp",
-    "amount": "$4,200.00"
-  }
-}`,
-    badge: { label: "202 Accepted", color: "text-blue-400 border-blue-500/30 bg-blue-500/10" },
+      "POST raw HTML, a URL, or a template name with variables. Add any options — format, margins, watermark, metadata.",
+    accent: "text-blue-400 border-blue-500/30 bg-blue-500/10",
   },
   {
     number: "02",
     title: "We render it",
     description:
-      "Your job queues, gets picked up by an isolated Chromium worker, and is processed with your fonts and CSS — exactly as designed.",
-    code: `{
-  "id":           "job_7f3k2m",
-  "status":       "processing",
-  "queued_at":    "2026-03-15T14:23:01Z",
-  "estimated_ms": 900
-}`,
-    badge: { label: "processing", color: "text-amber-400 border-amber-500/30 bg-amber-500/10" },
+      "Your job hits our queue and gets picked up by an isolated Chromium worker. Full CSS, JS, and font support — pixel-perfect.",
+    accent: "text-amber-400 border-amber-500/30 bg-amber-500/10",
   },
   {
     number: "03",
     title: "Get your PDF",
     description:
-      "A signed download URL arrives in your webhook payload within seconds. Or poll /v1/jobs/:id.",
-    code: `{
-  "event":        "job.completed",
-  "job_id":       "job_7f3k2m",
-  "download_url": "https://cdn.rendrpdf.com/…",
-  "pages":        2,
-  "duration_ms":  843
-}`,
-    badge: { label: "job.completed", color: "text-emerald-400 border-emerald-500/30 bg-emerald-500/10" },
+      "Download it inline, poll the status URL, or let a webhook push the signed download link to your server.",
+    accent: "text-emerald-400 border-emerald-500/30 bg-emerald-500/10",
   },
 ];
 
 export function HowItWorks() {
   return (
     <section className="relative overflow-hidden border-t border-white/[0.06] bg-zinc-950 py-24 sm:py-32">
-      {/* Background orb */}
-      <div className="pointer-events-none absolute left-1/2 top-1/2 h-[600px] w-[900px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-900/10 blur-[140px]" />
-
       <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8">
         {/* Header */}
         <div className="mb-16 text-center">
@@ -66,42 +40,92 @@ export function HowItWorks() {
           </p>
         </div>
 
-        {/* Steps */}
-        <div className="relative grid gap-4 lg:grid-cols-3">
-          {/* Connecting line (desktop) */}
-          <div className="pointer-events-none absolute left-[16.67%] right-[16.67%] top-[38px] hidden h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent lg:block" />
-
-          {steps.map((step) => (
-            <div
-              key={step.number}
-              className="relative rounded-2xl border border-white/[0.07] bg-white/[0.02] p-6"
-            >
-              {/* Step number + badge */}
-              <div className="mb-5 flex items-start justify-between gap-3">
-                <span className="font-heading text-3xl font-extrabold text-white/10">
-                  {step.number}
-                </span>
-                <span
-                  className={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-semibold ${step.badge.color}`}
-                >
-                  {step.badge.label}
-                </span>
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1fr_1.2fr] lg:gap-16 lg:items-center">
+          {/* Left — Steps */}
+          <div className="relative space-y-0">
+            {steps.map((step, i) => (
+              <div key={step.number} className="relative flex gap-5 pb-10 last:pb-0">
+                {/* Vertical connector */}
+                <div className="flex flex-col items-center">
+                  <span
+                    className={`relative z-10 flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border text-sm font-bold ${step.accent}`}
+                  >
+                    {step.number}
+                  </span>
+                  {i < steps.length - 1 && (
+                    <div className="mt-1 h-full w-px bg-gradient-to-b from-white/[0.08] to-transparent" />
+                  )}
+                </div>
+                {/* Text */}
+                <div className="pt-1.5">
+                  <h3 className="text-base font-semibold text-white">{step.title}</h3>
+                  <p className="mt-1.5 text-[13.5px] leading-relaxed text-zinc-500">
+                    {step.description}
+                  </p>
+                </div>
               </div>
+            ))}
+          </div>
 
-              <h3 className="mb-2 text-sm font-semibold text-white">
-                {step.title}
-              </h3>
-              <p className="mb-5 text-sm leading-relaxed text-zinc-500">
-                {step.description}
-              </p>
-
-              <div className="overflow-hidden rounded-xl border border-white/[0.05] bg-black/40">
-                <pre className="overflow-x-auto p-4 font-mono text-[11.5px] leading-[1.8] text-zinc-300">
-                  <code>{step.code}</code>
-                </pre>
-              </div>
+          {/* Right — Code example */}
+          <div className="rounded-2xl border border-white/[0.06] bg-zinc-900/60 overflow-hidden">
+            {/* Tab bar */}
+            <div className="flex items-center gap-1 border-b border-white/[0.06] px-4 py-2.5">
+              <span className="rounded-md bg-white/[0.08] px-2.5 py-1 text-[11px] font-medium text-white">
+                cURL
+              </span>
+              <span className="rounded-md px-2.5 py-1 text-[11px] font-medium text-zinc-600">
+                Node.js
+              </span>
+              <span className="rounded-md px-2.5 py-1 text-[11px] font-medium text-zinc-600">
+                Python
+              </span>
             </div>
-          ))}
+            {/* Code */}
+            <div className="p-5 font-mono text-[12px] leading-[1.7]">
+              <pre className="overflow-x-auto text-zinc-400">
+                <code>{`curl -X POST https://rendrpdf.com/api/v1/convert \\
+  -H "Authorization: Bearer rk_live_..." \\
+  -H "Content-Type: application/json" \\
+  -d '{
+  "input": {
+    "type": "template",
+    "template": "invoice-pro",
+    "variables": {
+      "client": "Acme Corp",
+      "amount": "$4,200.00"
+    }
+  },
+  "options": {
+    "format": "A4",
+    "margin": { "top": "20mm", "bottom": "20mm" }
+  }
+}'`}</code>
+              </pre>
+            </div>
+            {/* Response preview */}
+            <div className="border-t border-white/[0.06] px-5 py-3.5">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2.5">
+                  <span className="flex h-5 items-center rounded-full bg-emerald-500/15 px-2 text-[10px] font-semibold text-emerald-400">
+                    200
+                  </span>
+                  <span className="text-[11px] text-zinc-500">
+                    application/json · 843ms
+                  </span>
+                </div>
+              </div>
+              <pre className="font-mono text-[11.5px] leading-[1.7] text-zinc-400">
+                <code>{`{
+  "job_id":       "job_7f3k2m",
+  "status":       "succeeded",
+  "pdf_url":      "https://cdn.rendrpdf.com/files/...",
+  "pages":        2,
+  "duration_ms":  843
+}`}</code>
+              </pre>
+            </div>
+          </div>
         </div>
       </div>
     </section>

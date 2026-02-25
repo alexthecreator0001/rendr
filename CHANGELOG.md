@@ -2,6 +2,11 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.43.1] — 2026-02-25
+### Changed
+- **"How it works" section redesign**: replaced 3-card grid with clean vertical timeline + live code example (cURL request + JSON response), works well on mobile too
+- **Features grid redesign**: rethought all features to match actual Rendr capabilities — now 9 cards in a clean 3×3 grid: HTML/URL to PDF, sync/async modes, webhooks, template library, signed URLs, PDF merge, watermarks, metadata/filenames, usage analytics. Each with an interactive mini demo.
+
 ## [0.43.0] — 2026-02-25
 ### Changed
 - Light theme default across all pages (defaultTheme changed from "dark" to "light")

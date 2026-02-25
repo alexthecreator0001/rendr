@@ -1,11 +1,16 @@
-import { Zap, Webhook, Layers, Type, Lock, BarChart2 } from "lucide-react";
+import {
+  Zap, Webhook, Layers, FileText, Lock,
+  Globe, Merge, Stamp, BarChart2,
+} from "lucide-react";
 
-function AsyncJobsDemo() {
+/* ── Mini demos inside each card ── */
+
+function AsyncDemo() {
   return (
     <div className="mt-4 rounded-xl border border-white/[0.06] bg-black/40 p-4 font-mono text-[11.5px] leading-[1.8]">
       <div className="flex items-center justify-between">
-        <span className="text-zinc-600">job_id</span>
-        <span className="text-zinc-300">job_7f3k2m</span>
+        <span className="text-zinc-600">mode</span>
+        <span className="text-zinc-300">async</span>
       </div>
       <div className="flex items-center justify-between">
         <span className="text-zinc-600">status</span>
@@ -15,12 +20,12 @@ function AsyncJobsDemo() {
         </span>
       </div>
       <div className="flex items-center justify-between">
-        <span className="text-zinc-600">queued_at</span>
-        <span className="text-zinc-400">14:23:01.042</span>
+        <span className="text-zinc-600">job_id</span>
+        <span className="text-zinc-400">job_7f3k2m</span>
       </div>
       <div className="flex items-center justify-between">
-        <span className="text-zinc-600">estimated_ms</span>
-        <span className="text-zinc-400">900</span>
+        <span className="text-zinc-600">duration</span>
+        <span className="text-zinc-400">843ms</span>
       </div>
     </div>
   );
@@ -30,8 +35,7 @@ function WebhookDemo() {
   return (
     <div className="mt-4 rounded-xl border border-white/[0.06] bg-black/40 p-4 font-mono text-[11px] leading-[1.8]">
       <div className="mb-2 text-zinc-600">
-        POST{" "}
-        <span className="text-zinc-400">your-server.com/webhook</span>
+        POST <span className="text-zinc-400">your-server.com/webhook</span>
       </div>
       <div className="flex items-center justify-between">
         <span className="text-zinc-600">event</span>
@@ -68,13 +72,40 @@ function TemplatesDemo() {
           className="flex items-center justify-between rounded-xl border border-white/[0.06] bg-black/30 px-4 py-2.5"
         >
           <span className="font-mono text-[11.5px] text-zinc-400">{t.id}</span>
-          <span
-            className={`rounded-full border px-2 py-0.5 text-[10px] font-medium ${tagColors[t.tag]}`}
-          >
+          <span className={`rounded-full border px-2 py-0.5 text-[10px] font-medium ${tagColors[t.tag]}`}>
             {t.tag}
           </span>
         </div>
       ))}
+    </div>
+  );
+}
+
+function HtmlUrlDemo() {
+  return (
+    <div className="mt-4 rounded-xl border border-white/[0.06] bg-black/40 p-4 font-mono text-[11px] leading-[1.8]">
+      <div className="flex items-center justify-between">
+        <span className="text-zinc-600">input.type</span>
+        <span className="text-blue-400">&quot;html&quot;</span>
+      </div>
+      <div className="flex items-center justify-between">
+        <span className="text-zinc-600">format</span>
+        <span className="text-zinc-300">A4</span>
+      </div>
+      <div className="flex items-center justify-between">
+        <span className="text-zinc-600">pages</span>
+        <span className="text-zinc-300">2</span>
+      </div>
+      <div className="mt-2 border-t border-white/[0.04] pt-2">
+        <div className="flex items-center justify-between">
+          <span className="text-zinc-600">input.type</span>
+          <span className="text-violet-400">&quot;url&quot;</span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-zinc-600">url</span>
+          <span className="text-zinc-400 truncate ml-4">https://app.example.com/report</span>
+        </div>
+      </div>
     </div>
   );
 }
@@ -90,8 +121,6 @@ function SignedUrlDemo() {
         <span className="text-white">/files/job_7f3k2m</span>
         <span className="text-zinc-600">?token=</span>
         <span className="text-blue-400">rk_dl_••••••••</span>
-        <span className="text-zinc-600">&expires=</span>
-        <span className="text-zinc-400">1735689600</span>
       </p>
       <div className="mt-3 flex items-center gap-2">
         <span className="rounded-full border border-emerald-500/25 bg-emerald-500/10 px-2 py-0.5 text-[10px] text-emerald-400">
@@ -105,29 +134,55 @@ function SignedUrlDemo() {
   );
 }
 
-function FontsDemo() {
-  const fonts = [
-    { name: "Inter.woff2", size: "18kb", status: "Embedded" },
-    { name: "Montserrat.ttf", size: "23kb", status: "Subset" },
-    { name: "JetBrainsMono.woff2", size: "31kb", status: "Embedded" },
-  ];
+function MergeDemo() {
   return (
-    <div className="mt-4 space-y-2">
-      {fonts.map((f) => (
-        <div
-          key={f.name}
-          className="flex items-center justify-between rounded-xl border border-white/[0.06] bg-black/30 px-4 py-2.5"
-        >
-          <div>
-            <p className="font-mono text-[11.5px] text-zinc-300">{f.name}</p>
-            <p className="text-[10px] text-zinc-600">{f.size}</p>
-          </div>
-          <span className="flex items-center gap-1.5 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-2 py-0.5 text-[10px] text-emerald-400">
-            <span className="h-1 w-1 rounded-full bg-emerald-400" />
-            {f.status}
-          </span>
+    <div className="mt-4 rounded-xl border border-white/[0.06] bg-black/40 p-4 font-mono text-[11px] leading-[1.8]">
+      <div className="mb-2 text-zinc-600">
+        POST <span className="text-zinc-400">/api/v1/merge</span>
+      </div>
+      <div className="flex items-center justify-between">
+        <span className="text-zinc-600">files</span>
+        <span className="text-zinc-300">3 PDFs</span>
+      </div>
+      <div className="flex items-center justify-between">
+        <span className="text-zinc-600">pages</span>
+        <span className="text-emerald-400">12 total</span>
+      </div>
+      <div className="flex items-center justify-between">
+        <span className="text-zinc-600">status</span>
+        <span className="text-emerald-400">merged</span>
+      </div>
+    </div>
+  );
+}
+
+function WatermarkDemo() {
+  return (
+    <div className="mt-4 rounded-xl border border-white/[0.06] bg-black/40 p-4 relative overflow-hidden">
+      {/* Simulated watermark text */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <span className="text-white/[0.06] text-3xl font-bold -rotate-45 select-none tracking-widest">
+          DRAFT
+        </span>
+      </div>
+      <div className="relative font-mono text-[11px] leading-[1.8]">
+        <div className="flex items-center justify-between">
+          <span className="text-zinc-600">text</span>
+          <span className="text-zinc-300">&quot;DRAFT&quot;</span>
         </div>
-      ))}
+        <div className="flex items-center justify-between">
+          <span className="text-zinc-600">opacity</span>
+          <span className="text-zinc-400">0.15</span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-zinc-600">rotation</span>
+          <span className="text-zinc-400">-45°</span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-zinc-600">fontSize</span>
+          <span className="text-zinc-400">72px</span>
+        </div>
+      </div>
     </div>
   );
 }
@@ -159,49 +214,91 @@ function AnalyticsDemo() {
   );
 }
 
+function MetadataDemo() {
+  return (
+    <div className="mt-4 rounded-xl border border-white/[0.06] bg-black/40 p-4 font-mono text-[11px] leading-[1.8]">
+      <div className="flex items-center justify-between">
+        <span className="text-zinc-600">title</span>
+        <span className="text-zinc-300">&quot;Invoice #1042&quot;</span>
+      </div>
+      <div className="flex items-center justify-between">
+        <span className="text-zinc-600">author</span>
+        <span className="text-zinc-400">&quot;Acme Corp&quot;</span>
+      </div>
+      <div className="flex items-center justify-between">
+        <span className="text-zinc-600">filename</span>
+        <span className="text-blue-400">invoice-1042.pdf</span>
+      </div>
+      <div className="flex items-center justify-between">
+        <span className="text-zinc-600">keywords</span>
+        <span className="text-zinc-400">&quot;invoice, billing&quot;</span>
+      </div>
+    </div>
+  );
+}
+
 const features = [
   {
-    icon: Zap,
-    title: "Async render jobs",
+    icon: FileText,
+    title: "HTML & URL to PDF",
     description:
-      "Fire and forget. Submit a job, get an ID back immediately. We process it and push the result — no blocking HTTP.",
-    demo: <AsyncJobsDemo />,
-    span: "lg:col-span-2",
+      "Send raw HTML or point us at any URL. Full Chromium rendering — CSS grid, flexbox, web fonts, JavaScript. Pixel-perfect.",
+    demo: <HtmlUrlDemo />,
+  },
+  {
+    icon: Zap,
+    title: "Sync & async modes",
+    description:
+      "Sync returns the PDF in one call. Async fires a webhook when it's ready. Built-in queue, retries, and status polling.",
+    demo: <AsyncDemo />,
   },
   {
     icon: Webhook,
     title: "Webhook delivery",
     description:
-      "Signed HMAC payloads pushed to your server the moment a job finishes. Or fails.",
+      "HMAC-signed payloads pushed to your server on completion or failure. Exponential backoff retries. Per-job overrides.",
     demo: <WebhookDemo />,
   },
   {
     icon: Layers,
     title: "Template library",
     description:
-      "Store, version, and call your HTML templates by ID. One API call per render.",
+      "Store HTML templates with {{variables}}. Render them with different data per call. Manage via API or dashboard.",
     demo: <TemplatesDemo />,
   },
   {
     icon: Lock,
     title: "Signed download URLs",
     description:
-      "Time-limited, credential-free download links. No proxy layer, no auth middleware.",
+      "Time-limited, credential-free download links. Share directly — no proxy layer or auth middleware needed.",
     demo: <SignedUrlDemo />,
-    span: "lg:col-span-2",
   },
   {
-    icon: Type,
-    title: "Custom fonts",
+    icon: Merge,
+    title: "PDF merge",
     description:
-      "Upload TTF or WOFF2. We embed and subset them in every render — zero config.",
-    demo: <FontsDemo />,
+      "Combine 2–50 PDFs into one document in a single API call. Preserves page order. Add metadata to the result.",
+    demo: <MergeDemo />,
+  },
+  {
+    icon: Stamp,
+    title: "Watermarks",
+    description:
+      "Overlay text on every page. Customize color, opacity, font size, and rotation. Perfect for DRAFT or CONFIDENTIAL stamps.",
+    demo: <WatermarkDemo />,
+  },
+  {
+    icon: Globe,
+    title: "Metadata & filenames",
+    description:
+      "Set PDF title, author, subject, keywords, and download filename. No more random hashes — name it invoice-42.pdf.",
+    demo: <MetadataDemo />,
   },
   {
     icon: BarChart2,
     title: "Usage analytics",
     description:
-      "Track render volume, latency, and error rates per API key from the dashboard.",
+      "Track render volume, latency, and success rates per API key. Usage alerts at 80% of your plan limit.",
     demo: <AnalyticsDemo />,
   },
 ];
@@ -226,14 +323,14 @@ export function FeaturesGrid() {
           </p>
         </div>
 
-        {/* Bento grid */}
+        {/* 3×3 Grid */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {features.map((feature) => {
             const Icon = feature.icon;
             return (
               <div
                 key={feature.title}
-                className={`group rounded-2xl border border-white/[0.07] bg-white/[0.02] p-6 transition-all duration-300 hover:border-white/[0.12] hover:bg-white/[0.04] ${feature.span ?? ""}`}
+                className="group rounded-2xl border border-white/[0.07] bg-white/[0.02] p-6 transition-all duration-300 hover:border-white/[0.12] hover:bg-white/[0.04]"
               >
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-blue-500/20 bg-blue-500/10">
                   <Icon className="h-4 w-4 text-blue-400" />
