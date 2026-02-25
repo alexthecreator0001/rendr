@@ -91,7 +91,7 @@ export function PricingCards({ currency = "eur" }: PricingCardsProps) {
           onClick={() => setAnnual(false)}
           className={cn(
             "rounded-full px-4 py-1.5 text-sm font-medium transition-colors",
-            !annual ? "bg-white/10 text-foreground" : "text-muted-foreground hover:text-foreground"
+            !annual ? "bg-primary/10 text-foreground" : "text-muted-foreground hover:text-foreground"
           )}
         >
           Monthly
@@ -101,7 +101,7 @@ export function PricingCards({ currency = "eur" }: PricingCardsProps) {
           onClick={() => setAnnual(true)}
           className={cn(
             "rounded-full px-4 py-1.5 text-sm font-medium transition-colors flex items-center gap-2",
-            annual ? "bg-white/10 text-foreground" : "text-muted-foreground hover:text-foreground"
+            annual ? "bg-primary/10 text-foreground" : "text-muted-foreground hover:text-foreground"
           )}
         >
           Annual

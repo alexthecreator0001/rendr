@@ -39,7 +39,7 @@ export default async function LandingPage() {
       <ComparisonTable />
 
       {/* Pricing */}
-      <section className="border-t border-white/[0.06] bg-zinc-950 py-24 sm:py-32">
+      <section className="dark border-t border-white/[0.06] bg-zinc-950 py-24 sm:py-32">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="mb-16 text-center">
             <p className="mb-3 text-sm font-semibold uppercase tracking-[0.15em] text-blue-400">

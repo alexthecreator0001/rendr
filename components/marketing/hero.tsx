@@ -93,6 +93,8 @@ export function Hero() {
             className="block w-[90%] h-auto ml-auto select-none"
             draggable={false}
           />
+          {/* Bottom-to-top black fade */}
+          <div className="absolute inset-x-0 bottom-0 h-[45%] bg-gradient-to-t from-zinc-950 via-zinc-950/60 via-30% to-transparent" />
         </div>
       </div>
     </section>

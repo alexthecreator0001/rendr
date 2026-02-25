@@ -2,6 +2,18 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.43.0] — 2026-02-25
+### Changed
+- Light theme default across all pages (defaultTheme changed from "dark" to "light")
+- Navbar adapts to light/dark context: dark on homepage hero, light on other pages (pricing, features, blog, etc.)
+- Solutions megamenu dropdown supports both light and dark modes
+- Redesigned mobile navigation menu: clean white panel, smooth slide-in animation, body scroll lock, animated solutions dropdown
+- Landing page pricing section scoped to dark mode to match surrounding dark sections
+- Pricing toggle uses `bg-primary/10` instead of `bg-white/10` for light mode compatibility
+
+### Added
+- Bottom-to-top black gradient fade on mobile hero image
+
 ## [0.42.0] — 2026-02-24
 ### Added
 - **Forgot password flow**: "Forgot password?" link on login page, email with reset link (1h expiry), set new password page
