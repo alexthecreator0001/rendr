@@ -4,21 +4,21 @@ const steps = [
     title: "Send a request",
     description:
       "POST raw HTML, a URL, or a template name with variables. Add any options — format, margins, watermark, metadata.",
-    accent: "text-blue-400 border-blue-500/30 bg-blue-500/10",
+    accent: "text-blue-500 dark:text-blue-400 border-blue-500/30 bg-blue-500/10",
   },
   {
     number: "02",
     title: "We render it",
     description:
       "Your job hits our queue and gets picked up by an isolated Chromium worker. Full CSS, JS, and font support — pixel-perfect.",
-    accent: "text-amber-400 border-amber-500/30 bg-amber-500/10",
+    accent: "text-amber-500 dark:text-amber-400 border-amber-500/30 bg-amber-500/10",
   },
   {
     number: "03",
     title: "Get your PDF",
     description:
       "Download it inline, poll the status URL, or let a webhook push the signed download link to your server.",
-    accent: "text-emerald-400 border-emerald-500/30 bg-emerald-500/10",
+    accent: "text-emerald-500 dark:text-emerald-400 border-emerald-500/30 bg-emerald-500/10",
   },
 ];
 
@@ -67,23 +67,23 @@ export function HowItWorks() {
             ))}
           </div>
 
-          {/* Right — Code example (kept dark) */}
-          <div className="dark rounded-2xl border border-white/[0.06] bg-zinc-950 overflow-hidden">
+          {/* Right — Code example */}
+          <div className="rounded-2xl border border-border bg-muted/30 overflow-hidden shadow-sm">
             {/* Tab bar */}
-            <div className="flex items-center gap-1 border-b border-white/[0.06] px-4 py-2.5">
-              <span className="rounded-md bg-white/[0.08] px-2.5 py-1 text-[11px] font-medium text-white">
+            <div className="flex items-center gap-1 border-b border-border px-4 py-2.5">
+              <span className="rounded-md bg-primary/10 px-2.5 py-1 text-[11px] font-medium text-primary">
                 cURL
               </span>
-              <span className="rounded-md px-2.5 py-1 text-[11px] font-medium text-zinc-600">
+              <span className="rounded-md px-2.5 py-1 text-[11px] font-medium text-muted-foreground/50">
                 Node.js
               </span>
-              <span className="rounded-md px-2.5 py-1 text-[11px] font-medium text-zinc-600">
+              <span className="rounded-md px-2.5 py-1 text-[11px] font-medium text-muted-foreground/50">
                 Python
               </span>
             </div>
             {/* Code */}
             <div className="p-5 font-mono text-[12px] leading-[1.7]">
-              <pre className="overflow-x-auto text-zinc-400">
+              <pre className="overflow-x-auto text-muted-foreground">
                 <code>{`curl -X POST https://rendrpdf.com/api/v1/convert \\
   -H "Authorization: Bearer rk_live_..." \\
   -H "Content-Type: application/json" \\
@@ -104,18 +104,18 @@ export function HowItWorks() {
               </pre>
             </div>
             {/* Response preview */}
-            <div className="border-t border-white/[0.06] px-5 py-3.5">
+            <div className="border-t border-border px-5 py-3.5">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2.5">
-                  <span className="flex h-5 items-center rounded-full bg-emerald-500/15 px-2 text-[10px] font-semibold text-emerald-400">
+                  <span className="flex h-5 items-center rounded-full bg-emerald-500/15 px-2 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
                     200
                   </span>
-                  <span className="text-[11px] text-zinc-500">
+                  <span className="text-[11px] text-muted-foreground/60">
                     application/json · 843ms
                   </span>
                 </div>
               </div>
-              <pre className="font-mono text-[11.5px] leading-[1.7] text-zinc-400">
+              <pre className="font-mono text-[11.5px] leading-[1.7] text-muted-foreground">
                 <code>{`{
   "job_id":       "job_7f3k2m",
   "status":       "succeeded",

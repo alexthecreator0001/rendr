@@ -2,6 +2,20 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.45.0] — 2026-02-25
+### Changed
+- **Complete light theme overhaul**: EVERY element on the landing page now responds to theme toggle — no forced dark sections anywhere
+- Hero section: uses `bg-background`, `text-foreground`, gradient fades use `from-background`
+- Spiral background: renders in black on light theme, white on dark theme (reads `resolvedTheme`)
+- Navbar: fully theme-aware using `dark:` variants and semantic tokens, removed `isDark` boolean logic, logo swaps via `dark:hidden`/`dark:block`
+- All feature demo blocks: use `bg-muted/50`, `border-border`, `text-foreground` instead of forced dark
+- Code block in "How it works": uses `bg-muted/30`, `text-muted-foreground` instead of forced dark
+- Job lifecycle field blocks: use `bg-muted/50` instead of forced dark
+- CTA buttons: `bg-zinc-900 dark:bg-white` pattern for proper contrast in both themes
+- Footer: kept dark with explicit `dark` class + `colorScheme: "dark"` (standard pattern)
+- Highlighted pricing card: uses `bg-zinc-900 dark:bg-zinc-950` instead of forced `dark` class
+- Mobile menu: uses `bg-background` and semantic tokens throughout
+
 ## [0.44.0] — 2026-02-25
 ### Changed
 - **Full light theme for entire landing page**: converted all marketing sections from hardcoded dark styles to semantic tokens (bg-background, text-foreground, border-border, etc.)

@@ -3,29 +3,29 @@ import {
   Globe, Merge, Stamp, BarChart2,
 } from "lucide-react";
 
-/* ── Mini demos inside each card (kept dark for code readability) ── */
+/* ── Mini demos inside each card ── */
 
 function AsyncDemo() {
   return (
-    <div className="dark mt-4 rounded-xl border border-white/[0.06] bg-zinc-950 p-4 font-mono text-[11.5px] leading-[1.8]">
+    <div className="mt-4 rounded-xl border border-border bg-muted/50 p-4 font-mono text-[11.5px] leading-[1.8]">
       <div className="flex items-center justify-between">
-        <span className="text-zinc-600">mode</span>
-        <span className="text-zinc-300">async</span>
+        <span className="text-muted-foreground/60">mode</span>
+        <span className="text-foreground">async</span>
       </div>
       <div className="flex items-center justify-between">
-        <span className="text-zinc-600">status</span>
+        <span className="text-muted-foreground/60">status</span>
         <span className="flex items-center gap-1.5">
           <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-blue-400" />
-          <span className="text-blue-400">processing</span>
+          <span className="text-blue-500 dark:text-blue-400">processing</span>
         </span>
       </div>
       <div className="flex items-center justify-between">
-        <span className="text-zinc-600">job_id</span>
-        <span className="text-zinc-400">job_7f3k2m</span>
+        <span className="text-muted-foreground/60">job_id</span>
+        <span className="text-muted-foreground">job_7f3k2m</span>
       </div>
       <div className="flex items-center justify-between">
-        <span className="text-zinc-600">duration</span>
-        <span className="text-zinc-400">843ms</span>
+        <span className="text-muted-foreground/60">duration</span>
+        <span className="text-muted-foreground">843ms</span>
       </div>
     </div>
   );
@@ -33,21 +33,21 @@ function AsyncDemo() {
 
 function WebhookDemo() {
   return (
-    <div className="dark mt-4 rounded-xl border border-white/[0.06] bg-zinc-950 p-4 font-mono text-[11px] leading-[1.8]">
-      <div className="mb-2 text-zinc-600">
-        POST <span className="text-zinc-400">your-server.com/webhook</span>
+    <div className="mt-4 rounded-xl border border-border bg-muted/50 p-4 font-mono text-[11px] leading-[1.8]">
+      <div className="mb-2 text-muted-foreground/60">
+        POST <span className="text-muted-foreground">your-server.com/webhook</span>
       </div>
       <div className="flex items-center justify-between">
-        <span className="text-zinc-600">event</span>
-        <span className="text-emerald-400">job.completed</span>
+        <span className="text-muted-foreground/60">event</span>
+        <span className="text-emerald-600 dark:text-emerald-400">job.completed</span>
       </div>
       <div className="flex items-center justify-between">
-        <span className="text-zinc-600">job_id</span>
-        <span className="text-zinc-400">job_7f3k2m</span>
+        <span className="text-muted-foreground/60">job_id</span>
+        <span className="text-muted-foreground">job_7f3k2m</span>
       </div>
       <div className="flex items-center justify-between">
-        <span className="text-zinc-600">signature</span>
-        <span className="text-amber-400">sha256=3f9a…</span>
+        <span className="text-muted-foreground/60">signature</span>
+        <span className="text-amber-600 dark:text-amber-400">sha256=3f9a…</span>
       </div>
     </div>
   );
@@ -60,18 +60,18 @@ function TemplatesDemo() {
     { id: "tmpl_report", tag: "Internal" },
   ];
   const tagColors: Record<string, string> = {
-    Finance: "text-blue-400 border-blue-500/30 bg-blue-500/10",
-    Legal: "text-violet-400 border-violet-500/30 bg-violet-500/10",
-    Internal: "text-amber-400 border-amber-500/30 bg-amber-500/10",
+    Finance: "text-blue-600 dark:text-blue-400 border-blue-500/30 bg-blue-500/10",
+    Legal: "text-violet-600 dark:text-violet-400 border-violet-500/30 bg-violet-500/10",
+    Internal: "text-amber-600 dark:text-amber-400 border-amber-500/30 bg-amber-500/10",
   };
   return (
-    <div className="dark mt-4 space-y-2">
+    <div className="mt-4 space-y-2">
       {tpls.map((t) => (
         <div
           key={t.id}
-          className="flex items-center justify-between rounded-xl border border-white/[0.06] bg-zinc-950 px-4 py-2.5"
+          className="flex items-center justify-between rounded-xl border border-border bg-muted/50 px-4 py-2.5"
         >
-          <span className="font-mono text-[11.5px] text-zinc-400">{t.id}</span>
+          <span className="font-mono text-[11.5px] text-muted-foreground">{t.id}</span>
           <span className={`rounded-full border px-2 py-0.5 text-[10px] font-medium ${tagColors[t.tag]}`}>
             {t.tag}
           </span>
@@ -83,27 +83,27 @@ function TemplatesDemo() {
 
 function HtmlUrlDemo() {
   return (
-    <div className="dark mt-4 rounded-xl border border-white/[0.06] bg-zinc-950 p-4 font-mono text-[11px] leading-[1.8]">
+    <div className="mt-4 rounded-xl border border-border bg-muted/50 p-4 font-mono text-[11px] leading-[1.8]">
       <div className="flex items-center justify-between">
-        <span className="text-zinc-600">input.type</span>
-        <span className="text-blue-400">&quot;html&quot;</span>
+        <span className="text-muted-foreground/60">input.type</span>
+        <span className="text-blue-600 dark:text-blue-400">&quot;html&quot;</span>
       </div>
       <div className="flex items-center justify-between">
-        <span className="text-zinc-600">format</span>
-        <span className="text-zinc-300">A4</span>
+        <span className="text-muted-foreground/60">format</span>
+        <span className="text-foreground">A4</span>
       </div>
       <div className="flex items-center justify-between">
-        <span className="text-zinc-600">pages</span>
-        <span className="text-zinc-300">2</span>
+        <span className="text-muted-foreground/60">pages</span>
+        <span className="text-foreground">2</span>
       </div>
-      <div className="mt-2 border-t border-white/[0.04] pt-2">
+      <div className="mt-2 border-t border-border/50 pt-2">
         <div className="flex items-center justify-between">
-          <span className="text-zinc-600">input.type</span>
-          <span className="text-violet-400">&quot;url&quot;</span>
+          <span className="text-muted-foreground/60">input.type</span>
+          <span className="text-violet-600 dark:text-violet-400">&quot;url&quot;</span>
         </div>
         <div className="flex items-center justify-between">
-          <span className="text-zinc-600">url</span>
-          <span className="text-zinc-400 truncate ml-4">https://app.example.com/report</span>
+          <span className="text-muted-foreground/60">url</span>
+          <span className="text-muted-foreground truncate ml-4">https://app.example.com/report</span>
         </div>
       </div>
     </div>
@@ -112,21 +112,21 @@ function HtmlUrlDemo() {
 
 function SignedUrlDemo() {
   return (
-    <div className="dark mt-4 rounded-xl border border-white/[0.06] bg-zinc-950 p-4">
-      <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
+    <div className="mt-4 rounded-xl border border-border bg-muted/50 p-4">
+      <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">
         Signed download URL
       </p>
-      <p className="break-all font-mono text-[10.5px] leading-[1.7] text-zinc-400">
-        <span className="text-zinc-600">https://cdn.rendrpdf.com</span>
-        <span className="text-white">/files/job_7f3k2m</span>
-        <span className="text-zinc-600">?token=</span>
-        <span className="text-blue-400">rk_dl_••••••••</span>
+      <p className="break-all font-mono text-[10.5px] leading-[1.7] text-muted-foreground">
+        <span className="text-muted-foreground/60">https://cdn.rendrpdf.com</span>
+        <span className="text-foreground">/files/job_7f3k2m</span>
+        <span className="text-muted-foreground/60">?token=</span>
+        <span className="text-blue-600 dark:text-blue-400">rk_dl_••••••••</span>
       </p>
       <div className="mt-3 flex items-center gap-2">
-        <span className="rounded-full border border-emerald-500/25 bg-emerald-500/10 px-2 py-0.5 text-[10px] text-emerald-400">
+        <span className="rounded-full border border-emerald-500/25 bg-emerald-500/10 px-2 py-0.5 text-[10px] text-emerald-600 dark:text-emerald-400">
           Time-limited
         </span>
-        <span className="rounded-full border border-blue-500/25 bg-blue-500/10 px-2 py-0.5 text-[10px] text-blue-400">
+        <span className="rounded-full border border-blue-500/25 bg-blue-500/10 px-2 py-0.5 text-[10px] text-blue-600 dark:text-blue-400">
           No auth required
         </span>
       </div>
@@ -136,21 +136,21 @@ function SignedUrlDemo() {
 
 function MergeDemo() {
   return (
-    <div className="dark mt-4 rounded-xl border border-white/[0.06] bg-zinc-950 p-4 font-mono text-[11px] leading-[1.8]">
-      <div className="mb-2 text-zinc-600">
-        POST <span className="text-zinc-400">/api/v1/merge</span>
+    <div className="mt-4 rounded-xl border border-border bg-muted/50 p-4 font-mono text-[11px] leading-[1.8]">
+      <div className="mb-2 text-muted-foreground/60">
+        POST <span className="text-muted-foreground">/api/v1/merge</span>
       </div>
       <div className="flex items-center justify-between">
-        <span className="text-zinc-600">files</span>
-        <span className="text-zinc-300">3 PDFs</span>
+        <span className="text-muted-foreground/60">files</span>
+        <span className="text-foreground">3 PDFs</span>
       </div>
       <div className="flex items-center justify-between">
-        <span className="text-zinc-600">pages</span>
-        <span className="text-emerald-400">12 total</span>
+        <span className="text-muted-foreground/60">pages</span>
+        <span className="text-emerald-600 dark:text-emerald-400">12 total</span>
       </div>
       <div className="flex items-center justify-between">
-        <span className="text-zinc-600">status</span>
-        <span className="text-emerald-400">merged</span>
+        <span className="text-muted-foreground/60">status</span>
+        <span className="text-emerald-600 dark:text-emerald-400">merged</span>
       </div>
     </div>
   );
@@ -158,29 +158,29 @@ function MergeDemo() {
 
 function WatermarkDemo() {
   return (
-    <div className="dark mt-4 rounded-xl border border-white/[0.06] bg-zinc-950 p-4 relative overflow-hidden">
+    <div className="mt-4 rounded-xl border border-border bg-muted/50 p-4 relative overflow-hidden">
       {/* Simulated watermark text */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <span className="text-white/[0.06] text-3xl font-bold -rotate-45 select-none tracking-widest">
+        <span className="text-foreground/[0.06] text-3xl font-bold -rotate-45 select-none tracking-widest">
           DRAFT
         </span>
       </div>
       <div className="relative font-mono text-[11px] leading-[1.8]">
         <div className="flex items-center justify-between">
-          <span className="text-zinc-600">text</span>
-          <span className="text-zinc-300">&quot;DRAFT&quot;</span>
+          <span className="text-muted-foreground/60">text</span>
+          <span className="text-foreground">&quot;DRAFT&quot;</span>
         </div>
         <div className="flex items-center justify-between">
-          <span className="text-zinc-600">opacity</span>
-          <span className="text-zinc-400">0.15</span>
+          <span className="text-muted-foreground/60">opacity</span>
+          <span className="text-muted-foreground">0.15</span>
         </div>
         <div className="flex items-center justify-between">
-          <span className="text-zinc-600">rotation</span>
-          <span className="text-zinc-400">-45°</span>
+          <span className="text-muted-foreground/60">rotation</span>
+          <span className="text-muted-foreground">-45°</span>
         </div>
         <div className="flex items-center justify-between">
-          <span className="text-zinc-600">fontSize</span>
-          <span className="text-zinc-400">72px</span>
+          <span className="text-muted-foreground/60">fontSize</span>
+          <span className="text-muted-foreground">72px</span>
         </div>
       </div>
     </div>
@@ -189,25 +189,25 @@ function WatermarkDemo() {
 
 function AnalyticsDemo() {
   return (
-    <div className="dark mt-4 rounded-xl border border-white/[0.06] bg-zinc-950 p-4 space-y-3">
+    <div className="mt-4 rounded-xl border border-border bg-muted/50 p-4 space-y-3">
       <div>
-        <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
+        <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">
           This month
         </p>
-        <p className="font-heading text-2xl font-extrabold text-white">
+        <p className="font-heading text-2xl font-extrabold text-foreground">
           2,847
-          <span className="ml-2 text-sm font-normal text-emerald-400">↑ 23%</span>
+          <span className="ml-2 text-sm font-normal text-emerald-600 dark:text-emerald-400">↑ 23%</span>
         </p>
-        <p className="text-[11px] text-zinc-600">renders</p>
+        <p className="text-[11px] text-muted-foreground/60">renders</p>
       </div>
       <div className="grid grid-cols-2 gap-2">
-        <div className="rounded-lg border border-white/[0.05] bg-white/[0.02] p-2.5">
-          <p className="text-xs font-semibold text-white">843ms</p>
-          <p className="text-[10px] text-zinc-600">avg render</p>
+        <div className="rounded-lg border border-border/50 bg-background p-2.5">
+          <p className="text-xs font-semibold text-foreground">843ms</p>
+          <p className="text-[10px] text-muted-foreground/60">avg render</p>
         </div>
-        <div className="rounded-lg border border-white/[0.05] bg-white/[0.02] p-2.5">
-          <p className="text-xs font-semibold text-emerald-400">99.2%</p>
-          <p className="text-[10px] text-zinc-600">success rate</p>
+        <div className="rounded-lg border border-border/50 bg-background p-2.5">
+          <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">99.2%</p>
+          <p className="text-[10px] text-muted-foreground/60">success rate</p>
         </div>
       </div>
     </div>
@@ -216,22 +216,22 @@ function AnalyticsDemo() {
 
 function MetadataDemo() {
   return (
-    <div className="dark mt-4 rounded-xl border border-white/[0.06] bg-zinc-950 p-4 font-mono text-[11px] leading-[1.8]">
+    <div className="mt-4 rounded-xl border border-border bg-muted/50 p-4 font-mono text-[11px] leading-[1.8]">
       <div className="flex items-center justify-between">
-        <span className="text-zinc-600">title</span>
-        <span className="text-zinc-300">&quot;Invoice #1042&quot;</span>
+        <span className="text-muted-foreground/60">title</span>
+        <span className="text-foreground">&quot;Invoice #1042&quot;</span>
       </div>
       <div className="flex items-center justify-between">
-        <span className="text-zinc-600">author</span>
-        <span className="text-zinc-400">&quot;Acme Corp&quot;</span>
+        <span className="text-muted-foreground/60">author</span>
+        <span className="text-muted-foreground">&quot;Acme Corp&quot;</span>
       </div>
       <div className="flex items-center justify-between">
-        <span className="text-zinc-600">filename</span>
-        <span className="text-blue-400">invoice-1042.pdf</span>
+        <span className="text-muted-foreground/60">filename</span>
+        <span className="text-blue-600 dark:text-blue-400">invoice-1042.pdf</span>
       </div>
       <div className="flex items-center justify-between">
-        <span className="text-zinc-600">keywords</span>
-        <span className="text-zinc-400">&quot;invoice, billing&quot;</span>
+        <span className="text-muted-foreground/60">keywords</span>
+        <span className="text-muted-foreground">&quot;invoice, billing&quot;</span>
       </div>
     </div>
   );
@@ -333,7 +333,7 @@ export function FeaturesGrid() {
                 className="group rounded-2xl border border-border bg-card p-6 shadow-sm transition-all duration-300 hover:border-border hover:bg-muted/50"
               >
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-blue-500/20 bg-blue-500/10">
-                  <Icon className="h-4 w-4 text-blue-400" />
+                  <Icon className="h-4 w-4 text-blue-500 dark:text-blue-400" />
                 </div>
                 <h3 className="mt-4 text-sm font-semibold text-foreground">
                   {feature.title}

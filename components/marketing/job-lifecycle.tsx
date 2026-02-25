@@ -3,7 +3,7 @@ const states = [
     key: "queued",
     label: "Queued",
     ts: "14:23:01.042",
-    color: "text-zinc-400 border-zinc-400/30 bg-zinc-400/10 dark:border-zinc-700 dark:bg-zinc-800/60",
+    color: "text-zinc-500 dark:text-zinc-400 border-zinc-400/30 bg-zinc-400/10",
     dot: "bg-zinc-500",
     fields: {
       id: "job_7f3k2m",
@@ -16,7 +16,7 @@ const states = [
     key: "processing",
     label: "Processing",
     ts: "14:23:01.198",
-    color: "text-blue-400 border-blue-500/30 bg-blue-500/10",
+    color: "text-blue-500 dark:text-blue-400 border-blue-500/30 bg-blue-500/10",
     dot: "bg-blue-400 animate-pulse",
     fields: {
       id: "job_7f3k2m",
@@ -29,7 +29,7 @@ const states = [
     key: "rendered",
     label: "Rendered",
     ts: "14:23:01.941",
-    color: "text-violet-400 border-violet-500/30 bg-violet-500/10",
+    color: "text-violet-500 dark:text-violet-400 border-violet-500/30 bg-violet-500/10",
     dot: "bg-violet-400",
     fields: {
       id: "job_7f3k2m",
@@ -42,7 +42,7 @@ const states = [
     key: "delivered",
     label: "Delivered",
     ts: "14:23:01.997",
-    color: "text-emerald-400 border-emerald-500/30 bg-emerald-500/10",
+    color: "text-emerald-500 dark:text-emerald-400 border-emerald-500/30 bg-emerald-500/10",
     dot: "bg-emerald-400",
     fields: {
       id: "job_7f3k2m",
@@ -96,14 +96,14 @@ export function JobLifecycle() {
                   </span>
                 </div>
 
-                {/* Fields (kept dark for code readability) */}
-                <div className="dark space-y-1.5 rounded-xl border border-white/[0.05] bg-zinc-950 p-3.5 font-mono text-[11px] leading-[1.7]">
+                {/* Fields */}
+                <div className="space-y-1.5 rounded-xl border border-border/50 bg-muted/50 p-3.5 font-mono text-[11px] leading-[1.7]">
                   {Object.entries(state.fields).map(([k, v]) => (
                     <div key={k} className="flex items-baseline justify-between gap-2">
-                      <span className="shrink-0 text-zinc-600">{k}</span>
+                      <span className="shrink-0 text-muted-foreground/60">{k}</span>
                       <span
                         className={`truncate text-right ${
-                          k === "status" ? state.color.split(" ")[0] : "text-zinc-400"
+                          k === "status" ? state.color.split(" ")[0] : "text-muted-foreground"
                         }`}
                       >
                         {v}

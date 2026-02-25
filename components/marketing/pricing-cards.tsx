@@ -118,7 +118,7 @@ export function PricingCards({ currency = "eur" }: PricingCardsProps) {
             className={cn(
               "relative flex flex-col rounded-2xl p-8",
               plan.highlighted
-                ? "dark bg-zinc-950 shadow-2xl shadow-black/20 ring-1 ring-white/10 lg:scale-[1.03]"
+                ? "bg-zinc-900 dark:bg-zinc-950 shadow-2xl shadow-black/20 ring-1 ring-zinc-800 dark:ring-white/10 lg:scale-[1.03]"
                 : "border border-border bg-card shadow-sm"
             )}
           >

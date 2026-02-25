@@ -110,6 +110,7 @@ export function FooterAsciiArt() {
         const y = pos.row * lineHeight;
 
         if (x >= -charWidth && x <= canvas.width) {
+          // Footer is always in a dark container
           ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
           ctx.fillText(SYMBOLS[state.current], x, y);
         }
