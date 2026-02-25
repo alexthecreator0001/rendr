@@ -3,7 +3,7 @@ const states = [
     key: "queued",
     label: "Queued",
     ts: "14:23:01.042",
-    color: "text-zinc-400 border-zinc-700 bg-zinc-800/60",
+    color: "text-zinc-400 border-zinc-400/30 bg-zinc-400/10 dark:border-zinc-700 dark:bg-zinc-800/60",
     dot: "bg-zinc-500",
     fields: {
       id: "job_7f3k2m",
@@ -55,19 +55,19 @@ const states = [
 
 export function JobLifecycle() {
   return (
-    <section className="border-t border-white/[0.06] bg-zinc-950 py-24 sm:py-32">
+    <section className="border-t border-border bg-background py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         {/* Header */}
         <div className="mb-16 max-w-xl">
-          <p className="mb-3 text-sm font-semibold uppercase tracking-[0.15em] text-blue-400">
+          <p className="mb-3 text-sm font-semibold uppercase tracking-[0.15em] text-primary">
             Job lifecycle
           </p>
-          <h2 className="font-heading text-4xl font-extrabold leading-[1.05] tracking-[-0.03em] text-white sm:text-5xl">
+          <h2 className="font-heading text-4xl font-extrabold leading-[1.05] tracking-[-0.03em] text-foreground sm:text-5xl">
             Full visibility,
             <br />
-            <span className="text-zinc-500">every step.</span>
+            <span className="text-muted-foreground">every step.</span>
           </h2>
-          <p className="mt-5 text-base text-zinc-400">
+          <p className="mt-5 text-base text-muted-foreground">
             Every render job moves through four observable states. Poll, stream,
             or let webhooks do the work.
           </p>
@@ -79,10 +79,10 @@ export function JobLifecycle() {
             <div key={state.key} className="relative">
               {/* Connector line */}
               {i < states.length - 1 && (
-                <div className="absolute right-0 top-[22px] z-10 hidden h-px w-4 -translate-y-1/2 bg-white/[0.08] lg:block" />
+                <div className="absolute right-0 top-[22px] z-10 hidden h-px w-4 -translate-y-1/2 bg-border lg:block" />
               )}
 
-              <div className="rounded-2xl border border-white/[0.07] bg-white/[0.02] p-5">
+              <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
                 {/* Status badge */}
                 <div className="mb-4 flex items-center justify-between">
                   <span
@@ -91,13 +91,13 @@ export function JobLifecycle() {
                     <span className={`h-1.5 w-1.5 rounded-full ${state.dot}`} />
                     {state.label}
                   </span>
-                  <span className="font-mono text-[10px] text-zinc-700">
+                  <span className="font-mono text-[10px] text-muted-foreground/50">
                     {state.ts}
                   </span>
                 </div>
 
-                {/* Fields */}
-                <div className="space-y-1.5 rounded-xl border border-white/[0.05] bg-black/30 p-3.5 font-mono text-[11px] leading-[1.7]">
+                {/* Fields (kept dark for code readability) */}
+                <div className="dark space-y-1.5 rounded-xl border border-white/[0.05] bg-zinc-950 p-3.5 font-mono text-[11px] leading-[1.7]">
                   {Object.entries(state.fields).map(([k, v]) => (
                     <div key={k} className="flex items-baseline justify-between gap-2">
                       <span className="shrink-0 text-zinc-600">{k}</span>
@@ -117,10 +117,10 @@ export function JobLifecycle() {
         </div>
 
         {/* Bottom note */}
-        <p className="mt-8 text-center text-[11px] text-zinc-700">
+        <p className="mt-8 text-center text-[11px] text-muted-foreground/50">
           Webhook fired on{" "}
-          <span className="font-mono text-zinc-500">job.completed</span> and{" "}
-          <span className="font-mono text-zinc-500">job.failed</span> · Logs retained
+          <span className="font-mono text-muted-foreground">job.completed</span> and{" "}
+          <span className="font-mono text-muted-foreground">job.failed</span> · Logs retained
           30 days on Growth plan
         </p>
       </div>

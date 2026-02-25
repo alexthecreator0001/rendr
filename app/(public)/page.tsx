@@ -4,7 +4,7 @@ import { headers } from "next/headers";
 import { auth } from "@/auth";
 import { detectCurrency } from "@/lib/currency";
 import { Hero } from "@/components/marketing/hero";
-import { TrustRow } from "@/components/marketing/trust-row";
+
 import { PainPoints } from "@/components/marketing/pain-points";
 import { FeaturesGrid } from "@/components/marketing/features-grid";
 import { HowItWorks } from "@/components/marketing/how-it-works";
@@ -30,7 +30,6 @@ export default async function LandingPage() {
   return (
     <>
       <Hero />
-      <TrustRow />
       <PainPoints />
       <FeaturesGrid />
       <HowItWorks />
@@ -39,16 +38,16 @@ export default async function LandingPage() {
       <ComparisonTable />
 
       {/* Pricing */}
-      <section className="dark border-t border-white/[0.06] bg-zinc-950 py-24 sm:py-32">
+      <section className="border-t border-border bg-background py-24 sm:py-32">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="mb-16 text-center">
-            <p className="mb-3 text-sm font-semibold uppercase tracking-[0.15em] text-blue-400">
+            <p className="mb-3 text-sm font-semibold uppercase tracking-[0.15em] text-primary">
               Pricing
             </p>
-            <h2 className="font-heading text-4xl font-extrabold tracking-[-0.03em] text-white sm:text-5xl">
+            <h2 className="font-heading text-4xl font-extrabold tracking-[-0.03em] text-foreground sm:text-5xl">
               Simple, predictable pricing.
             </h2>
-            <p className="mx-auto mt-4 max-w-md text-base text-zinc-400">
+            <p className="mx-auto mt-4 max-w-md text-base text-muted-foreground">
               Start free. Scale when you need to. No surprises.
             </p>
           </div>

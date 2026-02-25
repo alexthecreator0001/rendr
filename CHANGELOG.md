@@ -2,6 +2,15 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.44.0] — 2026-02-25
+### Changed
+- **Full light theme for entire landing page**: converted all marketing sections from hardcoded dark styles to semantic tokens (bg-background, text-foreground, border-border, etc.)
+- Sections converted: Pain Points, Features Grid, How It Works, Job Lifecycle, Testimonials, Comparison Table, FAQ, CTA, Pricing wrapper
+- Code blocks and mini demos inside feature cards stay dark for readability
+- Footer stays dark (common pattern) with explicit `dark` class
+- Highlighted pricing card (Growth) stays dark with explicit `dark` class
+- Removed "Trusted by engineering teams at" (TrustRow) section from landing page
+
 ## [0.43.2] — 2026-02-25
 ### Added
 - Theme toggle (sun/moon) in the landing page navbar header — visible on both desktop and mobile

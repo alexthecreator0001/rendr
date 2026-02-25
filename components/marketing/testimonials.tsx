@@ -30,17 +30,17 @@ const testimonials = [
 
 export function Testimonials() {
   return (
-    <section className="border-t border-white/[0.06] bg-zinc-950 py-24 sm:py-32">
+    <section className="border-t border-border bg-background py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         {/* Header */}
         <div className="mb-16 text-center">
-          <p className="mb-3 text-sm font-semibold uppercase tracking-[0.15em] text-blue-400">
+          <p className="mb-3 text-sm font-semibold uppercase tracking-[0.15em] text-primary">
             What developers say
           </p>
-          <h2 className="font-heading text-4xl font-extrabold tracking-[-0.03em] text-white sm:text-5xl">
+          <h2 className="font-heading text-4xl font-extrabold tracking-[-0.03em] text-foreground sm:text-5xl">
             Built for engineers
             <br />
-            <span className="text-zinc-500">who have shipped before.</span>
+            <span className="text-muted-foreground">who have shipped before.</span>
           </h2>
         </div>
 
@@ -49,7 +49,7 @@ export function Testimonials() {
           {testimonials.map((t) => (
             <div
               key={t.name}
-              className="flex flex-col rounded-2xl border border-white/[0.07] bg-white/[0.02] p-7 transition-all duration-300 hover:border-white/[0.12] hover:bg-white/[0.04]"
+              className="flex flex-col rounded-2xl border border-border bg-card p-7 shadow-sm transition-all duration-300 hover:border-border hover:bg-muted/50"
             >
               {/* Stars */}
               <div className="mb-5 flex gap-1">
@@ -60,7 +60,7 @@ export function Testimonials() {
                 ))}
               </div>
 
-              <p className="flex-1 text-sm leading-[1.8] text-zinc-400">
+              <p className="flex-1 text-sm leading-[1.8] text-muted-foreground">
                 &ldquo;{t.quote}&rdquo;
               </p>
 
@@ -71,8 +71,8 @@ export function Testimonials() {
                   {t.initials}
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-white">{t.name}</p>
-                  <p className="text-xs text-zinc-600">
+                  <p className="text-sm font-semibold text-foreground">{t.name}</p>
+                  <p className="text-xs text-muted-foreground/70">
                     {t.role} · {t.company}
                   </p>
                 </div>

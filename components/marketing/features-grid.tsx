@@ -3,11 +3,11 @@ import {
   Globe, Merge, Stamp, BarChart2,
 } from "lucide-react";
 
-/* ── Mini demos inside each card ── */
+/* ── Mini demos inside each card (kept dark for code readability) ── */
 
 function AsyncDemo() {
   return (
-    <div className="mt-4 rounded-xl border border-white/[0.06] bg-black/40 p-4 font-mono text-[11.5px] leading-[1.8]">
+    <div className="dark mt-4 rounded-xl border border-white/[0.06] bg-zinc-950 p-4 font-mono text-[11.5px] leading-[1.8]">
       <div className="flex items-center justify-between">
         <span className="text-zinc-600">mode</span>
         <span className="text-zinc-300">async</span>
@@ -33,7 +33,7 @@ function AsyncDemo() {
 
 function WebhookDemo() {
   return (
-    <div className="mt-4 rounded-xl border border-white/[0.06] bg-black/40 p-4 font-mono text-[11px] leading-[1.8]">
+    <div className="dark mt-4 rounded-xl border border-white/[0.06] bg-zinc-950 p-4 font-mono text-[11px] leading-[1.8]">
       <div className="mb-2 text-zinc-600">
         POST <span className="text-zinc-400">your-server.com/webhook</span>
       </div>
@@ -65,11 +65,11 @@ function TemplatesDemo() {
     Internal: "text-amber-400 border-amber-500/30 bg-amber-500/10",
   };
   return (
-    <div className="mt-4 space-y-2">
+    <div className="dark mt-4 space-y-2">
       {tpls.map((t) => (
         <div
           key={t.id}
-          className="flex items-center justify-between rounded-xl border border-white/[0.06] bg-black/30 px-4 py-2.5"
+          className="flex items-center justify-between rounded-xl border border-white/[0.06] bg-zinc-950 px-4 py-2.5"
         >
           <span className="font-mono text-[11.5px] text-zinc-400">{t.id}</span>
           <span className={`rounded-full border px-2 py-0.5 text-[10px] font-medium ${tagColors[t.tag]}`}>
@@ -83,7 +83,7 @@ function TemplatesDemo() {
 
 function HtmlUrlDemo() {
   return (
-    <div className="mt-4 rounded-xl border border-white/[0.06] bg-black/40 p-4 font-mono text-[11px] leading-[1.8]">
+    <div className="dark mt-4 rounded-xl border border-white/[0.06] bg-zinc-950 p-4 font-mono text-[11px] leading-[1.8]">
       <div className="flex items-center justify-between">
         <span className="text-zinc-600">input.type</span>
         <span className="text-blue-400">&quot;html&quot;</span>
@@ -112,7 +112,7 @@ function HtmlUrlDemo() {
 
 function SignedUrlDemo() {
   return (
-    <div className="mt-4 rounded-xl border border-white/[0.06] bg-black/40 p-4">
+    <div className="dark mt-4 rounded-xl border border-white/[0.06] bg-zinc-950 p-4">
       <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
         Signed download URL
       </p>
@@ -136,7 +136,7 @@ function SignedUrlDemo() {
 
 function MergeDemo() {
   return (
-    <div className="mt-4 rounded-xl border border-white/[0.06] bg-black/40 p-4 font-mono text-[11px] leading-[1.8]">
+    <div className="dark mt-4 rounded-xl border border-white/[0.06] bg-zinc-950 p-4 font-mono text-[11px] leading-[1.8]">
       <div className="mb-2 text-zinc-600">
         POST <span className="text-zinc-400">/api/v1/merge</span>
       </div>
@@ -158,7 +158,7 @@ function MergeDemo() {
 
 function WatermarkDemo() {
   return (
-    <div className="mt-4 rounded-xl border border-white/[0.06] bg-black/40 p-4 relative overflow-hidden">
+    <div className="dark mt-4 rounded-xl border border-white/[0.06] bg-zinc-950 p-4 relative overflow-hidden">
       {/* Simulated watermark text */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
         <span className="text-white/[0.06] text-3xl font-bold -rotate-45 select-none tracking-widest">
@@ -189,7 +189,7 @@ function WatermarkDemo() {
 
 function AnalyticsDemo() {
   return (
-    <div className="mt-4 rounded-xl border border-white/[0.06] bg-black/40 p-4 space-y-3">
+    <div className="dark mt-4 rounded-xl border border-white/[0.06] bg-zinc-950 p-4 space-y-3">
       <div>
         <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
           This month
@@ -216,7 +216,7 @@ function AnalyticsDemo() {
 
 function MetadataDemo() {
   return (
-    <div className="mt-4 rounded-xl border border-white/[0.06] bg-black/40 p-4 font-mono text-[11px] leading-[1.8]">
+    <div className="dark mt-4 rounded-xl border border-white/[0.06] bg-zinc-950 p-4 font-mono text-[11px] leading-[1.8]">
       <div className="flex items-center justify-between">
         <span className="text-zinc-600">title</span>
         <span className="text-zinc-300">&quot;Invoice #1042&quot;</span>
@@ -305,19 +305,19 @@ const features = [
 
 export function FeaturesGrid() {
   return (
-    <section className="bg-zinc-950 py-24 sm:py-32">
+    <section className="bg-background py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         {/* Header */}
         <div className="mb-16 max-w-xl">
-          <p className="mb-3 text-sm font-semibold uppercase tracking-[0.15em] text-blue-400">
+          <p className="mb-3 text-sm font-semibold uppercase tracking-[0.15em] text-primary">
             Features
           </p>
-          <h2 className="font-heading text-4xl font-extrabold leading-[1.05] tracking-[-0.03em] text-white sm:text-5xl">
+          <h2 className="font-heading text-4xl font-extrabold leading-[1.05] tracking-[-0.03em] text-foreground sm:text-5xl">
             Everything you need.
             <br />
-            <span className="text-zinc-500">Nothing you don&apos;t.</span>
+            <span className="text-muted-foreground">Nothing you don&apos;t.</span>
           </h2>
-          <p className="mt-5 text-base text-zinc-400">
+          <p className="mt-5 text-base text-muted-foreground">
             Built for developers who want to ship PDFs fast — not spend a sprint
             configuring a rendering pipeline.
           </p>
@@ -330,15 +330,15 @@ export function FeaturesGrid() {
             return (
               <div
                 key={feature.title}
-                className="group rounded-2xl border border-white/[0.07] bg-white/[0.02] p-6 transition-all duration-300 hover:border-white/[0.12] hover:bg-white/[0.04]"
+                className="group rounded-2xl border border-border bg-card p-6 shadow-sm transition-all duration-300 hover:border-border hover:bg-muted/50"
               >
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-blue-500/20 bg-blue-500/10">
                   <Icon className="h-4 w-4 text-blue-400" />
                 </div>
-                <h3 className="mt-4 text-sm font-semibold text-white">
+                <h3 className="mt-4 text-sm font-semibold text-foreground">
                   {feature.title}
                 </h3>
-                <p className="mt-1.5 text-sm leading-relaxed text-zinc-500">
+                <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
                   {feature.description}
                 </p>
                 {feature.demo}

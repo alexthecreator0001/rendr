@@ -33,7 +33,7 @@ const footerLinks = {
 
 export function Footer() {
   return (
-    <footer className="overflow-hidden bg-zinc-950">
+    <footer className="dark overflow-hidden bg-zinc-950" style={{ colorScheme: "dark" }}>
       <div className="mx-auto max-w-7xl px-6 pt-16 pb-12 sm:px-8 lg:px-10">
         <div className="grid grid-cols-2 gap-10 sm:grid-cols-3 lg:grid-cols-6">
           {/* Brand */}

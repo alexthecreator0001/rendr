@@ -14,15 +14,15 @@ const rows: { feature: string; rendr: CellValue; puppeteer: CellValue; wkhtmltop
 ];
 
 function Cell({ value, highlight }: { value: CellValue; highlight?: boolean }) {
-  const base = highlight ? "text-white font-semibold" : "text-zinc-500";
+  const base = highlight ? "text-foreground font-semibold" : "text-muted-foreground";
   if (value === "yes") return (
-    <span className={`inline-flex items-center justify-center ${highlight ? "" : ""}`}>
+    <span className="inline-flex items-center justify-center">
       <Check className="h-4 w-4 text-emerald-400" />
     </span>
   );
   if (value === "no") return (
     <span className="inline-flex items-center justify-center">
-      <X className="h-4 w-4 text-zinc-700" />
+      <X className="h-4 w-4 text-muted-foreground/40" />
     </span>
   );
   if (value === "partial") return (
@@ -35,50 +35,50 @@ function Cell({ value, highlight }: { value: CellValue; highlight?: boolean }) {
 
 export function ComparisonTable() {
   return (
-    <section className="border-t border-white/[0.06] bg-zinc-950 py-24 sm:py-32">
+    <section className="border-t border-border bg-background py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         {/* Header */}
         <div className="mb-14 max-w-xl">
-          <p className="mb-3 text-sm font-semibold uppercase tracking-[0.15em] text-blue-400">
+          <p className="mb-3 text-sm font-semibold uppercase tracking-[0.15em] text-primary">
             Why Rendr
           </p>
-          <h2 className="font-heading text-4xl font-extrabold leading-[1.05] tracking-[-0.03em] text-white sm:text-5xl">
+          <h2 className="font-heading text-4xl font-extrabold leading-[1.05] tracking-[-0.03em] text-foreground sm:text-5xl">
             Stop duct-taping
             <br />
-            <span className="text-zinc-500">a rendering pipeline.</span>
+            <span className="text-muted-foreground">a rendering pipeline.</span>
           </h2>
-          <p className="mt-5 text-base text-zinc-400">
+          <p className="mt-5 text-base text-muted-foreground">
             Every alternative either means running your own Chromium, patching missing primitives, or paying thousands per month.
           </p>
         </div>
 
         {/* Table — scrollable on mobile */}
-        <div className="overflow-x-auto rounded-2xl border border-white/[0.07]">
+        <div className="overflow-x-auto rounded-2xl border border-border shadow-sm">
           <table className="w-full min-w-[640px] border-collapse">
             <thead>
-              <tr className="border-b border-white/[0.07]">
-                <th className="py-4 pl-6 pr-4 text-left text-xs font-semibold uppercase tracking-wider text-zinc-600">
+              <tr className="border-b border-border">
+                <th className="py-4 pl-6 pr-4 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground/60">
                   Feature
                 </th>
-                <th className="bg-blue-600/[0.06] py-4 px-4 text-center text-xs font-semibold text-blue-400 ring-1 ring-inset ring-blue-500/20">
+                <th className="bg-primary/[0.06] py-4 px-4 text-center text-xs font-semibold text-primary ring-1 ring-inset ring-primary/20">
                   Rendr
                 </th>
-                <th className="py-4 px-4 text-center text-xs font-semibold uppercase tracking-wider text-zinc-600">
+                <th className="py-4 px-4 text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground/60">
                   DIY Puppeteer
                 </th>
-                <th className="py-4 px-4 text-center text-xs font-semibold uppercase tracking-wider text-zinc-600">
+                <th className="py-4 px-4 text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground/60">
                   wkhtmltopdf
                 </th>
-                <th className="py-4 px-4 pr-6 text-center text-xs font-semibold uppercase tracking-wider text-zinc-600">
+                <th className="py-4 px-4 pr-6 text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground/60">
                   Prince XML
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/[0.04]">
+            <tbody className="divide-y divide-border/50">
               {rows.map((row) => (
-                <tr key={row.feature} className="group transition-colors hover:bg-white/[0.02]">
-                  <td className="py-3.5 pl-6 pr-4 text-sm text-zinc-400">{row.feature}</td>
-                  <td className="bg-blue-600/[0.04] py-3.5 px-4 text-center ring-1 ring-inset ring-blue-500/10">
+                <tr key={row.feature} className="group transition-colors hover:bg-muted/30">
+                  <td className="py-3.5 pl-6 pr-4 text-sm text-muted-foreground">{row.feature}</td>
+                  <td className="bg-primary/[0.04] py-3.5 px-4 text-center ring-1 ring-inset ring-primary/10">
                     <Cell value={row.rendr} highlight />
                   </td>
                   <td className="py-3.5 px-4 text-center">

@@ -24,17 +24,17 @@ const steps = [
 
 export function HowItWorks() {
   return (
-    <section className="relative overflow-hidden border-t border-white/[0.06] bg-zinc-950 py-24 sm:py-32">
+    <section className="relative overflow-hidden border-t border-border bg-background py-24 sm:py-32">
       <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8">
         {/* Header */}
         <div className="mb-16 text-center">
-          <p className="mb-3 text-sm font-semibold uppercase tracking-[0.15em] text-blue-400">
+          <p className="mb-3 text-sm font-semibold uppercase tracking-[0.15em] text-primary">
             How it works
           </p>
-          <h2 className="font-heading text-4xl font-extrabold tracking-[-0.03em] text-white sm:text-5xl">
+          <h2 className="font-heading text-4xl font-extrabold tracking-[-0.03em] text-foreground sm:text-5xl">
             Three steps. That&apos;s it.
           </h2>
-          <p className="mx-auto mt-4 max-w-md text-base text-zinc-400">
+          <p className="mx-auto mt-4 max-w-md text-base text-muted-foreground">
             From zero to production PDF in less time than it takes to set up
             Puppeteer.
           </p>
@@ -53,13 +53,13 @@ export function HowItWorks() {
                     {step.number}
                   </span>
                   {i < steps.length - 1 && (
-                    <div className="mt-1 h-full w-px bg-gradient-to-b from-white/[0.08] to-transparent" />
+                    <div className="mt-1 h-full w-px bg-gradient-to-b from-border to-transparent" />
                   )}
                 </div>
                 {/* Text */}
                 <div className="pt-1.5">
-                  <h3 className="text-base font-semibold text-white">{step.title}</h3>
-                  <p className="mt-1.5 text-[13.5px] leading-relaxed text-zinc-500">
+                  <h3 className="text-base font-semibold text-foreground">{step.title}</h3>
+                  <p className="mt-1.5 text-[13.5px] leading-relaxed text-muted-foreground">
                     {step.description}
                   </p>
                 </div>
@@ -67,8 +67,8 @@ export function HowItWorks() {
             ))}
           </div>
 
-          {/* Right — Code example */}
-          <div className="rounded-2xl border border-white/[0.06] bg-zinc-900/60 overflow-hidden">
+          {/* Right — Code example (kept dark) */}
+          <div className="dark rounded-2xl border border-white/[0.06] bg-zinc-950 overflow-hidden">
             {/* Tab bar */}
             <div className="flex items-center gap-1 border-b border-white/[0.06] px-4 py-2.5">
               <span className="rounded-md bg-white/[0.08] px-2.5 py-1 text-[11px] font-medium text-white">

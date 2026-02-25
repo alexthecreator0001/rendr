@@ -29,19 +29,19 @@ const pains = [
 
 export function PainPoints() {
   return (
-    <section className="bg-zinc-950 py-24 sm:py-32">
+    <section className="bg-background py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         {/* Header */}
         <div className="mb-16 max-w-xl">
-          <p className="mb-3 text-sm font-semibold uppercase tracking-[0.15em] text-blue-400">
+          <p className="mb-3 text-sm font-semibold uppercase tracking-[0.15em] text-primary">
             The problem
           </p>
-          <h2 className="font-heading text-4xl font-extrabold leading-[1.05] tracking-[-0.03em] text-white sm:text-5xl">
+          <h2 className="font-heading text-4xl font-extrabold leading-[1.05] tracking-[-0.03em] text-foreground sm:text-5xl">
             The old way
             <br />
-            <span className="text-zinc-500">is a mess.</span>
+            <span className="text-muted-foreground">is a mess.</span>
           </h2>
-          <p className="mt-5 text-base text-zinc-400">
+          <p className="mt-5 text-base text-muted-foreground">
             Rolling your own PDF stack means fighting infrastructure instead of
             shipping product.
           </p>
@@ -54,20 +54,20 @@ export function PainPoints() {
             return (
               <div
                 key={pain.title}
-                className="group rounded-2xl border border-white/[0.07] bg-white/[0.02] p-6 transition-all duration-300 hover:border-white/[0.12] hover:bg-white/[0.04]"
+                className="group rounded-2xl border border-border bg-card p-6 transition-all duration-300 hover:border-border hover:bg-muted/50 shadow-sm"
               >
                 <div className="mb-4 flex items-start justify-between gap-2">
                   <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-red-500/20 bg-red-500/10">
                     <Icon className="h-4 w-4 text-red-400" />
                   </div>
-                  <span className="rounded-full border border-white/[0.06] bg-white/[0.03] px-2 py-0.5 text-[10px] font-medium text-zinc-600">
+                  <span className="rounded-full border border-border bg-muted/50 px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
                     {pain.label}
                   </span>
                 </div>
-                <h3 className="mb-2.5 text-sm font-semibold text-white">
+                <h3 className="mb-2.5 text-sm font-semibold text-foreground">
                   {pain.title}
                 </h3>
-                <p className="text-sm leading-relaxed text-zinc-500">
+                <p className="text-sm leading-relaxed text-muted-foreground">
                   {pain.body}
                 </p>
               </div>

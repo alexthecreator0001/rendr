@@ -43,14 +43,14 @@ const faqs = [
 
 export function FaqSection() {
   return (
-    <section className="border-t border-white/[0.06] bg-zinc-950 py-24 sm:py-32">
+    <section className="border-t border-border bg-background py-24 sm:py-32">
       <div className="mx-auto max-w-3xl px-6 lg:px-8">
         {/* Header */}
         <div className="mb-14 text-center">
-          <p className="mb-3 text-sm font-semibold uppercase tracking-[0.15em] text-blue-400">
+          <p className="mb-3 text-sm font-semibold uppercase tracking-[0.15em] text-primary">
             FAQ
           </p>
-          <h2 className="font-heading text-4xl font-extrabold tracking-[-0.03em] text-white sm:text-5xl">
+          <h2 className="font-heading text-4xl font-extrabold tracking-[-0.03em] text-foreground sm:text-5xl">
             Common questions.
           </h2>
         </div>
@@ -60,12 +60,12 @@ export function FaqSection() {
             <AccordionItem
               key={i}
               value={`faq-${i}`}
-              className="rounded-2xl border border-white/[0.07] bg-white/[0.02] px-6 data-[state=open]:border-white/[0.12] data-[state=open]:bg-white/[0.04]"
+              className="rounded-2xl border border-border bg-card px-6 shadow-sm data-[state=open]:border-primary/30 data-[state=open]:bg-muted/50"
             >
-              <AccordionTrigger className="py-5 text-sm font-semibold text-white hover:no-underline [&[data-state=open]]:text-blue-400">
+              <AccordionTrigger className="py-5 text-sm font-semibold text-foreground hover:no-underline [&[data-state=open]]:text-primary">
                 {faq.q}
               </AccordionTrigger>
-              <AccordionContent className="pb-5 text-sm leading-relaxed text-zinc-400">
+              <AccordionContent className="pb-5 text-sm leading-relaxed text-muted-foreground">
                 {faq.a}
               </AccordionContent>
             </AccordionItem>
