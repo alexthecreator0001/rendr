@@ -2,6 +2,10 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.47.1] — 2026-02-25
+### Fixed
+- Admin panel used plan name `"pro"` instead of `"business"` — plans set via admin didn't match the system's plan names, causing wrong render limits and feature gates
+
 ## [0.47.0] — 2026-02-25
 ### Fixed
 - PDF preview in Studio now works — changed `X-Frame-Options` from `DENY` to `SAMEORIGIN` and added `'self'` to CSP `frame-src`

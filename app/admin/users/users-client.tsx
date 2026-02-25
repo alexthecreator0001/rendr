@@ -23,7 +23,7 @@ type User = {
   _count: { jobs: number; apiKeys: number };
 };
 
-const PLANS = ["starter", "growth", "pro"];
+const PLANS = ["starter", "growth", "business"];
 
 function UserRow({ user }: { user: User }) {
   const router = useRouter();

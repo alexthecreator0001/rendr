@@ -40,7 +40,7 @@ export async function changePlanAction(
   await requireAdmin();
   const userId = formData.get("userId") as string;
   const plan = formData.get("plan") as string;
-  const validPlans = ["starter", "growth", "pro"];
+  const validPlans = ["starter", "growth", "business"];
   if (!userId || !validPlans.includes(plan)) return { error: "Invalid plan." };
 
   await prisma.user.update({ where: { id: userId }, data: { plan } });
