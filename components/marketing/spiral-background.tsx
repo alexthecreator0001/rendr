@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { useTheme } from "next-themes";
 
 const SPIRAL_ART = [
   "$&&                                                                             *&$$$$$$$$$$$$$$$$$$$$$$$$$^                  z$$$$$$$$$$$$$$$$$                 _$$$$$$$$$$$$$$$$$k  ",
@@ -110,7 +109,6 @@ const FILL_CHARS = ["$", "#", "@", "%", "&", "*", "+", "=", "~", "^", "0", "8", 
 
 export function SpiralBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const { resolvedTheme } = useTheme();
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -179,9 +177,6 @@ export function SpiralBackground() {
       const offsetX = (canvas.width - artW) / 2;
       const offsetY = (canvas.height - artH) / 2;
 
-      // Determine color based on theme
-      const isDark = resolvedTheme === "dark";
-
       // Slow time for smooth wave
       const t = time * 0.0008;
 
@@ -198,9 +193,7 @@ export function SpiralBackground() {
 
         // Brightness pulse based on a second wave
         const pulse = 0.09 + Math.sin(t * 1.3 + distances[i] * 5) * 0.035;
-        ctx.fillStyle = isDark
-          ? `rgba(255, 255, 255, ${pulse})`
-          : `rgba(0, 0, 0, ${pulse * 0.7})`;
+        ctx.fillStyle = `rgba(255, 255, 255, ${pulse})`;
         ctx.fillText(FILL_CHARS[idx], x, y);
       }
 
@@ -213,7 +206,7 @@ export function SpiralBackground() {
       cancelAnimationFrame(animId);
       window.removeEventListener("resize", resize);
     };
-  }, [resolvedTheme]);
+  }, []);
 
   return (
     <canvas

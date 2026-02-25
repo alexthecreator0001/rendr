@@ -2,6 +2,12 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.46.0] — 2026-02-25
+### Changed
+- Removed light theme entirely — site is dark-only again (`forcedTheme="dark"`)
+- Removed theme toggle (sun/moon) from navbar on all pages
+- Removed `useTheme` and theme-detection logic from spiral background
+
 ## [0.45.0] — 2026-02-25
 ### Changed
 - **Complete light theme overhaul**: EVERY element on the landing page now responds to theme toggle — no forced dark sections anywhere

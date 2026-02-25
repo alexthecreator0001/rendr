@@ -3,8 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
-import { ChevronDown, Menu, X, ArrowRight, Sun, Moon } from "lucide-react";
-import { useTheme } from "next-themes";
+import { ChevronDown, Menu, X, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { SOLUTIONS } from "@/lib/solutions-data";
@@ -88,7 +87,6 @@ function SolutionsMenu({ active }: { active?: boolean }) {
 
 export function Navbar() {
   const pathname = usePathname();
-  const { theme, setTheme } = useTheme();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [mobileSolutionsOpen, setMobileSolutionsOpen] = useState(false);
@@ -181,16 +179,6 @@ export function Navbar() {
 
           {/* Right side */}
           <div className="flex items-center gap-1.5">
-            {/* Theme toggle */}
-            <button
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              aria-label="Toggle theme"
-              className="flex h-8 w-8 items-center justify-center rounded-lg transition-colors text-muted-foreground hover:text-foreground hover:bg-muted/50"
-            >
-              <Sun className="h-4 w-4 rotate-0 scale-100 transition-transform dark:-rotate-90 dark:scale-0" />
-              <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-transform dark:rotate-0 dark:scale-100" />
-            </button>
-
             <div className="hidden items-center gap-1 md:flex">
               <Button
                 variant="ghost"
