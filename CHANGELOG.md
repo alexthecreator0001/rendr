@@ -2,6 +2,10 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.50.0] — 2026-02-26
+### Added
+- 6 more starter templates: Resume/CV, Pay Stub, Boarding Pass, Quote/Estimate, Warranty Card, Donation Receipt (20 total)
+
 ## [0.49.0] — 2026-02-26
 ### Added
 - 6 new starter templates: Shipping Label, Event Ticket, Non-Disclosure Agreement, Packing Slip, Meeting Minutes, Gift Card (14 total)

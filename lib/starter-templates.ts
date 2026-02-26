@@ -823,6 +823,398 @@ body{font-family:'Inter',system-ui,sans-serif;background:#f9fafb;padding:40px;di
 </div>
 </body></html>`,
   },
+
+  // ─── 15. Resume / CV ───────────────────────────────────────────────────────
+  {
+    name: "Resume",
+    html: `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',system-ui,sans-serif;background:#fff;color:#374151;font-size:12.5px;line-height:1.6}
+.page{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+.sidebar{background:#0f172a;color:#fff;padding:44px 28px}
+.name{font-size:22px;font-weight:800;letter-spacing:-0.5px;line-height:1.2;margin-bottom:4px}
+.title{font-size:12px;font-weight:500;color:#94a3b8;margin-bottom:28px}
+.side-section{margin-bottom:24px}
+.side-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2.5px;color:#475569;margin-bottom:10px}
+.side-item{font-size:12px;color:#cbd5e1;line-height:1.7;margin-bottom:2px}
+.side-item strong{color:#fff}
+.skill-bar{height:4px;background:#1e293b;border-radius:2px;margin-top:4px;margin-bottom:10px;overflow:hidden}
+.skill-fill{height:100%;background:linear-gradient(90deg,#3b82f6,#60a5fa);border-radius:2px}
+.main{padding:44px 40px}
+.section{margin-bottom:28px}
+.sec-head{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2.5px;color:#111827;padding-bottom:8px;border-bottom:2px solid #111827;margin-bottom:14px}
+.entry{margin-bottom:18px}
+.entry-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px}
+.entry-role{font-size:14px;font-weight:700;color:#111827}
+.entry-date{font-size:11px;color:#9ca3af;font-weight:500}
+.entry-co{font-size:12px;color:#6b7280;font-weight:500;margin-bottom:4px}
+.entry-desc{color:#374151;font-size:12.5px;line-height:1.7}
+</style></head>
+<body>
+<div class="page">
+  <div class="sidebar">
+    <div class="name">{{full_name}}</div>
+    <div class="title">{{job_title}}</div>
+    <div class="side-section">
+      <div class="side-label">Contact</div>
+      <div class="side-item">{{email}}</div>
+      <div class="side-item">{{phone}}</div>
+      <div class="side-item">{{location}}</div>
+      <div class="side-item">{{website}}</div>
+    </div>
+    <div class="side-section">
+      <div class="side-label">Skills</div>
+      <div class="side-item"><strong>{{skill1}}</strong></div><div class="skill-bar"><div class="skill-fill" style="width:95%"></div></div>
+      <div class="side-item"><strong>{{skill2}}</strong></div><div class="skill-bar"><div class="skill-fill" style="width:88%"></div></div>
+      <div class="side-item"><strong>{{skill3}}</strong></div><div class="skill-bar"><div class="skill-fill" style="width:82%"></div></div>
+      <div class="side-item"><strong>{{skill4}}</strong></div><div class="skill-bar"><div class="skill-fill" style="width:75%"></div></div>
+    </div>
+    <div class="side-section">
+      <div class="side-label">Languages</div>
+      <div class="side-item">{{language1}}</div>
+      <div class="side-item">{{language2}}</div>
+    </div>
+  </div>
+  <div class="main">
+    <div class="section">
+      <div class="sec-head">Profile</div>
+      <div class="entry-desc">{{profile_summary}}</div>
+    </div>
+    <div class="section">
+      <div class="sec-head">Experience</div>
+      <div class="entry">
+        <div class="entry-header"><span class="entry-role">{{exp1_role}}</span><span class="entry-date">{{exp1_dates}}</span></div>
+        <div class="entry-co">{{exp1_company}}</div>
+        <div class="entry-desc">{{exp1_desc}}</div>
+      </div>
+      <div class="entry">
+        <div class="entry-header"><span class="entry-role">{{exp2_role}}</span><span class="entry-date">{{exp2_dates}}</span></div>
+        <div class="entry-co">{{exp2_company}}</div>
+        <div class="entry-desc">{{exp2_desc}}</div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="sec-head">Education</div>
+      <div class="entry">
+        <div class="entry-header"><span class="entry-role">{{edu_degree}}</span><span class="entry-date">{{edu_dates}}</span></div>
+        <div class="entry-co">{{edu_school}}</div>
+      </div>
+    </div>
+  </div>
+</div>
+</body></html>`,
+  },
+
+  // ─── 16. Pay Stub ──────────────────────────────────────────────────────────
+  {
+    name: "Pay Stub",
+    html: `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',system-ui,sans-serif;background:#fff;color:#111827;font-size:13px;line-height:1.5}
+.page{padding:44px 52px}
+.header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px;padding-bottom:20px;border-bottom:2px solid #111827}
+.co{font-size:18px;font-weight:800;letter-spacing:-0.3px}
+.co-addr{font-size:11px;color:#6b7280;margin-top:3px}
+.stub-label{text-align:right}
+.stub-label .word{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:3px;color:#6b7280}
+.stub-label .period{font-size:14px;font-weight:700;margin-top:4px}
+.emp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-bottom:28px;padding:16px 20px;background:#f9fafb;border-radius:8px}
+.emp-item label{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:#9ca3af;display:block;margin-bottom:3px}
+.emp-item p{font-weight:600;color:#111827;font-size:13px}
+.columns{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px}
+.col-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#111827;padding-bottom:8px;border-bottom:1.5px solid #111827;margin-bottom:10px}
+.line{display:flex;justify-content:space-between;padding:6px 0;font-size:12.5px;color:#374151}
+.line .v{font-weight:600;color:#111827}
+.net{display:flex;justify-content:space-between;align-items:center;padding:20px 24px;background:#111827;border-radius:8px;margin-top:8px}
+.net .label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:2px;color:#9ca3af}
+.net .val{font-size:32px;font-weight:900;color:#fff;letter-spacing:-1px}
+.foot{margin-top:24px;text-align:center;font-size:11px;color:#9ca3af}
+</style></head>
+<body>
+<div class="page">
+  <div class="header">
+    <div><div class="co">{{company_name}}</div><div class="co-addr">{{company_address}}</div></div>
+    <div class="stub-label"><div class="word">Pay Stub</div><div class="period">{{pay_period}}</div></div>
+  </div>
+  <div class="emp-grid">
+    <div class="emp-item"><label>Employee</label><p>{{employee_name}}</p></div>
+    <div class="emp-item"><label>Employee ID</label><p>{{employee_id}}</p></div>
+    <div class="emp-item"><label>Department</label><p>{{department}}</p></div>
+    <div class="emp-item"><label>Pay Date</label><p>{{pay_date}}</p></div>
+  </div>
+  <div class="columns">
+    <div>
+      <div class="col-title">Earnings</div>
+      <div class="line"><span>Regular Hours ({{regular_hours}} hrs)</span><span class="v">{{regular_pay}}</span></div>
+      <div class="line"><span>Overtime ({{overtime_hours}} hrs)</span><span class="v">{{overtime_pay}}</span></div>
+      <div class="line"><span>Bonus</span><span class="v">{{bonus}}</span></div>
+      <div class="line" style="border-top:1px solid #e5e7eb;padding-top:10px;margin-top:4px;font-weight:700"><span>Gross Pay</span><span class="v">{{gross_pay}}</span></div>
+    </div>
+    <div>
+      <div class="col-title">Deductions</div>
+      <div class="line"><span>Federal Tax</span><span class="v">{{federal_tax}}</span></div>
+      <div class="line"><span>State Tax</span><span class="v">{{state_tax}}</span></div>
+      <div class="line"><span>Social Security</span><span class="v">{{social_security}}</span></div>
+      <div class="line"><span>Health Insurance</span><span class="v">{{health_insurance}}</span></div>
+      <div class="line" style="border-top:1px solid #e5e7eb;padding-top:10px;margin-top:4px;font-weight:700"><span>Total Deductions</span><span class="v">{{total_deductions}}</span></div>
+    </div>
+  </div>
+  <div class="net">
+    <div class="label">Net Pay</div>
+    <div class="val">{{net_pay}}</div>
+  </div>
+  <div class="foot">This is a system-generated document. Retain for your records.</div>
+</div>
+</body></html>`,
+  },
+
+  // ─── 17. Boarding Pass ─────────────────────────────────────────────────────
+  {
+    name: "Boarding Pass",
+    html: `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',system-ui,sans-serif;background:#f3f4f6;padding:40px;display:flex;justify-content:center}
+.pass{width:520px;display:flex;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.1)}
+.main-section{flex:1;padding:28px 24px}
+.airline{font-size:16px;font-weight:800;color:#111827;letter-spacing:-0.3px;margin-bottom:20px}
+.route{display:flex;align-items:center;gap:16px;margin-bottom:24px}
+.city{text-align:center}
+.city-code{font-size:32px;font-weight:900;letter-spacing:-1px;color:#111827;line-height:1}
+.city-name{font-size:10px;color:#9ca3af;font-weight:500;margin-top:2px}
+.route-line{flex:1;display:flex;align-items:center;gap:8px}
+.route-line .line{flex:1;height:1px;background:#d1d5db}
+.route-line .plane{font-size:16px;color:#2563eb}
+.details{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.detail label{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:#9ca3af;display:block;margin-bottom:2px}
+.detail p{font-size:14px;font-weight:700;color:#111827}
+.detail p.highlight{color:#2563eb}
+.tear{width:1px;background:repeating-linear-gradient(to bottom,#d1d5db 0,#d1d5db 6px,transparent 6px,transparent 12px);margin:12px 0}
+.stub{width:120px;padding:20px 16px;display:flex;flex-direction:column;justify-content:space-between;background:#f8fafc}
+.stub-label{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af}
+.stub-value{font-size:13px;font-weight:700;color:#111827;margin-top:1px}
+.stub-route{text-align:center;margin:12px 0}
+.stub-route .codes{font-size:18px;font-weight:900;color:#111827;letter-spacing:-0.5px}
+.stub-route .arrow{color:#9ca3af;font-size:11px}
+</style></head>
+<body>
+<div class="pass">
+  <div class="main-section">
+    <div class="airline">{{airline}}</div>
+    <div class="route">
+      <div class="city"><div class="city-code">{{origin_code}}</div><div class="city-name">{{origin_city}}</div></div>
+      <div class="route-line"><div class="line"></div><div class="plane">&#9992;</div><div class="line"></div></div>
+      <div class="city"><div class="city-code">{{dest_code}}</div><div class="city-name">{{dest_city}}</div></div>
+    </div>
+    <div class="details">
+      <div class="detail"><label>Passenger</label><p>{{passenger_name}}</p></div>
+      <div class="detail"><label>Flight</label><p class="highlight">{{flight_number}}</p></div>
+      <div class="detail"><label>Date</label><p>{{flight_date}}</p></div>
+      <div class="detail"><label>Boarding</label><p>{{boarding_time}}</p></div>
+      <div class="detail"><label>Gate</label><p class="highlight">{{gate}}</p></div>
+      <div class="detail"><label>Seat</label><p>{{seat}}</p></div>
+    </div>
+  </div>
+  <div class="tear"></div>
+  <div class="stub">
+    <div><div class="stub-label">Passenger</div><div class="stub-value">{{passenger_name}}</div></div>
+    <div class="stub-route"><div class="codes">{{origin_code}}</div><div class="arrow">&#9660;</div><div class="codes">{{dest_code}}</div></div>
+    <div><div class="stub-label">Seat</div><div class="stub-value">{{seat}}</div></div>
+    <div><div class="stub-label">Gate</div><div class="stub-value">{{gate}}</div></div>
+  </div>
+</div>
+</body></html>`,
+  },
+
+  // ─── 18. Quote / Estimate ──────────────────────────────────────────────────
+  {
+    name: "Quote",
+    html: `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',system-ui,sans-serif;background:#fff;color:#111827;font-size:13px;line-height:1.5}
+.page{padding:52px 56px}
+.header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:40px;padding-bottom:28px;border-bottom:1.5px solid #2563eb}
+.brand{font-size:20px;font-weight:800;letter-spacing:-0.5px}
+.brand-meta{font-size:11.5px;color:#6b7280;margin-top:4px;line-height:1.7}
+.quote-info{text-align:right}
+.quote-info .word{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:3px;color:#2563eb}
+.quote-info .num{font-size:24px;font-weight:800;letter-spacing:-0.5px;margin-top:4px}
+.quote-info .valid{font-size:11px;color:#6b7280;margin-top:4px}
+.quote-info .valid strong{color:#111827}
+.meta{display:grid;grid-template-columns:2fr 1fr 1fr;gap:28px;margin-bottom:32px}
+.meta-block label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:#9ca3af;display:block;margin-bottom:4px}
+.meta-block p{color:#111827;font-size:13px;font-weight:500;line-height:1.6}
+table{width:100%;border-collapse:collapse;margin-bottom:28px}
+thead tr{background:#eff6ff;border-bottom:1.5px solid #2563eb}
+thead th{padding:10px 12px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#2563eb}
+thead th:last-child{text-align:right}
+tbody tr{border-bottom:1px solid #f3f4f6}
+tbody td{padding:14px 12px;color:#374151;font-size:13px}
+tbody td:last-child{text-align:right;font-weight:600;color:#111827}
+.totals{display:flex;justify-content:flex-end;margin-bottom:40px}
+.totals-inner{width:260px}
+.t-line{display:flex;justify-content:space-between;padding:7px 0;font-size:13px;color:#6b7280}
+.t-line.total{border-top:2px solid #2563eb;margin-top:8px;padding-top:14px;font-size:18px;font-weight:800;color:#111827}
+.notes{background:#eff6ff;border-radius:8px;padding:16px 20px;font-size:12px;color:#374151;line-height:1.7}
+.notes strong{display:block;font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:#2563eb;margin-bottom:4px}
+.footer{margin-top:36px;display:flex;justify-content:space-between;padding-top:20px;border-top:1px solid #e5e7eb;font-size:11px;color:#9ca3af}
+</style></head>
+<body>
+<div class="page">
+  <div class="header">
+    <div><div class="brand">{{company_name}}</div><div class="brand-meta">{{company_address}}<br>{{company_email}}</div></div>
+    <div class="quote-info"><div class="word">Quote</div><div class="num">{{quote_number}}</div><div class="valid">Valid until <strong>{{valid_until}}</strong></div></div>
+  </div>
+  <div class="meta">
+    <div class="meta-block"><label>Prepared For</label><p>{{client_name}}<br>{{client_address}}</p></div>
+    <div class="meta-block"><label>Issue Date</label><p>{{issue_date}}</p></div>
+    <div class="meta-block"><label>Prepared By</label><p>{{prepared_by}}</p></div>
+  </div>
+  <table>
+    <thead><tr><th style="width:48%">Description</th><th style="text-align:center">Qty</th><th style="text-align:right">Unit Price</th><th>Amount</th></tr></thead>
+    <tbody>
+      <tr><td>{{item1_desc}}</td><td style="text-align:center">{{item1_qty}}</td><td style="text-align:right">{{item1_price}}</td><td>{{item1_total}}</td></tr>
+      <tr><td>{{item2_desc}}</td><td style="text-align:center">{{item2_qty}}</td><td style="text-align:right">{{item2_price}}</td><td>{{item2_total}}</td></tr>
+      <tr><td>{{item3_desc}}</td><td style="text-align:center">{{item3_qty}}</td><td style="text-align:right">{{item3_price}}</td><td>{{item3_total}}</td></tr>
+    </tbody>
+  </table>
+  <div class="totals">
+    <div class="totals-inner">
+      <div class="t-line"><span>Subtotal</span><span>{{subtotal}}</span></div>
+      <div class="t-line"><span>Tax ({{tax_rate}}%)</span><span>{{tax_amount}}</span></div>
+      <div class="t-line total"><span>Total</span><span>{{total}}</span></div>
+    </div>
+  </div>
+  <div class="notes"><strong>Terms &amp; Notes</strong>{{quote_notes}}</div>
+  <div class="footer"><div>{{company_name}} &middot; {{company_email}}</div><div>Quote {{quote_number}}</div></div>
+</div>
+</body></html>`,
+  },
+
+  // ─── 19. Warranty Card ─────────────────────────────────────────────────────
+  {
+    name: "Warranty Card",
+    html: `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',system-ui,sans-serif;background:#f3f4f6;padding:40px;display:flex;justify-content:center}
+.card{width:480px;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08)}
+.top{background:#111827;color:#fff;padding:28px;display:flex;justify-content:space-between;align-items:flex-start}
+.top-brand{font-size:18px;font-weight:800;letter-spacing:-0.3px}
+.top-type{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;background:#22c55e;color:#fff;padding:4px 12px;border-radius:4px;margin-top:4px;display:inline-block}
+.shield{width:48px;height:48px;background:linear-gradient(135deg,#22c55e,#16a34a);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px}
+.body{padding:28px}
+.product{background:#f9fafb;border-radius:10px;padding:18px;margin-bottom:20px}
+.product-name{font-size:16px;font-weight:800;color:#111827;margin-bottom:10px}
+.product-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.product-item label{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:#9ca3af}
+.product-item p{font-size:13px;font-weight:600;color:#111827;margin-top:1px}
+.dates{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.date-box{border:1px solid #e5e7eb;border-radius:10px;padding:14px 16px;text-align:center}
+.date-box label{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:#9ca3af;display:block;margin-bottom:4px}
+.date-box p{font-size:16px;font-weight:800;color:#111827}
+.date-box.active{border-color:#22c55e;background:#f0fdf4}
+.date-box.active p{color:#16a34a}
+.coverage{font-size:12px;color:#6b7280;line-height:1.7;margin-bottom:20px}
+.coverage strong{color:#111827;display:block;font-size:10px;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px}
+.footer{padding:16px 28px;border-top:1px solid #f3f4f6;text-align:center;font-size:11px;color:#9ca3af}
+</style></head>
+<body>
+<div class="card">
+  <div class="top">
+    <div><div class="top-brand">{{brand_name}}</div><div class="top-type">Warranty Certificate</div></div>
+    <div class="shield">&#10003;</div>
+  </div>
+  <div class="body">
+    <div class="product">
+      <div class="product-name">{{product_name}}</div>
+      <div class="product-grid">
+        <div class="product-item"><label>Serial Number</label><p>{{serial_number}}</p></div>
+        <div class="product-item"><label>Model</label><p>{{model_number}}</p></div>
+        <div class="product-item"><label>Customer</label><p>{{customer_name}}</p></div>
+        <div class="product-item"><label>Purchase Location</label><p>{{purchase_location}}</p></div>
+      </div>
+    </div>
+    <div class="dates">
+      <div class="date-box"><label>Purchase Date</label><p>{{purchase_date}}</p></div>
+      <div class="date-box active"><label>Warranty Expires</label><p>{{warranty_expiry}}</p></div>
+    </div>
+    <div class="coverage"><strong>Coverage</strong>{{coverage_details}}</div>
+  </div>
+  <div class="footer">Keep this document for warranty claims &middot; {{brand_name}} Support: {{support_email}}</div>
+</div>
+</body></html>`,
+  },
+
+  // ─── 20. Donation Receipt ──────────────────────────────────────────────────
+  {
+    name: "Donation Receipt",
+    html: `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',system-ui,sans-serif;background:#fff;color:#111827;font-size:13px;line-height:1.6}
+.page{padding:52px 56px;max-width:600px;margin:0 auto}
+.header{text-align:center;margin-bottom:36px;padding-bottom:28px;border-bottom:1.5px solid #111827}
+.org-name{font-size:22px;font-weight:800;letter-spacing:-0.5px;margin-bottom:4px}
+.org-addr{font-size:11.5px;color:#6b7280;line-height:1.7}
+.org-ein{font-size:11px;color:#9ca3af;margin-top:4px}
+.badge{display:inline-block;margin-top:12px;background:#f0fdf4;border:1px solid #bbf7d0;color:#15803d;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:2px;padding:5px 14px;border-radius:6px}
+.receipt-num{text-align:center;font-size:12px;color:#9ca3af;margin-bottom:28px}
+.receipt-num strong{color:#111827;font-size:14px}
+.amount-section{text-align:center;padding:28px;background:#f9fafb;border-radius:12px;margin-bottom:28px}
+.amount-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:2.5px;color:#9ca3af;margin-bottom:8px}
+.amount{font-size:48px;font-weight:900;letter-spacing:-2px;color:#111827;line-height:1}
+.amount-type{font-size:12px;color:#6b7280;margin-top:8px}
+.details{margin-bottom:28px}
+.detail-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f3f4f6;font-size:13px}
+.detail-row .k{color:#6b7280}
+.detail-row .v{font-weight:600;color:#111827}
+.tax-note{background:#eff6ff;border-radius:8px;padding:16px 20px;font-size:12px;color:#374151;line-height:1.7}
+.tax-note strong{display:block;font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:#2563eb;margin-bottom:4px}
+.footer{margin-top:32px;text-align:center;font-size:11px;color:#9ca3af;line-height:1.7}
+.footer strong{color:#111827;display:block;font-size:13px;margin-bottom:4px}
+</style></head>
+<body>
+<div class="page">
+  <div class="header">
+    <div class="org-name">{{organization_name}}</div>
+    <div class="org-addr">{{organization_address}}</div>
+    <div class="org-ein">EIN: {{ein_number}}</div>
+    <div class="badge">Official Donation Receipt</div>
+  </div>
+  <div class="receipt-num">Receipt #: <strong>{{receipt_number}}</strong></div>
+  <div class="amount-section">
+    <div class="amount-label">Donation Amount</div>
+    <div class="amount">{{donation_amount}}</div>
+    <div class="amount-type">{{donation_type}}</div>
+  </div>
+  <div class="details">
+    <div class="detail-row"><span class="k">Donor Name</span><span class="v">{{donor_name}}</span></div>
+    <div class="detail-row"><span class="k">Donor Address</span><span class="v">{{donor_address}}</span></div>
+    <div class="detail-row"><span class="k">Donation Date</span><span class="v">{{donation_date}}</span></div>
+    <div class="detail-row"><span class="k">Payment Method</span><span class="v">{{payment_method}}</span></div>
+    <div class="detail-row"><span class="k">Purpose</span><span class="v">{{donation_purpose}}</span></div>
+  </div>
+  <div class="tax-note"><strong>Tax Deduction Notice</strong>No goods or services were provided in exchange for this contribution. This receipt may be used for tax deduction purposes. Please consult your tax advisor.</div>
+  <div class="footer"><strong>Thank you for your generous contribution.</strong>{{organization_name}} is a registered 501(c)(3) nonprofit organization.</div>
+</div>
+</body></html>`,
+  },
 ];
 
 /**
