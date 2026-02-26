@@ -83,8 +83,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (user?.name) token.name = user.name
       if ((user as { role?: string })?.role) token.role = (user as { role?: string }).role
       if ("emailVerified" in (user ?? {})) token.emailVerified = (user as { emailVerified?: Date | null }).emailVerified
-      if ((user as { passwordChangedAt?: Date })?.passwordChangedAt) {
-        token.passwordChangedAt = (user as { passwordChangedAt: Date }).passwordChangedAt.getTime()
+      if ((user as { passwordChangedAt?: Date | string })?.passwordChangedAt) {
+        const pca = (user as { passwordChangedAt: Date | string }).passwordChangedAt
+        token.passwordChangedAt = new Date(pca).getTime()
       }
 
       // On subsequent requests (not initial login), verify password hasn't changed.

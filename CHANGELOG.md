@@ -2,6 +2,10 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.51.2] — 2026-02-26
+### Fixed
+- **Critical**: fixed login/registration completely broken — `passwordChangedAt` Date was serialized to string by NextAuth, causing `.getTime()` to throw and destroy all sessions
+
 ## [0.51.1] — 2026-02-26
 ### Fixed
 - Existing users now automatically receive new starter templates on their next visit to the Templates page (previously only seeded for brand-new users with zero templates)
