@@ -307,7 +307,7 @@ export async function changePasswordAction(
   if (!valid) return { error: "Current password is incorrect." };
 
   const hash = await hashPassword(next);
-  await prisma.user.update({ where: { id: session.user.id }, data: { passwordHash: hash } });
+  await prisma.user.update({ where: { id: session.user.id }, data: { passwordHash: hash, passwordChangedAt: new Date() } });
 
   return { success: true };
 }
@@ -381,7 +381,7 @@ export async function resetPasswordAction(
   await Promise.all([
     prisma.user.update({
       where: { email: record.email },
-      data: { passwordHash },
+      data: { passwordHash, passwordChangedAt: new Date() },
     }),
     prisma.passwordResetToken.delete({ where: { id: record.id } }),
   ]);

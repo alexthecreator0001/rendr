@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { getPlanAiLimit } from "@/lib/plans";
 import { AiStudioClient } from "./ai-studio-client";
 
+export const dynamic = "force-dynamic";
 export const metadata = { title: "AI Studio" };
 
 export default async function AiStudioPage() {

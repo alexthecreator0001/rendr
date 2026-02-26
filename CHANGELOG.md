@@ -2,6 +2,16 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.51.0] — 2026-02-26
+### Fixed
+- **Template visibility bug**: added `force-dynamic` to all `/app` pages and layout — prevents Next.js from caching user-specific data across users
+- **Session invalidation on password change/reset**: added `passwordChangedAt` column; JWT callback checks it every 5 minutes and invalidates stale sessions
+- **Banned user enforcement**: JWT validation now detects mid-session bans and invalidates the session
+- **TypeScript fixes**: resolved duplicate property names in template SAMPLE, fixed cookie-banner cast, fixed SSRF guard DNS type
+
+### Changed
+- All 17 server-rendered `/app` pages now export `dynamic = "force-dynamic"` for guaranteed per-request rendering
+
 ## [0.50.1] — 2026-02-26
 ### Fixed
 - **CSP hardened**: removed `unsafe-eval`, whitelisted `googletagmanager.com` explicitly

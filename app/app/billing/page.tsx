@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { CheckoutButton, PortalButton, CancelButton, BillingPlansSection, CancellationBanner } from "./billing-actions";
+
+export const dynamic = "force-dynamic";
 import { detectCurrency, PLAN_PRICES } from "@/lib/currency";
 import { getStripe } from "@/lib/stripe";
 

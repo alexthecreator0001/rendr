@@ -3,6 +3,8 @@ import { prisma } from "@/lib/db";
 import { redirect } from "next/navigation";
 import { JobStatus } from "@prisma/client";
 
+export const dynamic = "force-dynamic";
+
 function StatusPill({ status }: { status: string }) {
   const map: Record<string, string> = {
     queued: "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400",

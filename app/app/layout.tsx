@@ -6,6 +6,8 @@ import { AppTopbar } from "@/components/layout/app-topbar";
 import { SidebarProvider } from "@/components/providers/sidebar-provider";
 import { getPlanRenderLimit } from "@/lib/plans";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: {
     default: "Dashboard",

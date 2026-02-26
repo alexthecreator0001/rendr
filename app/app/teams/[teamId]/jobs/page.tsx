@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { redirect } from "next/navigation";
 import { JobStatus } from "@prisma/client";
 
+export const dynamic = "force-dynamic";
 export const metadata = { title: "Team Jobs" };
 
 function StatusPill({ status }: { status: string }) {

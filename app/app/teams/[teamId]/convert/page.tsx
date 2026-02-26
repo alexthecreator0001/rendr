@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { ConvertClient } from "@/app/app/convert/convert-client";
 
+export const dynamic = "force-dynamic";
 export const metadata = { title: "Team Studio" };
 
 export default async function TeamConvertPage({

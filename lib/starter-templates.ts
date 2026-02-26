@@ -1084,9 +1084,9 @@ tbody td:last-child{text-align:right;font-weight:600;color:#111827}
   <table>
     <thead><tr><th style="width:48%">Description</th><th style="text-align:center">Qty</th><th style="text-align:right">Unit Price</th><th>Amount</th></tr></thead>
     <tbody>
-      <tr><td>{{item1_desc}}</td><td style="text-align:center">{{item1_qty}}</td><td style="text-align:right">{{item1_price}}</td><td>{{item1_total}}</td></tr>
-      <tr><td>{{item2_desc}}</td><td style="text-align:center">{{item2_qty}}</td><td style="text-align:right">{{item2_price}}</td><td>{{item2_total}}</td></tr>
-      <tr><td>{{item3_desc}}</td><td style="text-align:center">{{item3_qty}}</td><td style="text-align:right">{{item3_price}}</td><td>{{item3_total}}</td></tr>
+      <tr><td>{{qt_item1_desc}}</td><td style="text-align:center">{{qt_item1_qty}}</td><td style="text-align:right">{{qt_item1_price}}</td><td>{{qt_item1_total}}</td></tr>
+      <tr><td>{{qt_item2_desc}}</td><td style="text-align:center">{{qt_item2_qty}}</td><td style="text-align:right">{{qt_item2_price}}</td><td>{{qt_item2_total}}</td></tr>
+      <tr><td>{{qt_item3_desc}}</td><td style="text-align:center">{{qt_item3_qty}}</td><td style="text-align:right">{{qt_item3_price}}</td><td>{{qt_item3_total}}</td></tr>
     </tbody>
   </table>
   <div class="totals">
@@ -1135,7 +1135,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:#f3f4f6;padding:40px;di
 <body>
 <div class="card">
   <div class="top">
-    <div><div class="top-brand">{{brand_name}}</div><div class="top-type">Warranty Certificate</div></div>
+    <div><div class="top-brand">{{warranty_brand}}</div><div class="top-type">Warranty Certificate</div></div>
     <div class="shield">&#10003;</div>
   </div>
   <div class="body">
@@ -1154,7 +1154,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:#f3f4f6;padding:40px;di
     </div>
     <div class="coverage"><strong>Coverage</strong>{{coverage_details}}</div>
   </div>
-  <div class="footer">Keep this document for warranty claims &middot; {{brand_name}} Support: {{support_email}}</div>
+  <div class="footer">Keep this document for warranty claims &middot; {{warranty_brand}} Support: {{support_email}}</div>
 </div>
 </body></html>`,
   },

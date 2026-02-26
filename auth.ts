@@ -54,7 +54,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         const user = await prisma.user.findUnique({
           where: { email: parsed.data.email },
-          select: { id: true, name: true, email: true, passwordHash: true, role: true, emailVerified: true, bannedAt: true },
+          select: { id: true, name: true, email: true, passwordHash: true, role: true, emailVerified: true, bannedAt: true, passwordChangedAt: true },
         })
 
         if (!user) return null
@@ -71,20 +71,45 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           email: user.email,
           role: user.role,
           emailVerified: user.emailVerified,
+          passwordChangedAt: user.passwordChangedAt,
         }
       },
     }),
   ],
   session: { strategy: "jwt" },
   callbacks: {
-    jwt({ token, user }) {
+    async jwt({ token, user }) {
       if (user?.id) token.id = user.id
       if (user?.name) token.name = user.name
       if ((user as { role?: string })?.role) token.role = (user as { role?: string }).role
       if ("emailVerified" in (user ?? {})) token.emailVerified = (user as { emailVerified?: Date | null }).emailVerified
+      if ((user as { passwordChangedAt?: Date })?.passwordChangedAt) {
+        token.passwordChangedAt = (user as { passwordChangedAt: Date }).passwordChangedAt.getTime()
+      }
+
+      // On subsequent requests (not initial login), verify password hasn't changed.
+      // Throttle to once every 5 minutes to avoid a DB hit on every request.
+      const CHECK_INTERVAL = 5 * 60 * 1000
+      const lastCheck = (token.lastSecurityCheck as number) ?? 0
+      if (!user && token.id && token.passwordChangedAt && Date.now() - lastCheck > CHECK_INTERVAL) {
+        token.lastSecurityCheck = Date.now()
+        const dbUser = await prisma.user.findUnique({
+          where: { id: token.id as string },
+          select: { passwordChangedAt: true, bannedAt: true },
+        })
+        // Invalidate session if password was changed after this token was issued, or user was banned
+        if (!dbUser || dbUser.bannedAt || dbUser.passwordChangedAt.getTime() > (token.passwordChangedAt as number)) {
+          return { ...token, invalidated: true }
+        }
+      }
+
       return token
     },
     session({ session, token }) {
+      // Block invalidated sessions
+      if (token.invalidated) {
+        return { ...session, user: { ...session.user, id: "" } }
+      }
       if (token.id) session.user.id = token.id as string
       if (token.name) session.user.name = token.name as string
       if (token.role) session.user.role = token.role as string

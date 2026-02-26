@@ -8,6 +8,8 @@ import {
   TriangleAlert, CircleCheck,
 } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 function StatusPill({ status }: { status: string }) {
   const styles: Record<string, string> = {
     queued:     "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400",

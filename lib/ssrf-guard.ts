@@ -74,7 +74,7 @@ export async function assertSafeUrl(rawUrl: string): Promise<{ resolvedIp: strin
   }
 
   // Resolve hostname → IPs and check each one
-  let addresses: dns.LookupAddress[]
+  let addresses: { address: string; family: number }[]
   try {
     addresses = await dns.lookup(hostname, { all: true })
   } catch {

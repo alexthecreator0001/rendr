@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { SettingsClient } from "./settings-client";
 
+export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Settings" };
 
 export default async function SettingsPage() {

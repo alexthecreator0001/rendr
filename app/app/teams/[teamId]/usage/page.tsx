@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
 import { redirect } from "next/navigation";
 
+export const dynamic = "force-dynamic";
 export const metadata = { title: "Team Usage" };
 
 export default async function TeamUsagePage({

@@ -19,7 +19,7 @@ function setCookie(name: string, value: string, maxAge: number) {
 
 /** Fire Google Ads conversion event (only works if consent accepted + gtag loaded) */
 export function trackConversion() {
-  const w = window as Record<string, unknown>;
+  const w = window as unknown as Record<string, unknown>;
   if (typeof w.gtag === "function") {
     (w.gtag as Function)("event", "conversion", {
       send_to: `${GTAG_ID}/zf6WCITqgv8bENm8m_xC`,

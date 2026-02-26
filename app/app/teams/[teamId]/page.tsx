@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { redirect, notFound } from "next/navigation";
 import { TeamClient } from "./team-client";
 
+export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Team" };
 
 export default async function TeamDetailPage({ params }: { params: Promise<{ teamId: string }> }) {

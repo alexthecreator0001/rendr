@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { SupportClient } from "./support-client";
 
+export const dynamic = "force-dynamic";
 export const metadata = { title: "Support" };
 
 export default async function SupportPage() {

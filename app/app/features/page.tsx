@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { FeaturesClient } from "./features-client";
 
+export const dynamic = "force-dynamic";
 export const metadata = { title: "Feature Requests" };
 
 export default async function FeaturesPage() {

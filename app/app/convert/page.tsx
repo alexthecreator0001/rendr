@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { ConvertClient } from "./convert-client";
 
+export const dynamic = "force-dynamic";
 export const metadata = { title: "Studio" };
 
 export default async function ConvertPage() {

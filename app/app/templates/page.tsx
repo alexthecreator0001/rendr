@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { seedStarterTemplates } from "@/lib/starter-templates";
 import { TemplatesClient } from "./templates-client";
 
+export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Templates" };
 
 export default async function TemplatesPage() {

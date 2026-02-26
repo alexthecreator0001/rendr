@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { redirect } from "next/navigation";
 import { TeamTemplatesClient } from "./templates-client";
 
+export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Team Templates" };
 
 export default async function TeamTemplatesPage({
