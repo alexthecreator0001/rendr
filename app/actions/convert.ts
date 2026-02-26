@@ -7,6 +7,7 @@ import { requireTeamMember } from "@/lib/team-auth";
 import { sendUsageWarningEmail, sendUsageLimitReachedEmail } from "@/lib/email";
 import { getPlanRenderLimit } from "@/lib/plans";
 import { z } from "zod";
+import { assertSafeUrl } from "@/lib/ssrf-guard";
 
 async function checkUsageThresholds(userId: string): Promise<void> {
   const user = await prisma.user.findUnique({
@@ -185,6 +186,11 @@ export async function convertUrlAction(
     const raw = (formData.get("input") as string) ?? "";
     const parsed = urlSchema.safeParse(raw.trim());
     if (!parsed.success) return { error: parsed.error.issues[0].message };
+    try {
+      await assertSafeUrl(parsed.data);
+    } catch {
+      return { error: "URL is not allowed. Private/internal addresses are blocked." };
+    }
     jobData = {
       userId: session.user.id,
       teamId,

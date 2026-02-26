@@ -4,6 +4,7 @@ import crypto from "node:crypto"
 import { requireApiKey } from "@/lib/require-api-key"
 import { prisma } from "@/lib/db"
 import { apiError, ApiError } from "@/lib/errors"
+import { assertSafeUrl } from "@/lib/ssrf-guard"
 
 const VALID_EVENTS = ["job.completed", "job.failed"] as const
 
@@ -36,6 +37,8 @@ export async function POST(req: NextRequest) {
     if (!parsed.success) {
       return apiError(400, parsed.error.errors[0]?.message ?? "Invalid", "invalid_request")
     }
+
+    await assertSafeUrl(parsed.data.url)
 
     const secret = `whsec_${crypto.randomBytes(32).toString("base64url")}`
     const webhook = await prisma.webhook.create({

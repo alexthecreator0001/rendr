@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
   // CSRF protection: verify the request originates from our own site
   const origin = req.headers.get("origin");
   const expectedOrigin = process.env.NEXTAUTH_URL ?? process.env.AUTH_URL;
-  if (origin && expectedOrigin && !expectedOrigin.startsWith(origin)) {
+  if (!origin || !expectedOrigin || origin !== new URL(expectedOrigin).origin) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 

@@ -335,16 +335,18 @@ export async function forgotPasswordAction(
     // Delete any existing tokens for this email
     await prisma.passwordResetToken.deleteMany({ where: { email } });
 
-    const token = crypto.randomBytes(32).toString("base64url");
+    const rawToken = crypto.randomBytes(32).toString("base64url");
+    const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex");
     await prisma.passwordResetToken.create({
       data: {
         email,
-        token,
+        token: tokenHash,
         expiresAt: new Date(Date.now() + 60 * 60 * 1000), // 1 hour
       },
     });
 
-    sendPasswordResetEmail(email, token).catch(() => {});
+    // Email the raw token; only the hash is stored
+    sendPasswordResetEmail(email, rawToken).catch(() => {});
   }
 
   return { success: true };
@@ -356,15 +358,17 @@ export async function resetPasswordAction(
   _prevState: { error?: string; success?: boolean } | null,
   formData: FormData
 ): Promise<{ error?: string; success?: boolean }> {
-  const token = (formData.get("token") as string)?.trim();
+  const rawToken = (formData.get("token") as string)?.trim();
   const password = (formData.get("password") as string) ?? "";
   const confirm = (formData.get("confirm") as string) ?? "";
 
-  if (!token) return { error: "Invalid reset link." };
+  if (!rawToken) return { error: "Invalid reset link." };
   if (password.length < 8) return { error: "Password must be at least 8 characters." };
   if (password !== confirm) return { error: "Passwords don't match." };
 
-  const record = await prisma.passwordResetToken.findUnique({ where: { token } });
+  // Hash the submitted token to match the stored hash
+  const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex");
+  const record = await prisma.passwordResetToken.findUnique({ where: { token: tokenHash } });
 
   if (!record || record.expiresAt < new Date()) {
     // Clean up expired token

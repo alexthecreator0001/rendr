@@ -2,6 +2,15 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.50.1] — 2026-02-26
+### Fixed
+- **CSP hardened**: removed `unsafe-eval`, whitelisted `googletagmanager.com` explicitly
+- **SSRF guard** added to `convertUrlAction` (UI URL submissions were missing the check API routes had)
+- **SSRF guard** added to `POST /api/v1/webhooks` (webhook creation via API was missing the check)
+- **CSRF protection** added to Stripe cancel/resume routes; fixed origin check logic across all Stripe routes (was using fragile `startsWith`, now uses strict equality)
+- **Password reset tokens** now SHA-256 hashed before storage (raw token emailed, only hash in DB)
+- **Webhook signing** uses a derived key instead of `NEXTAUTH_SECRET` directly (prevents JWT secret leakage via webhook signatures)
+
 ## [0.50.0] — 2026-02-26
 ### Added
 - 6 more starter templates: Resume/CV, Pay Stub, Boarding Pass, Quote/Estimate, Warranty Card, Donation Receipt (20 total)

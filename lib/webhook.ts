@@ -52,15 +52,25 @@ export async function deliverWebhooks(
 }
 
 /**
+ * Derive a dedicated webhook signing key from NEXTAUTH_SECRET.
+ * This prevents the JWT signing secret from being exposed via webhook signatures.
+ */
+function getJobWebhookSecret(): string {
+  const appSecret = process.env.NEXTAUTH_SECRET ?? process.env.AUTH_SECRET ?? ""
+  if (!appSecret) return ""
+  return crypto.createHmac("sha256", appSecret).update("rendr:webhook:signing").digest("hex")
+}
+
+/**
  * Deliver a per-job webhook to a user-supplied URL.
- * Signed with NEXTAUTH_SECRET (shared app secret) since there's no per-webhook secret.
+ * Signed with a key derived from NEXTAUTH_SECRET (not the secret itself).
  */
 export async function deliverJobWebhook(
   url: string,
   event: string,
   payload: Record<string, unknown>
 ): Promise<void> {
-  const secret = process.env.NEXTAUTH_SECRET ?? ""
+  const secret = getJobWebhookSecret()
   if (!secret) return
   await deliverSingle(url, secret, event, payload)
 }
