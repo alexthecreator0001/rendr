@@ -2,6 +2,10 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.51.3] — 2026-02-26
+### Fixed
+- **Critical**: login/registration still broken — removed `passwordChangedAt` from authorize() SELECT (crashes if migration not applied), moved to separate try-catch DB read in JWT callback so auth never crashes regardless of DB state
+
 ## [0.51.2] — 2026-02-26
 ### Fixed
 - **Critical**: fixed login/registration completely broken — `passwordChangedAt` Date was serialized to string by NextAuth, causing `.getTime()` to throw and destroy all sessions

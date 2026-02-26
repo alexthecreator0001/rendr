@@ -54,7 +54,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         const user = await prisma.user.findUnique({
           where: { email: parsed.data.email },
-          select: { id: true, name: true, email: true, passwordHash: true, role: true, emailVerified: true, bannedAt: true, passwordChangedAt: true },
+          select: { id: true, name: true, email: true, passwordHash: true, role: true, emailVerified: true, bannedAt: true },
         })
 
         if (!user) return null
@@ -71,7 +71,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           email: user.email,
           role: user.role,
           emailVerified: user.emailVerified,
-          passwordChangedAt: user.passwordChangedAt,
         }
       },
     }),
@@ -83,24 +82,43 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (user?.name) token.name = user.name
       if ((user as { role?: string })?.role) token.role = (user as { role?: string }).role
       if ("emailVerified" in (user ?? {})) token.emailVerified = (user as { emailVerified?: Date | null }).emailVerified
-      if ((user as { passwordChangedAt?: Date | string })?.passwordChangedAt) {
-        const pca = (user as { passwordChangedAt: Date | string }).passwordChangedAt
-        token.passwordChangedAt = new Date(pca).getTime()
+
+      // On initial login, read passwordChangedAt from DB for session invalidation tracking
+      if (user?.id && !token.passwordChangedAt) {
+        try {
+          const dbUser = await prisma.user.findUnique({
+            where: { id: user.id },
+            select: { passwordChangedAt: true },
+          })
+          if (dbUser?.passwordChangedAt) {
+            token.passwordChangedAt = new Date(dbUser.passwordChangedAt).getTime()
+          }
+        } catch {
+          // Column may not exist yet (migration not applied) — skip gracefully
+        }
       }
 
       // On subsequent requests (not initial login), verify password hasn't changed.
       // Throttle to once every 5 minutes to avoid a DB hit on every request.
-      const CHECK_INTERVAL = 5 * 60 * 1000
-      const lastCheck = (token.lastSecurityCheck as number) ?? 0
-      if (!user && token.id && token.passwordChangedAt && Date.now() - lastCheck > CHECK_INTERVAL) {
-        token.lastSecurityCheck = Date.now()
-        const dbUser = await prisma.user.findUnique({
-          where: { id: token.id as string },
-          select: { passwordChangedAt: true, bannedAt: true },
-        })
-        // Invalidate session if password was changed after this token was issued, or user was banned
-        if (!dbUser || dbUser.bannedAt || dbUser.passwordChangedAt.getTime() > (token.passwordChangedAt as number)) {
-          return { ...token, invalidated: true }
+      if (!user && token.id && token.passwordChangedAt) {
+        const CHECK_INTERVAL = 5 * 60 * 1000
+        const lastCheck = (token.lastSecurityCheck as number) ?? 0
+        if (Date.now() - lastCheck > CHECK_INTERVAL) {
+          token.lastSecurityCheck = Date.now()
+          try {
+            const dbUser = await prisma.user.findUnique({
+              where: { id: token.id as string },
+              select: { passwordChangedAt: true, bannedAt: true },
+            })
+            if (dbUser?.bannedAt) {
+              return { ...token, invalidated: true }
+            }
+            if (dbUser?.passwordChangedAt && new Date(dbUser.passwordChangedAt).getTime() > (token.passwordChangedAt as number)) {
+              return { ...token, invalidated: true }
+            }
+          } catch {
+            // DB query failed — don't invalidate, just skip check this cycle
+          }
         }
       }
 
