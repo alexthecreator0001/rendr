@@ -2,6 +2,10 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.51.1] — 2026-02-26
+### Fixed
+- Existing users now automatically receive new starter templates on their next visit to the Templates page (previously only seeded for brand-new users with zero templates)
+
 ## [0.51.0] — 2026-02-26
 ### Fixed
 - **Template visibility bug**: added `force-dynamic` to all `/app` pages and layout — prevents Next.js from caching user-specific data across users

@@ -1230,11 +1230,6 @@ export async function seedStarterTemplates(
   prisma: PrismaClient,
   { force = false } = {}
 ): Promise<void> {
-  if (!force) {
-    const existing = await prisma.template.count({ where: { userId } });
-    if (existing > 0) return;
-  }
-
   // Prefer admin's templates as the canonical seed source (includes coverImageUrl)
   const adminUser = await prisma.user.findFirst({
     where: { role: "admin" },
@@ -1250,6 +1245,18 @@ export async function seedStarterTemplates(
         })
       : STARTER_TEMPLATES;
 
+  if (!force) {
+    // Check which starter template names the user already has
+    const existingNames = new Set(
+      (await prisma.template.findMany({
+        where: { userId, name: { in: source.map((t) => t.name) } },
+        select: { name: true },
+      })).map((t) => t.name)
+    );
+    // If user already has every starter template, nothing to do
+    if (existingNames.size >= source.length) return;
+  }
+
   // Upsert by name so re-seeding refreshes HTML and cover images without duplicating
   for (const t of source) {
     const existing = await prisma.template.findFirst({
@@ -1257,10 +1264,13 @@ export async function seedStarterTemplates(
       select: { id: true },
     });
     if (existing) {
-      await prisma.template.update({
-        where: { id: existing.id },
-        data: { html: t.html, coverImageUrl: t.coverImageUrl ?? null },
-      });
+      if (force) {
+        await prisma.template.update({
+          where: { id: existing.id },
+          data: { html: t.html, coverImageUrl: t.coverImageUrl ?? null },
+        });
+      }
+      // Without force, don't overwrite user's existing templates
     } else {
       await prisma.template.create({
         data: { userId, name: t.name, html: t.html, coverImageUrl: t.coverImageUrl ?? null },

@@ -12,21 +12,14 @@ export default async function TemplatesPage() {
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
 
-  let templates = await prisma.template.findMany({
+  // Auto-seed any missing starter templates (adds new ones without touching existing)
+  await seedStarterTemplates(session.user.id, prisma);
+
+  const templates = await prisma.template.findMany({
     where: { userId: session.user.id },
     orderBy: { updatedAt: "desc" },
     select: { id: true, name: true, html: true, coverImageUrl: true, createdAt: true, updatedAt: true },
   });
-
-  // Auto-seed starter templates for users who have none (e.g. registered before seeding was added)
-  if (templates.length === 0) {
-    await seedStarterTemplates(session.user.id, prisma);
-    templates = await prisma.template.findMany({
-      where: { userId: session.user.id },
-      orderBy: { updatedAt: "desc" },
-      select: { id: true, name: true, html: true, coverImageUrl: true, createdAt: true, updatedAt: true },
-    });
-  }
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
