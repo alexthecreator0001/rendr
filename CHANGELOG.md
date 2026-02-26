@@ -2,6 +2,11 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.51.4] — 2026-02-26
+### Fixed
+- **Template data leak**: seed function was copying ALL admin templates (including personal/custom ones) to every user — removed admin template override, now always uses hardcoded STARTER_TEMPLATES (20 templates)
+- Existing users now get all 20 starter templates on next visit (previously only got admin's 8)
+
 ## [0.51.3] — 2026-02-26
 ### Fixed
 - **Critical**: login/registration still broken — removed `passwordChangedAt` from authorize() SELECT (crashes if migration not applied), moved to separate try-catch DB read in JWT callback so auth never crashes regardless of DB state

@@ -1230,20 +1230,7 @@ export async function seedStarterTemplates(
   prisma: PrismaClient,
   { force = false } = {}
 ): Promise<void> {
-  // Prefer admin's templates as the canonical seed source (includes coverImageUrl)
-  const adminUser = await prisma.user.findFirst({
-    where: { role: "admin" },
-    select: { id: true },
-  });
-
-  const source: StarterTemplate[] =
-    adminUser
-      ? await prisma.template.findMany({
-          where: { userId: adminUser.id },
-          select: { name: true, html: true, coverImageUrl: true },
-          orderBy: { createdAt: "asc" },
-        })
-      : STARTER_TEMPLATES;
+  const source = STARTER_TEMPLATES;
 
   if (!force) {
     // Check which starter template names the user already has
