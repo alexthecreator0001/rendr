@@ -2,6 +2,11 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.49.0] — 2026-02-26
+### Added
+- 6 new starter templates: Shipping Label, Event Ticket, Non-Disclosure Agreement, Packing Slip, Meeting Minutes, Gift Card (14 total)
+- Sample preview data for all new templates
+
 ## [0.48.2] — 2026-02-25
 ### Added
 - GDPR cookie consent banner — Accept/Decline with 1-year cookie persistence

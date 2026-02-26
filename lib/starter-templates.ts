@@ -494,6 +494,335 @@ body{font-family:'Inter',system-ui,sans-serif;background:#fff;color:#111827;font
 </div>
 </body></html>`,
   },
+
+  // ─── 9. Shipping Label ──────────────────────────────────────────────────────
+  {
+    name: "Shipping Label",
+    html: `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',system-ui,sans-serif;background:#fff;padding:24px;display:flex;justify-content:center}
+.label{width:400px;border:2px solid #111827;border-radius:4px;overflow:hidden}
+.bar{background:#111827;color:#fff;padding:10px 16px;display:flex;justify-content:space-between;align-items:center}
+.bar-carrier{font-size:14px;font-weight:800;letter-spacing:-0.3px}
+.bar-type{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;background:#fff;color:#111827;padding:3px 10px;border-radius:3px}
+.tracking{padding:16px;text-align:center;border-bottom:2px dashed #d1d5db}
+.tracking-label{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;margin-bottom:4px}
+.tracking-num{font-size:20px;font-weight:900;letter-spacing:1px;color:#111827}
+.addresses{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid #e5e7eb}
+.addr{padding:16px}
+.addr+.addr{border-left:1px solid #e5e7eb}
+.addr-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;margin-bottom:6px}
+.addr-name{font-size:13px;font-weight:700;color:#111827}
+.addr-detail{font-size:11.5px;color:#6b7280;line-height:1.6;margin-top:2px}
+.ship-info{padding:12px 16px;display:flex;justify-content:space-between;font-size:11px;color:#6b7280}
+.ship-info strong{color:#111827}
+</style></head>
+<body>
+<div class="label">
+  <div class="bar">
+    <div class="bar-carrier">{{carrier}}</div>
+    <div class="bar-type">{{service_type}}</div>
+  </div>
+  <div class="tracking">
+    <div class="tracking-label">Tracking Number</div>
+    <div class="tracking-num">{{tracking_number}}</div>
+  </div>
+  <div class="addresses">
+    <div class="addr">
+      <div class="addr-label">From</div>
+      <div class="addr-name">{{sender_name}}</div>
+      <div class="addr-detail">{{sender_address}}<br>{{sender_city}}</div>
+    </div>
+    <div class="addr">
+      <div class="addr-label">To</div>
+      <div class="addr-name">{{recipient_name}}</div>
+      <div class="addr-detail">{{recipient_address}}<br>{{recipient_city}}</div>
+    </div>
+  </div>
+  <div class="ship-info">
+    <span>Weight: <strong>{{weight}}</strong></span>
+    <span>Ship date: <strong>{{ship_date}}</strong></span>
+    <span>Order: <strong>{{order_number}}</strong></span>
+  </div>
+</div>
+</body></html>`,
+  },
+
+  // ─── 10. Event Ticket ───────────────────────────────────────────────────────
+  {
+    name: "Event Ticket",
+    html: `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',system-ui,sans-serif;background:#f3f4f6;padding:40px;display:flex;justify-content:center}
+.ticket{width:480px;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.1)}
+.hero{background:linear-gradient(135deg,#7c3aed,#2563eb);color:#fff;padding:32px 28px;position:relative;overflow:hidden}
+.hero::after{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;background:rgba(255,255,255,0.06);border-radius:50%}
+.event-type{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:3px;color:rgba(255,255,255,0.6);margin-bottom:10px}
+.event-name{font-size:28px;font-weight:900;letter-spacing:-1px;line-height:1.1;margin-bottom:16px}
+.event-meta{display:flex;gap:20px;font-size:12px;color:rgba(255,255,255,0.8)}
+.event-meta strong{color:#fff;display:block;font-size:14px;margin-top:2px}
+.divider{height:0;border:none;border-top:2px dashed #e5e7eb;margin:0 28px;position:relative}
+.divider::before,.divider::after{content:'';position:absolute;top:-12px;width:24px;height:24px;background:#f3f4f6;border-radius:50%}
+.divider::before{left:-40px}
+.divider::after{right:-40px}
+.details{padding:24px 28px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.detail-item label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#9ca3af;display:block;margin-bottom:3px}
+.detail-item p{font-size:14px;font-weight:700;color:#111827}
+.footer{padding:16px 28px;border-top:1px solid #f3f4f6;text-align:center;font-size:11px;color:#9ca3af}
+</style></head>
+<body>
+<div class="ticket">
+  <div class="hero">
+    <div class="event-type">{{event_type}}</div>
+    <div class="event-name">{{event_name}}</div>
+    <div class="event-meta">
+      <div>Date<strong>{{event_date}}</strong></div>
+      <div>Time<strong>{{event_time}}</strong></div>
+      <div>Venue<strong>{{venue}}</strong></div>
+    </div>
+  </div>
+  <hr class="divider">
+  <div class="details">
+    <div class="detail-item"><label>Attendee</label><p>{{attendee_name}}</p></div>
+    <div class="detail-item"><label>Ticket #</label><p>{{ticket_number}}</p></div>
+    <div class="detail-item"><label>Section / Seat</label><p>{{seat}}</p></div>
+    <div class="detail-item"><label>Price</label><p>{{ticket_price}}</p></div>
+  </div>
+  <div class="footer">Present this ticket at the entrance &middot; Non-transferable &middot; No refunds</div>
+</div>
+</body></html>`,
+  },
+
+  // ─── 11. NDA (Non-Disclosure Agreement) ────────────────────────────────────
+  {
+    name: "Non-Disclosure Agreement",
+    html: `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',system-ui,sans-serif;background:#fff;color:#374151;font-size:13px;line-height:1.8}
+.page{padding:56px 64px;max-width:700px;margin:0 auto}
+.header{text-align:center;margin-bottom:40px;padding-bottom:28px;border-bottom:2px solid #111827}
+.doc-type{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:4px;color:#6b7280;margin-bottom:8px}
+.doc-title{font-size:24px;font-weight:800;color:#111827;letter-spacing:-0.5px}
+.doc-date{font-size:12px;color:#9ca3af;margin-top:6px}
+.parties{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:32px;padding:20px;background:#f9fafb;border-radius:8px}
+.party label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:#9ca3af;display:block;margin-bottom:4px}
+.party p{color:#111827;font-weight:600;font-size:13px}
+.clause{margin-bottom:20px}
+.clause h3{font-size:13px;font-weight:700;color:#111827;margin-bottom:6px}
+.clause p{color:#374151}
+.sign-section{display:grid;grid-template-columns:1fr 1fr;gap:48px;margin-top:48px;padding-top:28px;border-top:1.5px solid #e5e7eb}
+.sign-block h4{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:#9ca3af;margin-bottom:20px}
+.sign-line{border-bottom:1px solid #9ca3af;margin-bottom:8px;padding-bottom:28px}
+.sign-name{font-weight:700;color:#111827;font-size:13px}
+.sign-role{font-size:11px;color:#6b7280;margin-top:2px}
+</style></head>
+<body>
+<div class="page">
+  <div class="header">
+    <div class="doc-type">Confidential</div>
+    <div class="doc-title">Non-Disclosure Agreement</div>
+    <div class="doc-date">Effective Date: {{effective_date}}</div>
+  </div>
+  <div class="parties">
+    <div class="party"><label>Disclosing Party</label><p>{{disclosing_party}}</p></div>
+    <div class="party"><label>Receiving Party</label><p>{{receiving_party}}</p></div>
+  </div>
+  <div class="clause"><h3>1. Definition of Confidential Information</h3><p>{{definition_clause}}</p></div>
+  <div class="clause"><h3>2. Obligations of Receiving Party</h3><p>{{obligations_clause}}</p></div>
+  <div class="clause"><h3>3. Term and Duration</h3><p>This Agreement shall remain in effect for a period of {{duration}} from the Effective Date.</p></div>
+  <div class="clause"><h3>4. Governing Law</h3><p>This Agreement shall be governed by the laws of {{governing_law}}.</p></div>
+  <div class="sign-section">
+    <div class="sign-block">
+      <h4>Disclosing Party</h4>
+      <div class="sign-line"></div>
+      <div class="sign-name">{{disclosing_party}}</div>
+      <div class="sign-role">Date: _______________</div>
+    </div>
+    <div class="sign-block">
+      <h4>Receiving Party</h4>
+      <div class="sign-line"></div>
+      <div class="sign-name">{{receiving_party}}</div>
+      <div class="sign-role">Date: _______________</div>
+    </div>
+  </div>
+</div>
+</body></html>`,
+  },
+
+  // ─── 12. Packing Slip ──────────────────────────────────────────────────────
+  {
+    name: "Packing Slip",
+    html: `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',system-ui,sans-serif;background:#fff;color:#111827;font-size:13px;line-height:1.5}
+.page{padding:44px 52px}
+.top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:36px;padding-bottom:24px;border-bottom:2px solid #111827}
+.brand{font-size:20px;font-weight:800;letter-spacing:-0.5px}
+.brand-sub{font-size:11px;color:#6b7280;margin-top:3px}
+.slip-label{text-align:right}
+.slip-label .word{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:3px;color:#6b7280}
+.slip-label .num{font-size:22px;font-weight:800;letter-spacing:-0.5px;margin-top:2px}
+.addresses{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-bottom:32px}
+.addr label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:#9ca3af;display:block;margin-bottom:6px}
+.addr p{font-size:13px;font-weight:500;line-height:1.6;color:#111827}
+table{width:100%;border-collapse:collapse;margin-bottom:28px}
+thead tr{border-bottom:1.5px solid #111827}
+thead th{padding:10px 12px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#6b7280}
+thead th:last-child{text-align:center}
+tbody tr{border-bottom:1px solid #f3f4f6}
+tbody td{padding:12px;color:#374151;font-size:13px}
+tbody td:last-child{text-align:center;font-weight:700;color:#111827}
+.notes{background:#f9fafb;border-radius:8px;padding:16px 20px;font-size:12px;color:#6b7280}
+.notes strong{color:#111827;display:block;font-size:10px;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px}
+.foot{margin-top:28px;text-align:center;font-size:11px;color:#9ca3af}
+</style></head>
+<body>
+<div class="page">
+  <div class="top">
+    <div><div class="brand">{{company_name}}</div><div class="brand-sub">{{company_address}}</div></div>
+    <div class="slip-label"><div class="word">Packing Slip</div><div class="num">{{order_number}}</div></div>
+  </div>
+  <div class="addresses">
+    <div class="addr"><label>Ship To</label><p>{{ship_to_name}}<br>{{ship_to_address}}</p></div>
+    <div class="addr"><label>Order Date</label><p>{{order_date}}<br>Shipping: {{shipping_method}}</p></div>
+  </div>
+  <table>
+    <thead><tr><th style="width:50%">Item</th><th>SKU</th><th>Qty</th></tr></thead>
+    <tbody>
+      <tr><td>{{item1_name}}</td><td>{{item1_sku}}</td><td>{{item1_qty}}</td></tr>
+      <tr><td>{{item2_name}}</td><td>{{item2_sku}}</td><td>{{item2_qty}}</td></tr>
+      <tr><td>{{item3_name}}</td><td>{{item3_sku}}</td><td>{{item3_qty}}</td></tr>
+    </tbody>
+  </table>
+  <div class="notes"><strong>Notes</strong>{{packing_notes}}</div>
+  <div class="foot">Thank you for your order! Questions? Contact {{company_email}}</div>
+</div>
+</body></html>`,
+  },
+
+  // ─── 13. Meeting Minutes ───────────────────────────────────────────────────
+  {
+    name: "Meeting Minutes",
+    html: `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',system-ui,sans-serif;background:#fff;color:#111827;font-size:13px;line-height:1.7}
+.page{padding:48px 56px;max-width:700px}
+.header{margin-bottom:36px;padding-bottom:24px;border-bottom:2px solid #111827}
+.kicker{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:3px;color:#6b7280;margin-bottom:8px}
+.title{font-size:26px;font-weight:900;letter-spacing:-1px;color:#111827;margin-bottom:12px}
+.meta-row{display:flex;flex-wrap:wrap;gap:24px}
+.meta-item{font-size:12px;color:#6b7280}
+.meta-item strong{color:#111827}
+.section{margin-bottom:28px}
+.sec-head{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#2563eb;padding-bottom:8px;border-bottom:1.5px solid #dbeafe;margin-bottom:12px}
+.sec-body{color:#374151;white-space:pre-line}
+.attendees{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.attendee{background:#f1f5f9;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:600;color:#334155}
+.action-items{list-style:none;padding:0}
+.action-items li{padding:10px 14px;background:#f8fafc;border-left:3px solid #2563eb;border-radius:0 6px 6px 0;margin-bottom:8px;font-size:13px}
+.action-items li strong{color:#111827}
+.foot{margin-top:36px;padding-top:16px;border-top:1px solid #e5e7eb;font-size:11px;color:#9ca3af;display:flex;justify-content:space-between}
+</style></head>
+<body>
+<div class="page">
+  <div class="header">
+    <div class="kicker">Meeting Minutes</div>
+    <div class="title">{{meeting_title}}</div>
+    <div class="meta-row">
+      <div class="meta-item">Date: <strong>{{meeting_date}}</strong></div>
+      <div class="meta-item">Time: <strong>{{meeting_time}}</strong></div>
+      <div class="meta-item">Location: <strong>{{location}}</strong></div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="sec-head">Attendees</div>
+    <div class="attendees">
+      <div class="attendee">{{attendee1}}</div>
+      <div class="attendee">{{attendee2}}</div>
+      <div class="attendee">{{attendee3}}</div>
+      <div class="attendee">{{attendee4}}</div>
+    </div>
+  </div>
+  <div class="section"><div class="sec-head">Agenda</div><div class="sec-body">{{agenda}}</div></div>
+  <div class="section"><div class="sec-head">Discussion Summary</div><div class="sec-body">{{discussion}}</div></div>
+  <div class="section">
+    <div class="sec-head">Action Items</div>
+    <ul class="action-items">
+      <li><strong>{{action1_owner}}:</strong> {{action1_task}} — Due {{action1_due}}</li>
+      <li><strong>{{action2_owner}}:</strong> {{action2_task}} — Due {{action2_due}}</li>
+      <li><strong>{{action3_owner}}:</strong> {{action3_task}} — Due {{action3_due}}</li>
+    </ul>
+  </div>
+  <div class="section"><div class="sec-head">Next Meeting</div><div class="sec-body">{{next_meeting}}</div></div>
+  <div class="foot">
+    <span>Recorded by <strong>{{recorder}}</strong></span>
+    <span>{{meeting_date}}</span>
+  </div>
+</div>
+</body></html>`,
+  },
+
+  // ─── 14. Gift Card ─────────────────────────────────────────────────────────
+  {
+    name: "Gift Card",
+    html: `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',system-ui,sans-serif;background:#f9fafb;padding:40px;display:flex;justify-content:center;align-items:center;min-height:100vh}
+.card{width:440px;border-radius:20px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,0.12)}
+.top{background:linear-gradient(135deg,#111827 0%,#1e293b 100%);color:#fff;padding:36px 32px;position:relative;overflow:hidden}
+.top::after{content:'';position:absolute;top:-40px;right:-40px;width:160px;height:160px;background:linear-gradient(135deg,rgba(251,191,36,0.15),transparent);border-radius:50%}
+.brand{font-size:16px;font-weight:800;letter-spacing:-0.3px;margin-bottom:24px;position:relative;z-index:1}
+.gift-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:3px;color:rgba(255,255,255,0.4);margin-bottom:6px;position:relative;z-index:1}
+.amount{font-size:56px;font-weight:900;letter-spacing:-3px;line-height:1;position:relative;z-index:1;background:linear-gradient(135deg,#fbbf24,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.middle{background:#fff;padding:28px 32px}
+.msg-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:2px;color:#9ca3af;margin-bottom:8px}
+.msg{font-family:'Playfair Display',Georgia,serif;font-size:18px;font-style:italic;color:#374151;line-height:1.5;margin-bottom:16px}
+.names{display:flex;justify-content:space-between;font-size:13px}
+.names label{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:#9ca3af;display:block;margin-bottom:2px}
+.names p{font-weight:700;color:#111827}
+.bottom{background:#f9fafb;padding:16px 32px;display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#9ca3af;border-top:1px solid #e5e7eb}
+.code{font-family:monospace;font-size:14px;font-weight:700;color:#111827;letter-spacing:2px}
+</style></head>
+<body>
+<div class="card">
+  <div class="top">
+    <div class="brand">{{brand_name}}</div>
+    <div class="gift-label">Gift Card</div>
+    <div class="amount">{{amount}}</div>
+  </div>
+  <div class="middle">
+    <div class="msg-label">Message</div>
+    <div class="msg">{{message}}</div>
+    <div class="names">
+      <div><label>From</label><p>{{from_name}}</p></div>
+      <div><label>To</label><p>{{to_name}}</p></div>
+    </div>
+  </div>
+  <div class="bottom">
+    <span>Redeem at {{brand_name}} stores or online</span>
+    <span class="code">{{redemption_code}}</span>
+  </div>
+</div>
+</body></html>`,
+  },
 ];
 
 /**
