@@ -7,7 +7,8 @@ import { Shield, BarChart3 } from "lucide-react";
 
 const COOKIE_NAME = "cookie_consent";
 const COOKIE_MAX_AGE = 365 * 24 * 60 * 60; // 1 year in seconds
-const GTAG_ID = "AW-17977237081";
+const GTAG_ADS_ID = "AW-17977237081";
+const GTAG_GA4_ID = "G-W4087CZ887";
 
 function getCookie(name: string): string | null {
   const match = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
@@ -25,7 +26,7 @@ export function trackConversion() {
   const w = window as unknown as Record<string, unknown>;
   if (typeof w.gtag === "function") {
     (w.gtag as Function)("event", "conversion", {
-      send_to: `${GTAG_ID}/zf6WCITqgv8bENm8m_xC`,
+      send_to: `${GTAG_ADS_ID}/zf6WCITqgv8bENm8m_xC`,
       value: 1.0,
       currency: "EUR",
     });
@@ -42,7 +43,7 @@ function flushPendingConversion() {
       const w = window as unknown as Record<string, unknown>;
       if (typeof w.gtag === "function") {
         (w.gtag as Function)("event", "conversion", {
-          send_to: `${GTAG_ID}/zf6WCITqgv8bENm8m_xC`,
+          send_to: `${GTAG_ADS_ID}/zf6WCITqgv8bENm8m_xC`,
           value: 1.0,
           currency: "EUR",
         });
@@ -86,7 +87,7 @@ export function CookieBanner() {
       {consent === "accepted" && (
         <>
           <Script
-            src={`https://www.googletagmanager.com/gtag/js?id=${GTAG_ID}`}
+            src={`https://www.googletagmanager.com/gtag/js?id=${GTAG_GA4_ID}`}
             strategy="afterInteractive"
           />
           <Script
@@ -98,7 +99,8 @@ export function CookieBanner() {
               window.dataLayer = window.dataLayer || [];
               function gtag(){dataLayer.push(arguments);}
               gtag('js', new Date());
-              gtag('config', '${GTAG_ID}');
+              gtag('config', '${GTAG_GA4_ID}');
+              gtag('config', '${GTAG_ADS_ID}');
             `}
           </Script>
         </>

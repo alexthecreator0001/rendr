@@ -2,6 +2,11 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.53.1] — 2026-02-27
+### Added
+- Google Analytics 4 (G-W4087CZ887) alongside existing Google Ads tracking, both gated behind cookie consent
+- CSP updated to allow `analytics.google.com`
+
 ## [0.53.0] — 2026-02-27
 ### Added
 - **Case studies page** (`/case-studies`): 6 real-world case studies — price quotations from Lovable, e-commerce order confirmations, SaaS analytics reports, real estate brochures, legal contract generation, investor updates
