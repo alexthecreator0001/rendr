@@ -2,6 +2,10 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.51.5] — 2026-02-27
+### Fixed
+- **Google Ads conversions not counting**: `trackConversion()` silently failed when gtag hadn't loaded yet (no cookie consent or script still loading). Now queues the conversion in sessionStorage and flushes it once gtag initializes.
+
 ## [0.51.4] — 2026-02-26
 ### Fixed
 - **Template data leak**: seed function was copying ALL admin templates (including personal/custom ones) to every user — removed admin template override, now always uses hardcoded STARTER_TEMPLATES (20 templates)

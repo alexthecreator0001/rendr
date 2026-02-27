@@ -17,7 +17,9 @@ function setCookie(name: string, value: string, maxAge: number) {
   document.cookie = `${name}=${encodeURIComponent(value)}; path=/; max-age=${maxAge}; SameSite=Lax; Secure`;
 }
 
-/** Fire Google Ads conversion event (only works if consent accepted + gtag loaded) */
+const PENDING_CONVERSION_KEY = "rendr_pending_conversion";
+
+/** Queue or immediately fire a Google Ads conversion event */
 export function trackConversion() {
   const w = window as unknown as Record<string, unknown>;
   if (typeof w.gtag === "function") {
@@ -26,7 +28,27 @@ export function trackConversion() {
       value: 1.0,
       currency: "EUR",
     });
+  } else {
+    // gtag not loaded yet (no consent or script still loading) — queue it
+    try { sessionStorage.setItem(PENDING_CONVERSION_KEY, "1"); } catch {}
   }
+}
+
+/** Flush any queued conversion — called once gtag is ready */
+function flushPendingConversion() {
+  try {
+    if (sessionStorage.getItem(PENDING_CONVERSION_KEY)) {
+      sessionStorage.removeItem(PENDING_CONVERSION_KEY);
+      const w = window as unknown as Record<string, unknown>;
+      if (typeof w.gtag === "function") {
+        (w.gtag as Function)("event", "conversion", {
+          send_to: `${GTAG_ID}/zf6WCITqgv8bENm8m_xC`,
+          value: 1.0,
+          currency: "EUR",
+        });
+      }
+    }
+  } catch {}
 }
 
 export function CookieBanner() {
@@ -65,7 +87,11 @@ export function CookieBanner() {
             src={`https://www.googletagmanager.com/gtag/js?id=${GTAG_ID}`}
             strategy="afterInteractive"
           />
-          <Script id="gtag-init" strategy="afterInteractive">
+          <Script
+            id="gtag-init"
+            strategy="afterInteractive"
+            onReady={() => flushPendingConversion()}
+          >
             {`
               window.dataLayer = window.dataLayer || [];
               function gtag(){dataLayer.push(arguments);}
