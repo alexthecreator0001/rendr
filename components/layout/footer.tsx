@@ -17,6 +17,7 @@ const footerLinks = {
     { href: "/solutions/certificates", label: "Certificates" },
     { href: "/solutions/real-estate", label: "Real Estate" },
     { href: "/solutions/healthcare", label: "Healthcare" },
+    { href: "/case-studies", label: "Case Studies" },
   ],
   Developers: [
     { href: "/docs", label: "Documentation" },

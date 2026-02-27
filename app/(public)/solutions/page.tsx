@@ -130,6 +130,18 @@ export default function SolutionsPage() {
         </div>
       </section>
 
+      {/* Case studies callout */}
+      <section className="border-t border-border bg-muted/20 py-12">
+        <div className="mx-auto max-w-4xl px-6 lg:px-8 text-center">
+          <p className="text-sm text-muted-foreground">
+            Want to see real examples?{" "}
+            <Link href="/case-studies" className="text-primary font-medium hover:underline underline-offset-2">
+              Read our case studies →
+            </Link>
+          </p>
+        </div>
+      </section>
+
       {/* Shared features callout */}
       <section className="border-t border-border bg-muted/30 py-16">
         <div className="mx-auto max-w-4xl px-6 lg:px-8">

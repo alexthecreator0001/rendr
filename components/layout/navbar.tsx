@@ -66,9 +66,13 @@ function SolutionsMenu({ active }: { active?: boolean }) {
 
           {/* Footer */}
           <div className="flex items-center justify-between border-t border-border px-5 py-3">
-            <span className="text-[11.5px] text-muted-foreground/50">
-              PDF generation for every workflow
-            </span>
+            <Link
+              href="/case-studies"
+              onClick={() => setOpen(false)}
+              className="text-[12px] font-medium transition-colors text-muted-foreground hover:text-foreground"
+            >
+              Case studies →
+            </Link>
             <Link
               href="/solutions"
               onClick={() => setOpen(false)}
@@ -300,6 +304,13 @@ export function Navbar() {
                       {s.name}
                     </Link>
                   ))}
+                  <Link
+                    href="/case-studies"
+                    onClick={() => setMobileOpen(false)}
+                    className="block rounded-lg px-3 py-2.5 text-[13px] font-medium text-muted-foreground transition-colors hover:bg-background hover:text-foreground"
+                  >
+                    Case Studies
+                  </Link>
                   <Link
                     href="/solutions"
                     onClick={() => setMobileOpen(false)}

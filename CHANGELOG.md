@@ -2,6 +2,12 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.53.0] — 2026-02-27
+### Added
+- **Case studies page** (`/case-studies`): 6 real-world case studies — price quotations from Lovable, e-commerce order confirmations, SaaS analytics reports, real estate brochures, legal contract generation, investor updates
+- **Case study detail pages** (`/case-studies/[slug]`): full writeup with challenge, solution, how-it-works steps, results, tech stack, and quotes
+- Case studies linked in Solutions dropdown (desktop + mobile), footer, and solutions listing page
+
 ## [0.52.3] — 2026-02-27
 ### Fixed
 - **User-facing error messages**: raw Playwright errors no longer shown to users — replaced with friendly explanations and hints (bot protection, invalid URL, timeouts, file downloads, DNS errors, etc.)
