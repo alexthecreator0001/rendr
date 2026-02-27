@@ -19,6 +19,25 @@ function setCookie(name: string, value: string, maxAge: number) {
   document.cookie = `${name}=${encodeURIComponent(value)}; path=/; max-age=${maxAge}; SameSite=Lax; Secure`;
 }
 
+/** Helper to call gtag safely */
+function gtagCall(...args: unknown[]) {
+  const w = window as unknown as Record<string, unknown>;
+  if (typeof w.gtag === "function") {
+    (w.gtag as Function)(...args);
+  }
+}
+
+/** Update Google Consent Mode signals */
+function updateConsent(granted: boolean) {
+  const value = granted ? "granted" : "denied";
+  gtagCall("consent", "update", {
+    ad_storage: value,
+    ad_user_data: value,
+    ad_personalization: value,
+    analytics_storage: value,
+  });
+}
+
 const PENDING_CONVERSION_KEY = "rendr_pending_conversion";
 
 /** Queue or immediately fire a Google Ads conversion event */
@@ -40,14 +59,11 @@ function flushPendingConversion() {
   try {
     if (sessionStorage.getItem(PENDING_CONVERSION_KEY)) {
       sessionStorage.removeItem(PENDING_CONVERSION_KEY);
-      const w = window as unknown as Record<string, unknown>;
-      if (typeof w.gtag === "function") {
-        (w.gtag as Function)("event", "conversion", {
-          send_to: `${GTAG_ADS_ID}/zf6WCITqgv8bENm8m_xC`,
-          value: 1.0,
-          currency: "EUR",
-        });
-      }
+      gtagCall("event", "conversion", {
+        send_to: `${GTAG_ADS_ID}/zf6WCITqgv8bENm8m_xC`,
+        value: 1.0,
+        currency: "EUR",
+      });
     }
   } catch {}
 }
@@ -66,45 +82,67 @@ export function CookieBanner() {
     }
   }, []);
 
+  // When consent state is known (from cookie), update Google Consent Mode
+  useEffect(() => {
+    if (consent === "accepted") {
+      updateConsent(true);
+    }
+    // "denied" is already the default — no update needed
+  }, [consent]);
+
   const accept = useCallback(() => {
     setCookie(COOKIE_NAME, "accepted", COOKIE_MAX_AGE);
     setConsent("accepted");
     setVisible(false);
-    // Refresh so gtag loads on the fresh page
-    window.location.reload();
+    updateConsent(true);
   }, []);
 
   const decline = useCallback(() => {
     setCookie(COOKIE_NAME, "declined", COOKIE_MAX_AGE);
     setConsent("declined");
     setVisible(false);
-    window.location.reload();
   }, []);
 
   return (
     <>
-      {/* Only load gtag after consent */}
-      {consent === "accepted" && (
-        <>
-          <Script
-            src={`https://www.googletagmanager.com/gtag/js?id=${GTAG_GA4_ID}`}
-            strategy="afterInteractive"
-          />
-          <Script
-            id="gtag-init"
-            strategy="afterInteractive"
-            onReady={() => flushPendingConversion()}
-          >
-            {`
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', '${GTAG_GA4_ID}');
-              gtag('config', '${GTAG_ADS_ID}');
-            `}
-          </Script>
-        </>
-      )}
+      {/*
+        Google Consent Mode v2: gtag.js always loads, but consent defaults
+        to denied. Signals are updated to "granted" only after user accepts.
+        This enables cookieless pings and modeling even without consent.
+      */}
+      <Script
+        id="gtag-consent-defaults"
+        strategy="beforeInteractive"
+      >
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('consent', 'default', {
+            'ad_storage': 'denied',
+            'ad_user_data': 'denied',
+            'ad_personalization': 'denied',
+            'analytics_storage': 'denied',
+            'wait_for_update': 500
+          });
+        `}
+      </Script>
+      <Script
+        src={`https://www.googletagmanager.com/gtag/js?id=${GTAG_GA4_ID}`}
+        strategy="afterInteractive"
+      />
+      <Script
+        id="gtag-init"
+        strategy="afterInteractive"
+        onReady={() => flushPendingConversion()}
+      >
+        {`
+          window.dataLayer = window.dataLayer || [];
+          if(!window.gtag){function gtag(){dataLayer.push(arguments);}window.gtag=gtag;}
+          gtag('js', new Date());
+          gtag('config', '${GTAG_GA4_ID}');
+          gtag('config', '${GTAG_ADS_ID}');
+        `}
+      </Script>
 
       {/* Full-screen overlay consent wall */}
       {visible && (
@@ -132,7 +170,7 @@ export function CookieBanner() {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-zinc-200">Analytics &amp; Ads</p>
-                  <p className="text-xs text-zinc-500">Google Ads conversion tracking to measure campaign performance.</p>
+                  <p className="text-xs text-zinc-500">Google Analytics &amp; Ads conversion tracking to measure site usage and campaign performance.</p>
                 </div>
               </div>
             </div>

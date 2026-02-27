@@ -2,9 +2,14 @@
 
 All notable changes to Rendr are documented here.
 
-## [0.53.1] — 2026-02-27
+## [0.53.2] — 2026-02-27
 ### Added
-- Google Analytics 4 (G-W4087CZ887) alongside existing Google Ads tracking, both gated behind cookie consent
+- Google Analytics 4 (G-W4087CZ887) alongside existing Google Ads tracking
+- **Google Consent Mode v2** — fully compliant implementation:
+  - Consent defaults to `denied` for all 4 signals (`ad_storage`, `ad_user_data`, `ad_personalization`, `analytics_storage`)
+  - gtag.js always loads (enables cookieless pings & conversion modeling)
+  - Consent updated to `granted` only after user accepts
+  - No more page reload on accept/decline
 - CSP updated to allow `analytics.google.com`
 
 ## [0.53.0] — 2026-02-27
