@@ -239,7 +239,7 @@ export async function processJob(jobId: string): Promise<void> {
       if (metadata?.keywords) pdfDoc.setKeywords([metadata.keywords])
       if (hasMetadata) pdfDoc.setProducer("Rendr PDF")
       if (needsEncryption) {
-        pdfDoc.encrypt({
+        await pdfDoc.encrypt({
           userPassword: passwordOpts!.userPassword || "",
           ownerPassword: passwordOpts!.ownerPassword || passwordOpts!.userPassword || "",
         })
