@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Script from "next/script";
+import { Shield, BarChart3 } from "lucide-react";
 
 const COOKIE_NAME = "cookie_consent";
 const COOKIE_MAX_AGE = 365 * 24 * 60 * 60; // 1 year in seconds
@@ -29,7 +30,6 @@ export function trackConversion() {
       currency: "EUR",
     });
   } else {
-    // gtag not loaded yet (no consent or script still loading) — queue it
     try { sessionStorage.setItem(PENDING_CONVERSION_KEY, "1"); } catch {}
   }
 }
@@ -60,8 +60,7 @@ export function CookieBanner() {
     if (stored === "accepted" || stored === "declined") {
       setConsent(stored);
     } else {
-      // Small delay so it doesn't flash on page load
-      const t = setTimeout(() => setVisible(true), 800);
+      const t = setTimeout(() => setVisible(true), 400);
       return () => clearTimeout(t);
     }
   }, []);
@@ -70,12 +69,15 @@ export function CookieBanner() {
     setCookie(COOKIE_NAME, "accepted", COOKIE_MAX_AGE);
     setConsent("accepted");
     setVisible(false);
+    // Refresh so gtag loads on the fresh page
+    window.location.reload();
   }, []);
 
   const decline = useCallback(() => {
     setCookie(COOKIE_NAME, "declined", COOKIE_MAX_AGE);
     setConsent("declined");
     setVisible(false);
+    window.location.reload();
   }, []);
 
   return (
@@ -102,33 +104,63 @@ export function CookieBanner() {
         </>
       )}
 
-      {/* Banner */}
+      {/* Full-screen overlay consent wall */}
       {visible && (
-        <div className="fixed bottom-0 left-0 right-0 z-[9999] p-4 sm:p-6">
-          <div className="mx-auto max-w-2xl rounded-2xl border border-white/[0.08] bg-zinc-950/95 px-5 py-4 shadow-2xl shadow-black/60 backdrop-blur-xl sm:flex sm:items-center sm:gap-5">
-            <p className="text-sm text-zinc-400 sm:flex-1">
-              We use cookies for analytics and ads to improve your experience.
-              See our{" "}
-              <Link
-                href="/privacy"
-                className="text-blue-400 underline underline-offset-2 hover:text-blue-300"
-              >
-                Privacy Policy
-              </Link>.
-            </p>
-            <div className="mt-3 flex gap-2.5 sm:mt-0 sm:shrink-0">
-              <button
-                onClick={decline}
-                className="rounded-lg border border-white/[0.08] bg-transparent px-4 py-2 text-sm font-medium text-zinc-400 transition-colors hover:bg-white/[0.04] hover:text-zinc-200"
-              >
-                Decline
-              </button>
-              <button
-                onClick={accept}
-                className="rounded-lg bg-white px-4 py-2 text-sm font-semibold text-zinc-900 transition-colors hover:bg-zinc-200"
-              >
-                Accept
-              </button>
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+          <div className="w-full max-w-lg rounded-2xl border border-white/[0.08] bg-zinc-950 shadow-2xl shadow-black/80">
+            {/* Header */}
+            <div className="border-b border-white/[0.06] px-6 pt-7 pb-5">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/10 border border-blue-500/20">
+                  <Shield className="h-5 w-5 text-blue-400" />
+                </div>
+                <h2 className="text-lg font-semibold text-white">Your privacy matters</h2>
+              </div>
+              <p className="text-sm leading-relaxed text-zinc-400">
+                We use cookies to understand how you use Rendr and to show relevant ads.
+                You can accept or decline — either way, the app works the same.
+              </p>
+            </div>
+
+            {/* What we use */}
+            <div className="px-6 py-5 space-y-3">
+              <div className="flex items-start gap-3">
+                <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-zinc-800">
+                  <BarChart3 className="h-3.5 w-3.5 text-zinc-400" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-zinc-200">Analytics &amp; Ads</p>
+                  <p className="text-xs text-zinc-500">Google Ads conversion tracking to measure campaign performance.</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="border-t border-white/[0.06] px-6 py-5">
+              <div className="flex flex-col-reverse gap-2.5 sm:flex-row sm:justify-end">
+                <button
+                  onClick={decline}
+                  className="rounded-xl border border-white/[0.08] bg-transparent px-5 py-2.5 text-sm font-medium text-zinc-400 transition-colors hover:bg-white/[0.04] hover:text-zinc-200"
+                >
+                  Decline all
+                </button>
+                <button
+                  onClick={accept}
+                  className="rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-zinc-900 transition-colors hover:bg-zinc-200"
+                >
+                  Accept all
+                </button>
+              </div>
+              <p className="mt-3 text-center text-[11px] text-zinc-600">
+                Read our{" "}
+                <Link
+                  href="/privacy"
+                  className="text-zinc-500 underline underline-offset-2 hover:text-zinc-400"
+                >
+                  Privacy Policy
+                </Link>{" "}
+                for full details.
+              </p>
             </div>
           </div>
         </div>

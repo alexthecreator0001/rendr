@@ -2,6 +2,11 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.52.0] — 2026-02-27
+### Changed
+- **Cookie banner redesigned**: full-screen overlay that forces accept/decline before using the site, page refreshes after consent so gtag loads immediately
+- **Admin jobs page overhauled**: expandable rows showing full error logs, error codes, input content (HTML/URL/template data), PDF options, template name, download token, result URL — everything you need to debug a failed job
+
 ## [0.51.5] — 2026-02-27
 ### Fixed
 - **Google Ads conversions not counting**: `trackConversion()` silently failed when gtag hadn't loaded yet (no cookie consent or script still loading). Now queues the conversion in sessionStorage and flushes it once gtag initializes.
