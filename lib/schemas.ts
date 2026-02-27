@@ -68,6 +68,14 @@ export const pdfOptionsSchema = z
         rotation: z.number().min(-360).max(360).optional(),
       })
       .optional(),
+
+    // PDF password protection
+    password: z
+      .object({
+        userPassword: z.string().max(128).optional(),
+        ownerPassword: z.string().max(128).optional(),
+      })
+      .optional(),
   })
   .optional()
 

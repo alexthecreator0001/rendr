@@ -39,6 +39,7 @@ const docsNav: NavItem[] = [
       { title: "Custom fonts", href: "/docs/templates#fonts" },
       { title: "Async jobs", href: "/docs/api#async" },
       { title: "Signed URLs", href: "/docs/api#signed-urls" },
+      { title: "Integrations", href: "/docs/integrations", badge: "New" },
     ],
   },
   {

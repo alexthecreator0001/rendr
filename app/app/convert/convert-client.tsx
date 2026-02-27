@@ -159,6 +159,7 @@ export function ConvertClient({ templates, plan = "starter", teamId }: { templat
   const [watermarkFontSize, setWatermarkFontSize] = useState("72");
   const [watermarkRotation, setWatermarkRotation] = useState("-45");
   const [showWatermarkSettings, setShowWatermarkSettings] = useState(false);
+  const [pdfPassword, setPdfPassword] = useState("");
 
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -276,6 +277,7 @@ export function ConvertClient({ templates, plan = "starter", teamId }: { templat
       <input type="hidden" name="watermarkOpacity" value={watermarkOpacity} />
       <input type="hidden" name="watermarkFontSize" value={watermarkFontSize} />
       <input type="hidden" name="watermarkRotation" value={watermarkRotation} />
+      <input type="hidden" name="pdfPassword" value={pdfPassword} />
 
       {/* ── Studio shell ─────────────────────────────────────────────────────── */}
       <div className="flex flex-1 overflow-hidden">
@@ -986,6 +988,23 @@ export function ConvertClient({ templates, plan = "starter", teamId }: { templat
                       <SelectItem value="high" className="text-[11px]">High</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+              </InspectorRow>
+              <InspectorRow label="Password">
+                <div className="flex items-center gap-1.5">
+                  {plan === "starter" && (
+                    <Badge variant="secondary" className="text-[9px] rounded-full px-1.5 h-[14px] font-medium">
+                      Pro
+                    </Badge>
+                  )}
+                  <input
+                    type="password"
+                    value={pdfPassword}
+                    onChange={(e) => setPdfPassword(e.target.value)}
+                    placeholder="Protect PDF"
+                    disabled={isActive || plan === "starter"}
+                    className={cn(ctrl, plan === "starter" && "opacity-40")}
+                  />
                 </div>
               </InspectorRow>
             </div>

@@ -1,6 +1,6 @@
 import { chromium } from "playwright"
 import crypto from "node:crypto"
-import { PDFDocument } from "pdf-lib"
+import { PDFDocument } from "pdf-lib-with-encrypt"
 import { prisma } from "@/lib/db"
 import { saveFile } from "@/lib/storage"
 import { deliverWebhooks, deliverJobWebhook } from "@/lib/webhook"
@@ -222,21 +222,35 @@ export async function processJob(jobId: string): Promise<void> {
       }) ?? { top: "20mm", right: "15mm", bottom: "20mm", left: "15mm" },
     })
 
-    // F4: PDF metadata + compression via pdf-lib
+    // F4: PDF metadata + compression + password protection via pdf-lib-with-encrypt
     let finalPdf: Buffer | Uint8Array = pdfBuffer
     const metadata = opts.metadata as {
       title?: string; author?: string; subject?: string; keywords?: string
     } | null
     const hasMetadata = metadata && (metadata.title || metadata.author || metadata.subject || metadata.keywords)
     const needsCompression = compression !== "off"
-    if (hasMetadata || needsCompression) {
+    const passwordOpts = opts.password as { userPassword?: string; ownerPassword?: string } | null
+    const needsEncryption = !!(passwordOpts?.userPassword || passwordOpts?.ownerPassword)
+    if (hasMetadata || needsCompression || needsEncryption) {
       const pdfDoc = await PDFDocument.load(pdfBuffer)
       if (metadata?.title) pdfDoc.setTitle(metadata.title)
       if (metadata?.author) pdfDoc.setAuthor(metadata.author)
       if (metadata?.subject) pdfDoc.setSubject(metadata.subject)
       if (metadata?.keywords) pdfDoc.setKeywords([metadata.keywords])
       if (hasMetadata) pdfDoc.setProducer("Rendr PDF")
-      finalPdf = await pdfDoc.save(needsCompression ? { useObjectStreams: true } : {})
+      if (needsEncryption) {
+        pdfDoc.encrypt({
+          userPassword: passwordOpts!.userPassword || "",
+          ownerPassword: passwordOpts!.ownerPassword || passwordOpts!.userPassword || "",
+        })
+      }
+      // Encryption requires useObjectStreams: false
+      const saveOpts = needsEncryption
+        ? { useObjectStreams: false as const }
+        : needsCompression
+          ? { useObjectStreams: true as const }
+          : {}
+      finalPdf = await pdfDoc.save(saveOpts)
     }
 
     await context.close()

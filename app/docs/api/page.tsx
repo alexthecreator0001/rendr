@@ -76,6 +76,12 @@ const convertBody = `{
       "opacity": 0.15,          // 0–1 (default: 0.15)
       "fontSize": 72,           // px (default: 72)
       "rotation": -45            // degrees (default: -45)
+    },
+
+    // PDF password protection (Growth & Business plans)
+    "password": {
+      "userPassword": "secret",    // password to open the PDF
+      "ownerPassword": "admin123"  // owner password for permissions (optional)
     }
   },
 
@@ -550,6 +556,24 @@ export default function ApiReferencePage() {
             <li><code>fontSize</code> — pixels, 8–200 (default: <code>72</code>)</li>
             <li><code>rotation</code> — degrees, -360–360 (default: <code>-45</code>)</li>
           </ul>
+        </Prose>
+      </section>
+
+      {/* Password protection */}
+      <section id="password-protection">
+        <Prose>
+          <h2>Password protection</h2>
+          <p>
+            Set <code>options.password</code> to encrypt the generated PDF. Available on Growth and Business plans.
+          </p>
+          <ul>
+            <li><code>userPassword</code> &mdash; password required to open the PDF (max 128 chars)</li>
+            <li><code>ownerPassword</code> &mdash; owner password for editing permissions (optional, defaults to userPassword)</li>
+          </ul>
+          <p>
+            When set, the PDF viewer will prompt for a password before displaying the document.
+            If only <code>userPassword</code> is provided, the <code>ownerPassword</code> defaults to the same value.
+          </p>
         </Prose>
       </section>
 

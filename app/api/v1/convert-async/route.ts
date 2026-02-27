@@ -7,6 +7,7 @@ import { apiError, ApiError } from "@/lib/errors"
 import { assertSafeUrl } from "@/lib/ssrf-guard"
 import { getPlanRenderLimit } from "@/lib/plans"
 import { convertSchema, HTML_MAX_BYTES } from "@/lib/schemas"
+import { checkUsageThresholds } from "@/lib/usage-alerts"
 
 const BASE_URL = () => process.env.AUTH_URL ?? process.env.NEXTAUTH_URL ?? "http://localhost:3000"
 
@@ -126,6 +127,9 @@ export async function POST(req: NextRequest) {
         statusCode: 202,
       },
     })
+
+    // Fire-and-forget usage threshold check (sends warning/limit emails)
+    checkUsageThresholds(user.id).catch(() => {})
 
     const queue = await getQueue()
     await queue.send("pdf-conversion", { jobId: job.id })

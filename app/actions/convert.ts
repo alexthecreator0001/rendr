@@ -4,38 +4,10 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/db";
 import { getQueue } from "@/lib/queue";
 import { requireTeamMember } from "@/lib/team-auth";
-import { sendUsageWarningEmail, sendUsageLimitReachedEmail } from "@/lib/email";
 import { getPlanRenderLimit } from "@/lib/plans";
+import { checkUsageThresholds } from "@/lib/usage-alerts";
 import { z } from "zod";
 import { assertSafeUrl } from "@/lib/ssrf-guard";
-
-async function checkUsageThresholds(userId: string): Promise<void> {
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { email: true, plan: true },
-  });
-  if (!user) return;
-
-  const limit = getPlanRenderLimit(user.plan);
-  if (!isFinite(limit)) return;
-
-  const startOfMonth = new Date();
-  startOfMonth.setDate(1);
-  startOfMonth.setHours(0, 0, 0, 0);
-
-  const used = await prisma.job.count({
-    where: { userId, createdAt: { gte: startOfMonth } },
-  });
-
-  // Send at exactly 80% mark
-  if (used === Math.floor(limit * 0.8)) {
-    await sendUsageWarningEmail(user.email, used, limit);
-  }
-  // Send at exactly 100% mark
-  else if (used === limit) {
-    await sendUsageLimitReachedEmail(user.email, limit);
-  }
-}
 
 const urlSchema = z.string().url("Please enter a valid URL (include https://)");
 const htmlSchema = z.string().min(10, "HTML content is too short");
@@ -142,6 +114,10 @@ export async function convertUrlAction(
   const rawCompression = (formData.get("compression") as string)?.trim() || "off";
   const compression = userPlan === "starter" ? "off" : (["off", "low", "medium", "high"].includes(rawCompression) ? rawCompression : "off");
 
+  // Password protection (plan-gated: starter forced to empty)
+  const rawPdfPassword = (formData.get("pdfPassword") as string)?.trim() || "";
+  const pdfPassword = userPlan === "starter" ? "" : rawPdfPassword;
+
   const pdfOptions = {
     // Paper size
     ...(customWidth || customHeight
@@ -174,6 +150,7 @@ export async function convertUrlAction(
       },
     } : {}),
     ...(compression !== "off" ? { compression } : {}),
+    ...(pdfPassword ? { password: { userPassword: pdfPassword } } : {}),
   };
 
   // F2: filename stored at top level of optionsJson

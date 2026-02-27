@@ -7,6 +7,7 @@ import { apiError, ApiError } from "@/lib/errors"
 import { assertSafeUrl } from "@/lib/ssrf-guard"
 import { getPlanRenderLimit } from "@/lib/plans"
 import { convertSchema, HTML_MAX_BYTES } from "@/lib/schemas"
+import { checkUsageThresholds } from "@/lib/usage-alerts"
 
 function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms))
@@ -156,6 +157,9 @@ export async function POST(req: NextRequest) {
         statusCode: 202,
       },
     })
+
+    // Fire-and-forget usage threshold check (sends warning/limit emails)
+    checkUsageThresholds(user.id).catch(() => {})
 
     // Enqueue
     const queue = await getQueue()

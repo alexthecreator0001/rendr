@@ -2,6 +2,14 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.54.0] — 2026-02-27
+### Added
+- **Zapier/Make integration docs** (`/docs/integrations`): step-by-step guides for connecting Rendr to Zapier, Make, and any webhook-capable platform
+- **PDF password protection**: new `options.password` field with `userPassword` and `ownerPassword` — encrypts generated PDFs (Growth & Business plans). Uses `pdf-lib-with-encrypt` drop-in replacement
+- **Password input in Studio**: new password field in the Output inspector section (plan-gated)
+### Fixed
+- **Usage alerts for API routes**: `checkUsageThresholds()` now fires on `/api/v1/convert` and `/api/v1/convert-async` — previously only triggered from the Studio UI, so API-created jobs never sent usage warning/limit emails
+
 ## [0.53.4] — 2026-02-27
 ### Added
 - Password strength requirements: uppercase, lowercase, number, and special character (enforced on register, change password, and reset password)
