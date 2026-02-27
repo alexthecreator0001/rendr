@@ -2,6 +2,11 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.52.3] — 2026-02-27
+### Fixed
+- **User-facing error messages**: raw Playwright errors no longer shown to users — replaced with friendly explanations and hints (bot protection, invalid URL, timeouts, file downloads, DNS errors, etc.)
+- **Slow render warning**: replaced internal "Worker may be offline — check pm2 list" with user-friendly "Taking longer than usual" message
+
 ## [0.52.2] — 2026-02-27
 ### Fixed
 - **Google Ads conversions blocked by CSP**: Content-Security-Policy was missing Google Ads domains (`googleadservices.com`, `googleads.g.doubleclick.net`, `google.com`) in `connect-src`, `script-src`, and `img-src` — conversion pings were silently dropped by the browser

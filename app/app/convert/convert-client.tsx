@@ -27,6 +27,51 @@ interface JobResult {
   errorMessage: string | null;
 }
 
+/** Map raw Playwright / worker errors to user-friendly messages */
+function humanizeError(raw: string): string {
+  if (!raw) return "Something went wrong. Please try again.";
+  const r = raw.toLowerCase();
+
+  if (r.includes("timeout") && r.includes("exceeded"))
+    return "The page took too long to load. It may be using bot protection, loading heavy resources, or be temporarily unavailable. Try a different URL or increase the timeout.";
+
+  if (r.includes("download is starting") || r.includes("cannot render direct file url"))
+    return "This URL points to a downloadable file (e.g. PDF, ZIP). Rendr can only render web pages — provide an HTML page URL instead.";
+
+  if (r.includes("net::err_name_not_resolved") || r.includes("dns"))
+    return "Could not find this website. Please check the URL for typos.";
+
+  if (r.includes("net::err_connection_refused") || r.includes("net::err_connection_reset"))
+    return "The website refused the connection. It may be down or blocking automated access.";
+
+  if (r.includes("net::err_cert") || r.includes("ssl"))
+    return "This website has an SSL certificate issue. We couldn't establish a secure connection.";
+
+  if (r.includes("net::err_aborted"))
+    return "The page load was interrupted. The website may be blocking automated browsers or using bot protection (e.g. Cloudflare, CAPTCHA).";
+
+  if (r.includes("navigation") && r.includes("interrupted"))
+    return "The page redirected too many times or navigation was blocked. The site may use bot protection.";
+
+  if (r.includes("exceeds the") && r.includes("limit"))
+    return raw; // already user-friendly (plan size limit)
+
+  if (r.includes("captcha") || r.includes("challenge"))
+    return "This website requires a CAPTCHA or bot challenge that we cannot complete. Try rendering a different page.";
+
+  if (r.includes("403") || r.includes("forbidden"))
+    return "The website returned a 403 Forbidden error. It may require authentication or block automated access.";
+
+  if (r.includes("404") || r.includes("not found"))
+    return "The page was not found (404). Please double-check the URL.";
+
+  if (r.includes("500") || r.includes("internal server error"))
+    return "The website returned a server error (500). Try again later.";
+
+  // Generic fallback — don't expose raw Playwright internals
+  return "Render failed. The page may use bot protection, require login, or be temporarily unavailable. Try a different URL or check that the page is publicly accessible.";
+}
+
 const PDF_FORMATS = ["A4", "Letter", "Legal", "Tabloid", "A3", "A5", "A6"] as const;
 
 const MARGIN_PRESETS = {
@@ -191,10 +236,11 @@ export function ConvertClient({ templates, plan = "starter", teamId }: { templat
     { id: "url", label: "URL" },
   ];
 
-  const errorText =
+  const rawError =
     (state && "error" in state && state.error) ||
     jobResult?.errorMessage ||
-    "Render failed";
+    "";
+  const errorText = humanizeError(rawError);
 
   return (
     <form action={action} className="h-full flex flex-col">
@@ -359,7 +405,7 @@ export function ConvertClient({ templates, plan = "starter", teamId }: { templat
           {slowWarning && (
             <div className="flex items-center gap-2 px-4 py-1.5 bg-amber-50 dark:bg-amber-950/20 border-b border-amber-200 dark:border-amber-900/50 text-[11px] text-amber-700 dark:text-amber-400 shrink-0">
               <AlertTriangle className="h-3 w-3 shrink-0" />
-              Worker may be offline — check <code className="font-mono">pm2 list</code>
+              Taking longer than usual — the page may be heavy or loading slowly. Please wait.
             </div>
           )}
 
