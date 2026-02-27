@@ -61,10 +61,17 @@ const loginSchema = z.object({
   password: z.string().min(1),
 });
 
+const passwordSchema = z.string()
+  .min(8, "Password must be at least 8 characters.")
+  .regex(/[A-Z]/, "Password must contain at least one uppercase letter.")
+  .regex(/[a-z]/, "Password must contain at least one lowercase letter.")
+  .regex(/[0-9]/, "Password must contain at least one number.")
+  .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character.");
+
 const registerSchema = z.object({
   name: z.string().min(1).max(100).optional(),
   email: z.string().email(),
-  password: z.string().min(8),
+  password: passwordSchema,
 });
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -297,7 +304,8 @@ export async function changePasswordAction(
   const next = (formData.get("new") as string) ?? "";
   const confirm = (formData.get("confirm") as string) ?? "";
 
-  if (next.length < 8) return { error: "New password must be at least 8 characters." };
+  const pwCheck = passwordSchema.safeParse(next);
+  if (!pwCheck.success) return { error: pwCheck.error.issues[0].message };
   if (next !== confirm) return { error: "Passwords don't match." };
 
   const user = await prisma.user.findUnique({ where: { id: session.user.id } });
@@ -363,7 +371,8 @@ export async function resetPasswordAction(
   const confirm = (formData.get("confirm") as string) ?? "";
 
   if (!rawToken) return { error: "Invalid reset link." };
-  if (password.length < 8) return { error: "Password must be at least 8 characters." };
+  const pwCheck = passwordSchema.safeParse(password);
+  if (!pwCheck.success) return { error: pwCheck.error.issues[0].message };
   if (password !== confirm) return { error: "Passwords don't match." };
 
   // Hash the submitted token to match the stored hash

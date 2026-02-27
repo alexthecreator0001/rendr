@@ -2,6 +2,11 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.53.4] — 2026-02-27
+### Added
+- Password strength requirements: uppercase, lowercase, number, and special character (enforced on register, change password, and reset password)
+- Live password strength indicator on registration form with progress bar and per-rule checklist
+
 ## [0.53.3] — 2026-02-27
 ### Fixed
 - Updated Google Ads conversion label to Registrace action (`wqRTCPHjv_8bENm8m_xC`)

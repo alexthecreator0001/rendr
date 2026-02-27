@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Check, Zap, Shield, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,8 +8,18 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { registerAction } from "@/app/actions/auth";
 
+const PW_RULES = [
+  { label: "8+ characters", test: (v: string) => v.length >= 8 },
+  { label: "Uppercase letter", test: (v: string) => /[A-Z]/.test(v) },
+  { label: "Lowercase letter", test: (v: string) => /[a-z]/.test(v) },
+  { label: "Number", test: (v: string) => /[0-9]/.test(v) },
+  { label: "Special character", test: (v: string) => /[^A-Za-z0-9]/.test(v) },
+];
+
 export default function RegisterPage() {
   const [state, action, pending] = useActionState(registerAction, null);
+  const [pw, setPw] = useState("");
+  const passed = PW_RULES.filter((r) => r.test(pw)).length;
 
   return (
     <div className="mx-auto w-full max-w-4xl">
@@ -128,8 +138,38 @@ export default function RegisterPage() {
                 placeholder="Min. 8 characters"
                 required
                 minLength={8}
+                value={pw}
+                onChange={(e) => setPw(e.target.value)}
                 className="h-11 rounded-xl border-white/[0.08] bg-white/[0.04] text-white placeholder:text-zinc-600 focus-visible:border-blue-500/60 focus-visible:ring-blue-500/20"
               />
+              {pw.length > 0 && (
+                <div className="space-y-2 pt-1">
+                  <div className="flex gap-1">
+                    {PW_RULES.map((_, i) => (
+                      <div
+                        key={i}
+                        className={`h-1 flex-1 rounded-full transition-colors ${
+                          i < passed
+                            ? passed <= 2 ? "bg-red-500" : passed <= 3 ? "bg-amber-500" : passed <= 4 ? "bg-blue-500" : "bg-emerald-500"
+                            : "bg-white/[0.06]"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <div className="flex flex-wrap gap-x-3 gap-y-0.5">
+                    {PW_RULES.map((r) => (
+                      <span
+                        key={r.label}
+                        className={`text-[11px] transition-colors ${
+                          r.test(pw) ? "text-emerald-400" : "text-zinc-600"
+                        }`}
+                      >
+                        {r.test(pw) ? "✓" : "○"} {r.label}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             <Button

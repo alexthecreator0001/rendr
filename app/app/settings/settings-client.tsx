@@ -130,7 +130,7 @@ export function SettingsClient({ email, createdAt, plan }: SettingsClientProps) 
               <div>
                 <h2 className="text-sm font-semibold">Security</h2>
                 <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
-                  Update your password. Use at least 8 characters.
+                  Update your password. Must include uppercase, lowercase, number, and special character.
                 </p>
               </div>
             </div>
