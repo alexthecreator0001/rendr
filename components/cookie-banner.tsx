@@ -45,7 +45,7 @@ export function trackConversion() {
   const w = window as unknown as Record<string, unknown>;
   if (typeof w.gtag === "function") {
     (w.gtag as Function)("event", "conversion", {
-      send_to: `${GTAG_ADS_ID}/zf6WCITqgv8bENm8m_xC`,
+      send_to: `${GTAG_ADS_ID}/wqRTCPHjv_8bENm8m_xC`,
       value: 1.0,
       currency: "EUR",
     });
@@ -60,7 +60,7 @@ function flushPendingConversion() {
     if (sessionStorage.getItem(PENDING_CONVERSION_KEY)) {
       sessionStorage.removeItem(PENDING_CONVERSION_KEY);
       gtagCall("event", "conversion", {
-        send_to: `${GTAG_ADS_ID}/zf6WCITqgv8bENm8m_xC`,
+        send_to: `${GTAG_ADS_ID}/wqRTCPHjv_8bENm8m_xC`,
         value: 1.0,
         currency: "EUR",
       });

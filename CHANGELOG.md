@@ -2,6 +2,10 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.53.3] — 2026-02-27
+### Fixed
+- Updated Google Ads conversion label to Registrace action (`wqRTCPHjv_8bENm8m_xC`)
+
 ## [0.53.2] — 2026-02-27
 ### Added
 - Google Analytics 4 (G-W4087CZ887) alongside existing Google Ads tracking
