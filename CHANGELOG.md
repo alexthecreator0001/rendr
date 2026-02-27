@@ -2,6 +2,11 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.52.1] — 2026-02-27
+### Fixed
+- **URL render timeouts**: use `load` + graceful `networkidle` fallback instead of blocking on `networkidle` alone — sites with persistent analytics/ads/websockets no longer cause 30s timeouts
+- **Direct file URL errors**: reject `.pdf`, `.zip`, `.docx`, etc. URLs upfront with a clear error message instead of crashing with "Download is starting"
+
 ## [0.52.0] — 2026-02-27
 ### Changed
 - **Cookie banner redesigned**: full-screen overlay that forces accept/decline before using the site, page refreshes after consent so gtag loads immediately

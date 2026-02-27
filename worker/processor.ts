@@ -59,8 +59,22 @@ export async function processJob(jobId: string): Promise<void> {
       await page.setContent(job.inputContent, { waitUntil: "networkidle" })
     } else if (job.inputType === "url") {
       if (!job.inputContent) throw new Error("inputContent is required for url jobs")
+
+      // Reject direct file downloads (PDF, zip, etc.) — Playwright can't render them
+      const urlPath = new URL(job.inputContent).pathname.toLowerCase()
+      const blockedExts = [".pdf", ".zip", ".rar", ".7z", ".tar", ".gz", ".exe", ".dmg", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx"]
+      if (blockedExts.some((ext) => urlPath.endsWith(ext))) {
+        throw new Error(`Cannot render direct file URL (${urlPath.split(".").pop()} file). Provide an HTML page URL instead.`)
+      }
+
       // DNS is pinned via --host-resolver-rules above, preventing rebinding
-      await page.goto(job.inputContent, { waitUntil: "networkidle" })
+      // Use "load" first, then try to wait for networkidle with a short grace period.
+      // Many sites with analytics/ads never reach networkidle, so we don't let it block forever.
+      await page.goto(job.inputContent, { waitUntil: "load" })
+      await page.waitForLoadState("networkidle").catch(() => {
+        // networkidle timed out — page loaded but has persistent connections (ads, analytics, websockets).
+        // This is fine — the DOM is ready, proceed with PDF generation.
+      })
     } else if (job.inputType === "template") {
       if (!job.template) throw new Error("Template not found")
       let html = job.template.html
