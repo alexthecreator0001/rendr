@@ -2,6 +2,10 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.54.1] — 2026-02-28
+### Fixed
+- **Google Ads conversion tracking lost when consent accepted without page reload**: `trackConversion()` fired the event while consent was still `denied` (gtag silently dropped it). Now queues to sessionStorage and flushes when user clicks "Accept all" — no page reload needed
+
 ## [0.54.0] — 2026-02-27
 ### Added
 - **Zapier/Make integration docs** (`/docs/integrations`): step-by-step guides for connecting Rendr to Zapier, Make, and any webhook-capable platform

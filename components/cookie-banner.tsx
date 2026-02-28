@@ -40,30 +40,41 @@ function updateConsent(granted: boolean) {
 
 const PENDING_CONVERSION_KEY = "rendr_pending_conversion";
 
+/** Check whether cookie consent has been granted */
+function hasConsent(): boolean {
+  return getCookie(COOKIE_NAME) === "accepted";
+}
+
+/** Fire the conversion event via gtag (only call when consent is granted + gtag loaded) */
+function fireConversion() {
+  gtagCall("event", "conversion", {
+    send_to: `${GTAG_ADS_ID}/wqRTCPHjv_8bENm8m_xC`,
+    value: 1.0,
+    currency: "EUR",
+  });
+}
+
 /** Queue or immediately fire a Google Ads conversion event */
 export function trackConversion() {
   const w = window as unknown as Record<string, unknown>;
-  if (typeof w.gtag === "function") {
-    (w.gtag as Function)("event", "conversion", {
-      send_to: `${GTAG_ADS_ID}/wqRTCPHjv_8bENm8m_xC`,
-      value: 1.0,
-      currency: "EUR",
-    });
+  const gtagReady = typeof w.gtag === "function";
+
+  // Only fire immediately if gtag is loaded AND consent is already granted.
+  // Otherwise queue — the conversion will flush when consent is accepted or
+  // on next page load when consent cookie already exists.
+  if (gtagReady && hasConsent()) {
+    fireConversion();
   } else {
     try { sessionStorage.setItem(PENDING_CONVERSION_KEY, "1"); } catch {}
   }
 }
 
-/** Flush any queued conversion — called once gtag is ready */
+/** Flush any queued conversion — called on gtag init AND when consent is accepted */
 function flushPendingConversion() {
   try {
-    if (sessionStorage.getItem(PENDING_CONVERSION_KEY)) {
+    if (sessionStorage.getItem(PENDING_CONVERSION_KEY) && hasConsent()) {
       sessionStorage.removeItem(PENDING_CONVERSION_KEY);
-      gtagCall("event", "conversion", {
-        send_to: `${GTAG_ADS_ID}/wqRTCPHjv_8bENm8m_xC`,
-        value: 1.0,
-        currency: "EUR",
-      });
+      fireConversion();
     }
   } catch {}
 }
@@ -95,6 +106,8 @@ export function CookieBanner() {
     setConsent("accepted");
     setVisible(false);
     updateConsent(true);
+    // Flush any conversion that fired before consent was granted
+    flushPendingConversion();
   }, []);
 
   const decline = useCallback(() => {
