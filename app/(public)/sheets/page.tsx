@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { ArrowRight, Check, FileText } from "lucide-react";
+import { VideoPlayer } from "./video-player";
 
 export const metadata: Metadata = {
   title: "Google Sheets to PDF — Rendr",
@@ -176,23 +177,8 @@ export default function SheetsPage() {
             Watch how to go from a Google Sheet to rendered PDFs in under 2 minutes.
           </p>
 
-          {/* Video — hero-width, glowing border */}
-          <div className="mx-auto mt-8 max-w-4xl">
-            <div className="rounded-2xl bg-gradient-to-b from-emerald-500/20 via-blue-500/10 to-transparent p-[1px]">
-              <div className="overflow-hidden rounded-2xl bg-zinc-950">
-                <div className="relative w-full" style={{ padding: "53.75% 0 0 0" }}>
-                  <iframe
-                    src="https://player.vimeo.com/video/1171585294?badge=0&autopause=0&player_id=0&app_id=58479"
-                    frameBorder="0"
-                    allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
-                    referrerPolicy="strict-origin-when-cross-origin"
-                    className="absolute top-0 left-0 h-full w-full"
-                    title="How Google Sheets to PDF works"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
+          {/* Video — click to play with thumbnail overlay */}
+          <VideoPlayer />
 
           {/* Steps below video */}
           <div className="mx-auto mt-14 grid max-w-3xl gap-0">

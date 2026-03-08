@@ -2,6 +2,10 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.57.3] — 2026-03-08
+### Changed
+- **Sheets video player**: click-to-play overlay with thumbnail and play button instead of raw Vimeo iframe — no more ugly controls before playing
+
 ## [0.57.2] — 2026-03-08
 ### Added
 - **Dynamic sitemap.xml** for Google indexing — includes all public pages, solutions, case studies, and blog posts from DB
