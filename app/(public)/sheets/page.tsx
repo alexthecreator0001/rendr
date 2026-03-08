@@ -141,11 +141,11 @@ export default function SheetsPage() {
             </div>
 
             {/* Rendr logo */}
-            <div className="flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-2xl border border-white/[0.08] bg-white/[0.04] shadow-lg shadow-black/40">
+            <div className="flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-2xl border border-white/[0.08] bg-white/[0.04] shadow-lg shadow-black/40 p-3 sm:p-4">
               <img
                 src="/logo.svg"
                 alt="Rendr"
-                className="h-5 sm:h-6 w-auto"
+                className="h-auto w-full object-contain"
               />
             </div>
           </div>
@@ -245,6 +245,113 @@ export default function SheetsPage() {
                 </p>
               </div>
             ))}
+          </div>
+
+          {/* ── Visual demo ──────────────────────────────────────────── */}
+          <div className="mx-auto mt-20 max-w-5xl">
+            <div className="grid items-center gap-6 lg:grid-cols-[1fr_auto_1fr]">
+
+              {/* Spreadsheet mock */}
+              <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.02] shadow-xl shadow-black/30">
+                <div className="flex items-center gap-2 border-b border-white/[0.06] bg-white/[0.03] px-4 py-2.5">
+                  <img src="/google-sheets-logo.png" alt="" className="h-4 w-4" />
+                  <span className="text-xs font-medium text-zinc-400">clients-march.xlsx</span>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs">
+                    <thead>
+                      <tr className="border-b border-white/[0.06] bg-white/[0.02]">
+                        <th className="px-3 py-2 text-left font-medium text-emerald-400/80">name</th>
+                        <th className="px-3 py-2 text-left font-medium text-emerald-400/80">email</th>
+                        <th className="px-3 py-2 text-left font-medium text-emerald-400/80">amount</th>
+                        <th className="px-3 py-2 text-left font-medium text-emerald-400/80">date</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/[0.04]">
+                      <tr>
+                        <td className="px-3 py-2 text-zinc-300">Acme Corp</td>
+                        <td className="px-3 py-2 text-zinc-500">billing@acme.co</td>
+                        <td className="px-3 py-2 text-zinc-300">$2,400</td>
+                        <td className="px-3 py-2 text-zinc-500">2026-03-01</td>
+                      </tr>
+                      <tr>
+                        <td className="px-3 py-2 text-zinc-300">Globex Inc</td>
+                        <td className="px-3 py-2 text-zinc-500">ap@globex.io</td>
+                        <td className="px-3 py-2 text-zinc-300">$1,850</td>
+                        <td className="px-3 py-2 text-zinc-500">2026-03-01</td>
+                      </tr>
+                      <tr>
+                        <td className="px-3 py-2 text-zinc-300">Initech LLC</td>
+                        <td className="px-3 py-2 text-zinc-500">pay@initech.com</td>
+                        <td className="px-3 py-2 text-zinc-300">$3,100</td>
+                        <td className="px-3 py-2 text-zinc-500">2026-03-01</td>
+                      </tr>
+                      <tr className="opacity-40">
+                        <td className="px-3 py-2 text-zinc-500">...</td>
+                        <td className="px-3 py-2 text-zinc-500">...</td>
+                        <td className="px-3 py-2 text-zinc-500">...</td>
+                        <td className="px-3 py-2 text-zinc-500">...</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div className="border-t border-white/[0.06] bg-white/[0.02] px-4 py-2">
+                  <span className="text-[10px] text-zinc-600">247 rows</span>
+                </div>
+              </div>
+
+              {/* Arrow */}
+              <div className="hidden lg:flex flex-col items-center gap-2">
+                <div className="text-[10px] font-semibold uppercase tracking-widest text-zinc-600">Rendr</div>
+                <div className="flex items-center gap-1">
+                  <div className="h-[2px] w-8 bg-gradient-to-r from-emerald-500/40 to-blue-500/40" />
+                  <ArrowRight className="h-5 w-5 text-blue-400" />
+                </div>
+                <div className="text-[10px] font-semibold uppercase tracking-widest text-zinc-600">renders</div>
+              </div>
+
+              {/* Mobile arrow */}
+              <div className="flex lg:hidden items-center justify-center py-2">
+                <div className="flex items-center gap-2 text-zinc-600">
+                  <div className="h-[2px] w-8 bg-gradient-to-r from-emerald-500/40 to-blue-500/40" />
+                  <ArrowRight className="h-5 w-5 text-blue-400" />
+                  <span className="text-[10px] font-semibold uppercase tracking-widest">247 PDFs</span>
+                </div>
+              </div>
+
+              {/* PDF output mock */}
+              <div className="space-y-3">
+                {[
+                  { name: "Acme Corp", amount: "$2,400" },
+                  { name: "Globex Inc", amount: "$1,850" },
+                  { name: "Initech LLC", amount: "$3,100" },
+                ].map((row, i) => (
+                  <div
+                    key={row.name}
+                    className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-4 shadow-lg shadow-black/20"
+                    style={{ transform: `translateX(${i * 4}px)` }}
+                  >
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <div className="text-[10px] font-semibold uppercase tracking-widest text-zinc-600 mb-1">Invoice</div>
+                        <div className="text-sm font-semibold text-white">{row.name}</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-lg font-bold text-white">{row.amount}</div>
+                        <div className="text-[10px] text-zinc-500">March 2026</div>
+                      </div>
+                    </div>
+                    <div className="mt-3 flex items-center gap-2">
+                      <FileText className="h-3 w-3 text-red-400" />
+                      <span className="text-[10px] text-zinc-500">invoice-{row.name.toLowerCase().replace(/\s+/g, "-")}.pdf</span>
+                    </div>
+                  </div>
+                ))}
+                <div className="rounded-xl border border-dashed border-white/[0.06] p-3 text-center">
+                  <span className="text-[11px] text-zinc-600">+ 244 more PDFs</span>
+                </div>
+              </div>
+            </div>
           </div>
         </Container>
       </section>

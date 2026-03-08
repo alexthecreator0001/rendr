@@ -167,8 +167,7 @@ export function Navbar() {
               Pricing
             </Link>
 
-            <Link href="/sheets" className={cn(navItem(isSheets), "flex items-center gap-1.5")}>
-              <img src="/google-sheets-logo.png" alt="" className="h-3.5 w-3.5" />
+            <Link href="/sheets" className={navItem(isSheets)}>
               Sheets
             </Link>
 
