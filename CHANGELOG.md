@@ -2,6 +2,10 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.57.1] — 2026-03-08
+### Fixed
+- **Vimeo embed blocked by CSP**: added `https://player.vimeo.com` to `frame-src` Content-Security-Policy directive so the demo video on `/sheets` page loads correctly
+
 ## [0.57.0] — 2026-03-08
 ### Added
 - **Google OAuth login/signup**: users can now sign in or register with their Google account. Auto-links to existing accounts by email. Google button on both login and register pages
