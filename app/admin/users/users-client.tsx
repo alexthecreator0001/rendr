@@ -70,15 +70,15 @@ function UserRow({ user }: { user: User }) {
           )}
         </div>
       </td>
-      <td className="px-4 py-3">
+      <td className="px-4 py-3 hidden sm:table-cell">
         {user.emailVerified ? (
           <CheckCircle className="h-3.5 w-3.5 text-emerald-400" />
         ) : (
           <span className="text-[11px] text-muted-foreground/50">—</span>
         )}
       </td>
-      <td className="px-4 py-3 text-[12px] text-muted-foreground">{user._count.jobs}</td>
-      <td className="px-4 py-3 text-[12px] text-muted-foreground">{user._count.apiKeys}</td>
+      <td className="px-4 py-3 text-[12px] text-muted-foreground hidden sm:table-cell">{user._count.jobs}</td>
+      <td className="px-4 py-3 text-[12px] text-muted-foreground hidden md:table-cell">{user._count.apiKeys}</td>
       <td className="px-4 py-3">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -182,12 +182,12 @@ export function AdminUsersClient({
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8 space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Users</h1>
           <p className="text-sm text-muted-foreground mt-1">{total.toLocaleString()} total</p>
         </div>
-        <div className="relative w-64">
+        <div className="relative w-full sm:w-64">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
           <Input
             placeholder="Search email…"
@@ -200,16 +200,16 @@ export function AdminUsersClient({
         </div>
       </div>
 
-      <div className="rounded-xl border border-border bg-card overflow-hidden">
-        <table className="w-full text-sm">
+      <div className="rounded-xl border border-border bg-card overflow-x-auto">
+        <table className="w-full text-sm min-w-[600px]">
           <thead>
             <tr className="border-b border-border bg-muted/30">
               <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Email</th>
               <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Plan</th>
               <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Role</th>
-              <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Verified</th>
-              <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Jobs</th>
-              <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Keys</th>
+              <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground hidden sm:table-cell">Verified</th>
+              <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground hidden sm:table-cell">Jobs</th>
+              <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground hidden md:table-cell">Keys</th>
               <th className="px-4 py-3" />
             </tr>
           </thead>

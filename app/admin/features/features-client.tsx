@@ -56,13 +56,13 @@ function FeatureRow({ feature }: { feature: Feature }) {
         <p className="text-[13px] font-medium">{feature.title}</p>
         <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-2">{feature.description}</p>
       </td>
-      <td className="px-4 py-3 text-[12px] text-muted-foreground truncate max-w-[140px]">{feature.userEmail}</td>
+      <td className="px-4 py-3 text-[12px] text-muted-foreground truncate max-w-[140px] hidden sm:table-cell">{feature.userEmail}</td>
       <td className="px-4 py-3">
         <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold ${cfg.cls}`}>
           {cfg.label}
         </span>
       </td>
-      <td className="px-4 py-3 text-[12px] text-muted-foreground">
+      <td className="px-4 py-3 text-[12px] text-muted-foreground hidden md:table-cell">
         {new Date(feature.createdAt).toLocaleDateString()}
       </td>
       <td className="px-4 py-3">
@@ -126,15 +126,15 @@ export function AdminFeaturesClient({
         })}
       </div>
 
-      <div className="rounded-xl border border-border bg-card overflow-hidden">
-        <table className="w-full text-sm">
+      <div className="rounded-xl border border-border bg-card overflow-x-auto">
+        <table className="w-full text-sm min-w-[500px]">
           <thead>
             <tr className="border-b border-border bg-muted/30">
               <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground w-16">Votes</th>
               <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Request</th>
-              <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">From</th>
+              <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground hidden sm:table-cell">From</th>
               <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Status</th>
-              <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Date</th>
+              <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground hidden md:table-cell">Date</th>
               <th className="px-4 py-3" />
             </tr>
           </thead>

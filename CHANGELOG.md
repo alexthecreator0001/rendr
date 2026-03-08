@@ -2,6 +2,10 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.56.1] — 2026-03-08
+### Fixed
+- **Admin pages mobile responsive**: all admin tables now scroll horizontally on small screens, less important columns hidden on mobile (sm/md breakpoints), header layouts stack vertically on mobile, stat cards grid adapts to single column on small screens
+
 ## [0.56.0] — 2026-03-08
 ### Added
 - **Google Sheets to PDF**: connect a Google Sheet, map columns to template {{variables}}, batch-render one PDF per row. Full wizard UI: paste sheet URL → pick tab → preview data → select template → auto-map columns → generate. Gated to Growth & Business plans (100/500 rows per batch). Includes `GoogleConnection`, `SheetSync`, and `BatchRun` DB models, OAuth flow, encrypted refresh token storage, batch run progress tracking in worker

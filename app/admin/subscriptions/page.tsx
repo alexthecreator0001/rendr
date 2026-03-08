@@ -102,14 +102,14 @@ export default async function AdminSubscriptionsPage({
       </div>
 
       {/* Users table */}
-      <div className="rounded-xl border border-border bg-card overflow-hidden">
-        <table className="w-full text-sm">
+      <div className="rounded-xl border border-border bg-card overflow-x-auto">
+        <table className="w-full text-sm min-w-[500px]">
           <thead>
             <tr className="border-b border-border bg-muted/30">
               <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">User</th>
               <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Plan</th>
-              <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Jobs</th>
-              <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Joined</th>
+              <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground hidden sm:table-cell">Jobs</th>
+              <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground hidden md:table-cell">Joined</th>
               <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Role</th>
             </tr>
           </thead>
@@ -134,8 +134,8 @@ export default async function AdminSubscriptionsPage({
                         {u.plan}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-[12px] text-muted-foreground tabular-nums">{u._count.jobs}</td>
-                    <td className="px-4 py-3 text-[12px] text-muted-foreground">{u.createdAt.toLocaleDateString()}</td>
+                    <td className="px-4 py-3 text-[12px] text-muted-foreground tabular-nums hidden sm:table-cell">{u._count.jobs}</td>
+                    <td className="px-4 py-3 text-[12px] text-muted-foreground hidden md:table-cell">{u.createdAt.toLocaleDateString()}</td>
                     <td className="px-4 py-3">
                       {u.role === "admin" ? (
                         <span className="rounded-full border border-red-500/30 bg-red-500/10 px-2 py-0.5 text-[10px] font-semibold text-red-400">admin</span>

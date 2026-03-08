@@ -55,8 +55,8 @@ function TicketRow({ ticket }: { ticket: Ticket }) {
         <p className="text-[13px] font-medium">{ticket.subject}</p>
         <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-1">{ticket.message}</p>
       </td>
-      <td className="px-4 py-3 text-[13px] text-muted-foreground truncate max-w-[160px]">{ticket.email}</td>
-      <td className="px-4 py-3">
+      <td className="px-4 py-3 text-[13px] text-muted-foreground truncate max-w-[160px] hidden sm:table-cell">{ticket.email}</td>
+      <td className="px-4 py-3 hidden md:table-cell">
         <span className={`text-[12px] ${priority.cls}`}>{priority.label}</span>
       </td>
       <td className="px-4 py-3">
@@ -64,7 +64,7 @@ function TicketRow({ ticket }: { ticket: Ticket }) {
           {status.label}
         </span>
       </td>
-      <td className="px-4 py-3 text-[12px] text-muted-foreground">
+      <td className="px-4 py-3 text-[12px] text-muted-foreground hidden sm:table-cell">
         {new Date(ticket.createdAt).toLocaleDateString()}
       </td>
       <td className="px-4 py-3">
@@ -125,15 +125,15 @@ export function AdminSupportClient({
         ))}
       </div>
 
-      <div className="rounded-xl border border-border bg-card overflow-hidden">
-        <table className="w-full text-sm">
+      <div className="rounded-xl border border-border bg-card overflow-x-auto">
+        <table className="w-full text-sm min-w-[600px]">
           <thead>
             <tr className="border-b border-border bg-muted/30">
               <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Subject</th>
-              <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">From</th>
-              <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Priority</th>
+              <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground hidden sm:table-cell">From</th>
+              <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground hidden md:table-cell">Priority</th>
               <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Status</th>
-              <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Date</th>
+              <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-muted-foreground hidden sm:table-cell">Date</th>
               <th className="px-4 py-3" />
             </tr>
           </thead>

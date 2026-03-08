@@ -265,14 +265,14 @@ export function AdminTemplatesClient({
 }) {
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Default Templates</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Canonical templates stored in your admin account. Set a cover image so they look great on the templates page.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           <SyncCoversButton />
           <CreateDialog adminUserId={adminUserId} />
         </div>
@@ -300,7 +300,7 @@ export function AdminTemplatesClient({
           </div>
           <div className="divide-y divide-border">
             {templates.map((t) => (
-              <div key={t.id} className="flex items-center gap-4 px-5 py-4">
+              <div key={t.id} className="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:gap-4">
                 {/* Cover image or icon */}
                 <div className="shrink-0 h-12 w-16 overflow-hidden rounded-lg border border-border bg-muted/30 flex items-center justify-center">
                   {t.coverImageUrl ? (

@@ -232,7 +232,7 @@ export function AdminBlogClient({ posts }: { posts: Post[] }) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Blog</h1>
           <p className="mt-1 text-sm text-muted-foreground">
@@ -241,7 +241,7 @@ export function AdminBlogClient({ posts }: { posts: Post[] }) {
             {drafts > 0 && ` · ${drafts} draft${drafts !== 1 ? "s" : ""}`}
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           <Link
             href="/blog"
             target="_blank"
@@ -265,8 +265,8 @@ export function AdminBlogClient({ posts }: { posts: Post[] }) {
           <div className="mt-6"><CreateDialog /></div>
         </div>
       ) : (
-        <div className="rounded-2xl border border-border overflow-hidden">
-          <table className="w-full text-sm">
+        <div className="rounded-2xl border border-border overflow-x-auto">
+          <table className="w-full text-sm min-w-[500px]">
             <thead className="bg-muted/40">
               <tr>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide">Title</th>

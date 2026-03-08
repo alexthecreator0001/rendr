@@ -104,14 +104,14 @@ function JobRow({ job }: { job: Job }) {
           </span>
         </td>
         {/* Type */}
-        <td className="px-3 py-3">
+        <td className="px-3 py-3 hidden sm:table-cell">
           <span className="inline-flex items-center gap-1 text-[12px] text-zinc-400 capitalize">
             <Layers className="h-3 w-3 text-zinc-600" />
             {job.inputType}
           </span>
         </td>
         {/* Duration */}
-        <td className="px-3 py-3 text-[12px] text-zinc-500 tabular-nums">
+        <td className="px-3 py-3 text-[12px] text-zinc-500 tabular-nums hidden sm:table-cell">
           {duration !== null
             ? duration >= 1000
               ? `${(duration / 1000).toFixed(1)}s`
@@ -119,7 +119,7 @@ function JobRow({ job }: { job: Job }) {
             : "—"}
         </td>
         {/* Created */}
-        <td className="px-3 py-3 text-[12px] text-zinc-500 tabular-nums">
+        <td className="px-3 py-3 text-[12px] text-zinc-500 tabular-nums hidden md:table-cell">
           {new Date(job.createdAt).toLocaleString()}
         </td>
         {/* Error hint */}
@@ -339,8 +339,8 @@ export function AdminJobsClient({
         ))}
       </div>
 
-      <div className="rounded-xl border border-white/[0.06] bg-zinc-950/50 overflow-hidden">
-        <table className="w-full text-sm">
+      <div className="rounded-xl border border-white/[0.06] bg-zinc-950/50 overflow-x-auto">
+        <table className="w-full text-sm min-w-[700px]">
           <thead>
             <tr className="border-b border-white/[0.06] bg-zinc-900/30">
               <th className="w-8" />
@@ -353,13 +353,13 @@ export function AdminJobsClient({
               <th className="px-3 py-3 text-left text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
                 Status
               </th>
-              <th className="px-3 py-3 text-left text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
+              <th className="px-3 py-3 text-left text-[10px] font-semibold uppercase tracking-wider text-zinc-600 hidden sm:table-cell">
                 Type
               </th>
-              <th className="px-3 py-3 text-left text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
+              <th className="px-3 py-3 text-left text-[10px] font-semibold uppercase tracking-wider text-zinc-600 hidden sm:table-cell">
                 Duration
               </th>
-              <th className="px-3 py-3 text-left text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
+              <th className="px-3 py-3 text-left text-[10px] font-semibold uppercase tracking-wider text-zinc-600 hidden md:table-cell">
                 Created
               </th>
               <th className="px-3 py-3" />

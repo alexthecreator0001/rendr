@@ -133,12 +133,14 @@ function DeleteButton({ id }: { id: string }) {
 export function NotificationsClient({ notifications }: { notifications: Notification[] }) {
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Notifications</h1>
           <p className="mt-1 text-sm text-muted-foreground">Banner announcements shown on the user dashboard.</p>
         </div>
-        <CreateDialog />
+        <div className="shrink-0">
+          <CreateDialog />
+        </div>
       </div>
 
       {notifications.length === 0 ? (
@@ -152,8 +154,8 @@ export function NotificationsClient({ notifications }: { notifications: Notifica
           </p>
         </div>
       ) : (
-        <div className="rounded-2xl border border-border overflow-hidden">
-          <table className="w-full text-sm">
+        <div className="rounded-2xl border border-border overflow-x-auto">
+          <table className="w-full text-sm min-w-[450px]">
             <thead className="bg-muted/40">
               <tr>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide">Title</th>

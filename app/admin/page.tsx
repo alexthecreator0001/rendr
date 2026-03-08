@@ -195,7 +195,7 @@ export default async function AdminOverviewPage() {
       </div>
 
       {/* Stat cards */}
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-6">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         {statCards.map((s) => (
           <div key={s.label} className="rounded-xl border border-border bg-card p-5">
             <div className="flex items-center justify-between mb-3">
@@ -224,7 +224,7 @@ export default async function AdminOverviewPage() {
         {/* Donut + legend */}
         <div className="rounded-xl border border-border bg-card p-6">
           <h2 className="text-sm font-semibold mb-4">Job Status</h2>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col items-center gap-4 sm:flex-row">
             <DonutChart
               succeeded={succeededJobs}
               failed={failedJobs}
@@ -260,7 +260,7 @@ export default async function AdminOverviewPage() {
       </div>
 
       {/* Recent activity */}
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-6 md:grid-cols-2">
         {/* Recent users */}
         <div className="rounded-xl border border-border bg-card">
           <div className="flex items-center justify-between px-5 py-4 border-b border-border">
