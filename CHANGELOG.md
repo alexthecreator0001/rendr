@@ -2,6 +2,13 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.57.0] — 2026-03-08
+### Added
+- **Google OAuth login/signup**: users can now sign in or register with their Google account. Auto-links to existing accounts by email. Google button on both login and register pages
+- **Public Sheets landing page** (`/sheets`): dedicated marketing page for Google Sheets to PDF feature with the Google Sheets logo, how-it-works steps, feature grid, use cases, and CTAs
+- New env vars for Google OAuth: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` (shared with Sheets API)
+- DB migration: `passwordHash` now optional, added `googleId` and `image` columns to User
+
 ## [0.56.1] — 2026-03-08
 ### Fixed
 - **Admin pages mobile responsive**: all admin tables now scroll horizontally on small screens, less important columns hidden on mobile (sm/md breakpoints), header layouts stack vertically on mobile, stat cards grid adapts to single column on small screens

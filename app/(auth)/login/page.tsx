@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { loginAction } from "@/app/actions/auth";
+import { GoogleButton } from "@/components/auth/google-button";
 
 export default function LoginPage() {
   const [state, action, pending] = useActionState(loginAction, null);
@@ -74,6 +75,17 @@ export default function LoginPage() {
             <p className="mt-1.5 text-sm text-zinc-400">
               Sign in to your Rendr account to continue.
             </p>
+          </div>
+
+          <GoogleButton label="Sign in with Google" />
+
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-white/[0.06]" />
+            </div>
+            <div className="relative flex justify-center text-xs">
+              <span className="bg-zinc-950 px-3 text-zinc-600">or continue with email</span>
+            </div>
           </div>
 
           <form action={action} className="space-y-5">

@@ -1,8 +1,10 @@
 import NextAuth from "next-auth"
 import Credentials from "next-auth/providers/credentials"
+import Google from "next-auth/providers/google"
 import { z } from "zod"
 import { prisma } from "@/lib/db"
 import { verifyPassword } from "@/lib/auth-utils"
+import { seedStarterTemplates } from "@/lib/starter-templates"
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   // NextAuth v5 renamed NEXTAUTH_SECRET → AUTH_SECRET. Support both.
@@ -62,6 +64,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         // Block banned users from logging in
         if (user.bannedAt) return null
 
+        // Google-only users have no password
+        if (!user.passwordHash) return null
+
         const valid = await verifyPassword(parsed.data.password, user.passwordHash)
         if (!valid) return null
 
@@ -74,10 +79,69 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }
       },
     }),
+    Google({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      authorization: {
+        params: {
+          prompt: "consent",
+          access_type: "offline",
+        },
+      },
+    }),
   ],
   session: { strategy: "jwt" },
   callbacks: {
-    async jwt({ token, user }) {
+    async signIn({ user, account }) {
+      if (account?.provider === "google" && user.email) {
+        // Find or create user for Google sign-in
+        const existingUser = await prisma.user.findUnique({
+          where: { email: user.email },
+          select: { id: true, googleId: true, bannedAt: true },
+        })
+
+        if (existingUser?.bannedAt) return false
+
+        if (existingUser) {
+          // Link Google ID to existing account if not already linked
+          if (!existingUser.googleId && account.providerAccountId) {
+            await prisma.user.update({
+              where: { id: existingUser.id },
+              data: {
+                googleId: account.providerAccountId,
+                image: user.image ?? undefined,
+                emailVerified: new Date(),
+              },
+            })
+          }
+          // Inject the DB user ID so the jwt callback gets it
+          user.id = existingUser.id
+        } else {
+          // Create new user from Google profile
+          const newUser = await prisma.user.create({
+            data: {
+              email: user.email,
+              name: user.name ?? null,
+              googleId: account.providerAccountId,
+              image: user.image ?? null,
+              emailVerified: new Date(),
+            },
+          })
+          user.id = newUser.id
+          // Seed starter templates in the background
+          seedStarterTemplates(newUser.id, prisma).catch(() => {})
+        }
+
+        // Load role for the jwt callback
+        const dbUser = await prisma.user.findUnique({
+          where: { id: user.id },
+          select: { role: true },
+        })
+        if (dbUser) (user as { role?: string }).role = dbUser.role
+      }
+      return true
+    },
+    async jwt({ token, user, account }) {
       if (user?.id) token.id = user.id
       if (user?.name) token.name = user.name
       if ((user as { role?: string })?.role) token.role = (user as { role?: string }).role

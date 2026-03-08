@@ -311,6 +311,8 @@ export async function changePasswordAction(
   const user = await prisma.user.findUnique({ where: { id: session.user.id } });
   if (!user) return { error: "User not found." };
 
+  if (!user.passwordHash) return { error: "Your account uses Google sign-in. Set a password via the reset password flow." };
+
   const valid = await verifyPassword(current, user.passwordHash);
   if (!valid) return { error: "Current password is incorrect." };
 
