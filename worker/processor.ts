@@ -42,11 +42,33 @@ export async function processJob(jobId: string): Promise<void> {
     browser = await chromium.launch({ args: launchArgs })
 
     const context = await browser.newContext()
-    const page = await context.newPage()
-    page.setDefaultTimeout(TIMEOUT)
 
     const opts = (job.optionsJson as Record<string, unknown>) ?? {}
     const variables = (opts.variables as Record<string, string>) ?? {}
+
+    // Cookies: set on browser context before creating page (so they apply to all requests)
+    const cookies = opts.cookies as Array<{
+      name: string; value: string; domain: string; path?: string
+      secure?: boolean; httpOnly?: boolean; sameSite?: "Strict" | "Lax" | "None"
+      expires?: number
+    }> | null
+    if (cookies && cookies.length > 0 && job.inputType === "url") {
+      await context.addCookies(
+        cookies.map((c) => ({
+          name: c.name,
+          value: c.value,
+          domain: c.domain,
+          path: c.path ?? "/",
+          ...(c.secure !== undefined ? { secure: c.secure } : {}),
+          ...(c.httpOnly !== undefined ? { httpOnly: c.httpOnly } : {}),
+          ...(c.sameSite ? { sameSite: c.sameSite } : {}),
+          ...(c.expires !== undefined ? { expires: c.expires } : {}),
+        }))
+      )
+    }
+
+    const page = await context.newPage()
+    page.setDefaultTimeout(TIMEOUT)
 
     // F3: custom headers for URL renders
     const customHeaders = (opts.headers as Record<string, string>) ?? null

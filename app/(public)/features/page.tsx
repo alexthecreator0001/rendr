@@ -37,7 +37,7 @@ export const metadata: Metadata = {
 const stats = [
   { value: "< 1s", label: "Avg render time" },
   { value: "99.9%", label: "Uptime SLA" },
-  { value: "24+", label: "API features" },
+  { value: "25+", label: "API features" },
   { value: "3", label: "Lines to integrate" },
 ];
 
@@ -218,6 +218,7 @@ export default function FeaturesPage() {
                   { icon: Timer,               title: "Render delay",         desc: "Wait 0–10 seconds for JavaScript to execute before capturing. For SPAs and dynamic charts." },
                   { icon: MousePointerClick,   title: "waitForSelector",      desc: "Wait for a specific CSS selector to appear in the DOM before capture. More precise than a fixed delay." },
                   { icon: Network,             title: "Custom HTTP headers",  desc: "Pass Authorization, Cookie, or any custom headers when rendering URLs behind authentication." },
+                  { icon: Lock,               title: "Cookie & auth injection", desc: "Set browser cookies before rendering. Capture dashboards, admin panels, or any page behind session-based auth." },
                 ] as const).map((f) => (
                   <div key={f.title} className="group flex gap-4 rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 transition-colors hover:border-white/[0.1] hover:bg-white/[0.04]">
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-blue-500/20 bg-blue-500/10">

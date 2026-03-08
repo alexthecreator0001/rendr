@@ -1,6 +1,6 @@
 import {
   Zap, Webhook, Layers, FileText, Lock,
-  Globe, Merge, Stamp, BarChart2,
+  Globe, Merge, Stamp, BarChart2, Cookie,
 } from "lucide-react";
 
 /* ── Mini demos inside each card ── */
@@ -237,6 +237,34 @@ function MetadataDemo() {
   );
 }
 
+function CookieAuthDemo() {
+  return (
+    <div className="mt-4 rounded-xl border border-border bg-muted/50 p-4 font-mono text-[11px] leading-[1.8]">
+      <div className="mb-2 text-muted-foreground/60">
+        input.cookies
+      </div>
+      <div className="flex items-center justify-between">
+        <span className="text-muted-foreground/60">name</span>
+        <span className="text-foreground">&quot;session_id&quot;</span>
+      </div>
+      <div className="flex items-center justify-between">
+        <span className="text-muted-foreground/60">value</span>
+        <span className="text-amber-600 dark:text-amber-400">eyJhbG...x4kQ</span>
+      </div>
+      <div className="flex items-center justify-between">
+        <span className="text-muted-foreground/60">domain</span>
+        <span className="text-muted-foreground">app.example.com</span>
+      </div>
+      <div className="mt-2 border-t border-border/50 pt-2">
+        <div className="flex items-center gap-2">
+          <span className="flex h-5 items-center rounded-full bg-emerald-500/15 px-2 text-[10px] font-semibold text-emerald-400">200</span>
+          <span className="text-[11px] text-muted-foreground/60">Dashboard captured with auth</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const features = [
   {
     icon: FileText,
@@ -300,6 +328,13 @@ const features = [
     description:
       "Track render volume, latency, and success rates per API key. Usage alerts at 80% of your plan limit.",
     demo: <AnalyticsDemo />,
+  },
+  {
+    icon: Cookie,
+    title: "Cookie & auth injection",
+    description:
+      "Set browser cookies before rendering URLs. Capture dashboards, admin panels, or any page behind session-based authentication.",
+    demo: <CookieAuthDemo />,
   },
 ];
 

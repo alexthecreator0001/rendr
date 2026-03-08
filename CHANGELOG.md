@@ -2,7 +2,12 @@
 
 All notable changes to Rendr are documented here.
 
-## [0.54.2] — 2026-03-08
+## [0.55.0] — 2026-03-08
+### Added
+- **Cookie & auth injection**: new `input.cookies` field for URL renders — set browser cookies before navigation to capture pages behind session-based auth (dashboards, admin panels, internal tools). Up to 50 cookies with full control over domain, path, secure, httpOnly, sameSite, and expires
+- Feature card on landing page and `/features` page
+- Full API docs section for cookie injection
+
 ### Fixed
 - **Content-Disposition header injection**: sanitize user-supplied PDF filenames (strip control chars, quotes, backslashes, limit to 255 chars) and add RFC 5987 `filename*` encoding for non-ASCII support
 

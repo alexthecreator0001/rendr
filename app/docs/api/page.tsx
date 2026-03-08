@@ -26,7 +26,21 @@ const convertBody = `{
     "headers": {                           // max 20 entries; Host, Content-Length blocked
       "Authorization": "Bearer tok_...",
       "Cookie": "session=abc123"
-    }
+    },
+
+    // Browser cookies — set on the browser context before navigation (type: "url" only)
+    "cookies": [                           // max 50 cookies
+      {
+        "name": "session_id",             // required
+        "value": "eyJhbGciOi...",         // required
+        "domain": "app.example.com",      // required
+        "path": "/",                      // optional (default: "/")
+        "secure": true,                   // optional
+        "httpOnly": true,                 // optional
+        "sameSite": "Lax",               // optional: "Strict" | "Lax" | "None"
+        "expires": 1735689600             // optional: Unix timestamp
+      }
+    ]
   },
 
   // ── options (all optional) ─────────────────────────────────────────────────
@@ -520,6 +534,37 @@ export default function ApiReferencePage() {
             Max 20 headers. Dangerous headers (<code>Host</code>, <code>Content-Length</code>,{" "}
             <code>Transfer-Encoding</code>, etc.) are blocked. Headers are only allowed when{" "}
             <code>type</code> is <code>"url"</code>.
+          </p>
+        </Prose>
+      </section>
+
+      {/* Cookie injection */}
+      <section id="cookie-injection">
+        <Prose>
+          <h2>Cookie &amp; auth injection</h2>
+          <p>
+            When using <code>type: "url"</code>, pass <code>input.cookies</code> to set browser
+            cookies before the page loads. This lets you render pages behind session-based
+            authentication — dashboards, admin panels, internal tools — without exposing credentials
+            in headers.
+          </p>
+          <p>
+            Cookies are set on the browser context before navigation, so they&apos;re sent with the
+            initial request and all subsequent resource loads (images, CSS, JS).
+          </p>
+          <ul>
+            <li><code>name</code> — cookie name (required, max 256 chars)</li>
+            <li><code>value</code> — cookie value (required, max 4096 chars)</li>
+            <li><code>domain</code> — domain the cookie applies to (required, max 256 chars)</li>
+            <li><code>path</code> — cookie path (optional, default: <code>&quot;/&quot;</code>)</li>
+            <li><code>secure</code> — HTTPS only (optional)</li>
+            <li><code>httpOnly</code> — not accessible via JavaScript (optional)</li>
+            <li><code>sameSite</code> — <code>&quot;Strict&quot;</code>, <code>&quot;Lax&quot;</code>, or <code>&quot;None&quot;</code> (optional)</li>
+            <li><code>expires</code> — Unix timestamp for expiry (optional)</li>
+          </ul>
+          <p>
+            Max 50 cookies per request. Only allowed when <code>type</code> is <code>&quot;url&quot;</code>.
+            Combine with <code>input.headers</code> for full control over the request.
           </p>
         </Prose>
       </section>

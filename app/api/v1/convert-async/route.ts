@@ -35,6 +35,11 @@ export async function POST(req: NextRequest) {
       return apiError(400, "headers are only allowed when input.type is \"url\"", "invalid_request")
     }
 
+    // Cookies only allowed with type: "url"
+    if (input.cookies && input.type !== "url") {
+      return apiError(400, "cookies are only allowed when input.type is \"url\"", "invalid_request")
+    }
+
     // SSRF guard on webhook_url
     if (webhook_url) {
       try {
@@ -113,6 +118,7 @@ export async function POST(req: NextRequest) {
           ...(filename ? { filename } : {}),
           ...(webhook_url ? { webhook_url } : {}),
           ...(input.headers ? { headers: input.headers } : {}),
+          ...(input.cookies ? { cookies: input.cookies } : {}),
         },
         idempotencyKey,
       },

@@ -101,6 +101,23 @@ export const convertSchema = z.object({
             "headers: max 20 entries, blocked headers (Host, Content-Length, etc.) not allowed",
         }
       ),
+
+    // Browser cookies — only allowed when type: "url"
+    cookies: z
+      .array(
+        z.object({
+          name: z.string().min(1).max(256),
+          value: z.string().max(4096),
+          domain: z.string().min(1).max(256),
+          path: z.string().max(1024).optional(),
+          secure: z.boolean().optional(),
+          httpOnly: z.boolean().optional(),
+          sameSite: z.enum(["Strict", "Lax", "None"]).optional(),
+          expires: z.number().optional(),
+        })
+      )
+      .max(50, "Maximum 50 cookies")
+      .optional(),
   }),
   options: pdfOptionsSchema,
   variables: z.record(z.string()).optional(),
