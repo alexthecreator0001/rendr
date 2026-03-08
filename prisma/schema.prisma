@@ -36,6 +36,9 @@ model User {
   featureVotes       FeatureVote[]
   ownedTeams         Team[]       @relation("OwnedTeams")
   teamMemberships    TeamMember[]
+  googleConnections  GoogleConnection[]
+  sheetSyncs         SheetSync[]
+  batchRuns          BatchRun[]
 }
 
 model VerificationToken {
@@ -110,10 +113,14 @@ model Job {
   apiKey   ApiKey?   @relation(fields: [apiKeyId], references: [id])
   template Template? @relation(fields: [templateId], references: [id])
 
+  batchRunId     String?
+  batchRun       BatchRun? @relation(fields: [batchRunId], references: [id], onDelete: SetNull)
+
   @@unique([userId, idempotencyKey])
   @@index([userId, createdAt(sort: Desc)])
   @@index([teamId, createdAt(sort: Desc)])
   @@index([status])
+  @@index([batchRunId])
 }
 
 model Template {
@@ -126,9 +133,10 @@ model Template {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  user User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  team Team?  @relation(fields: [teamId], references: [id], onDelete: SetNull)
-  jobs Job[]
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  team       Team?       @relation(fields: [teamId], references: [id], onDelete: SetNull)
+  jobs       Job[]
+  sheetSyncs SheetSync[]
 }
 
 model Webhook {
@@ -261,4 +269,60 @@ model BlogPost {
   publishedAt DateTime?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model GoogleConnection {
+  id           String    @id @default(cuid())
+  userId       String
+  email        String
+  refreshToken String
+  scopes       String[]
+  connectedAt  DateTime  @default(now())
+  revokedAt    DateTime?
+
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sheetSyncs SheetSync[]
+
+  @@unique([userId, email])
+}
+
+model SheetSync {
+  id              String    @id @default(cuid())
+  userId          String
+  connectionId    String
+  templateId      String
+  spreadsheetId   String
+  spreadsheetName String
+  sheetName       String
+  columnMapping   Json
+  lastRunAt       DateTime?
+  lastRunStatus   String?
+  lastRunJobCount Int?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  user       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  connection GoogleConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  template   Template         @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  batchRuns  BatchRun[]
+
+  @@index([userId])
+}
+
+model BatchRun {
+  id            String    @id @default(cuid())
+  userId        String
+  sheetSyncId   String?
+  status        String    @default("running")
+  totalJobs     Int
+  succeededJobs Int       @default(0)
+  failedJobs    Int       @default(0)
+  createdAt     DateTime  @default(now())
+  completedAt   DateTime?
+
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sheetSync SheetSync? @relation(fields: [sheetSyncId], references: [id], onDelete: SetNull)
+  jobs      Job[]
+
+  @@index([userId, createdAt(sort: Desc)])
 }

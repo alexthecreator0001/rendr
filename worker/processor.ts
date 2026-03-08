@@ -331,6 +331,11 @@ export async function processJob(jobId: string): Promise<void> {
       }).catch((err) => console.error(`[worker] Per-job webhook failed: ${err}`))
     }
 
+    // Track batch run progress
+    if (job.batchRunId) {
+      await updateBatchRun(job.batchRunId, "succeeded")
+    }
+
     console.log(`[worker] Job ${jobId} succeeded`)
   } catch (err) {
     if (browser) {
@@ -372,6 +377,37 @@ export async function processJob(jobId: string): Promise<void> {
       }).catch((err) => console.error(`[worker] Per-job webhook failed: ${err}`))
     }
 
+    // Track batch run progress
+    if (job.batchRunId) {
+      await updateBatchRun(job.batchRunId, "failed")
+    }
+
     throw err
+  }
+}
+
+/** Atomically update batch run counters and finalize when all jobs are done */
+async function updateBatchRun(batchRunId: string, outcome: "succeeded" | "failed") {
+  const field = outcome === "succeeded" ? "succeededJobs" : "failedJobs"
+  const updated = await prisma.batchRun.update({
+    where: { id: batchRunId },
+    data: { [field]: { increment: 1 } },
+  })
+  if (updated.succeededJobs + updated.failedJobs >= updated.totalJobs) {
+    const status =
+      updated.failedJobs === 0 ? "succeeded" :
+      updated.succeededJobs === 0 ? "failed" :
+      "partial"
+    await prisma.batchRun.update({
+      where: { id: batchRunId },
+      data: { status, completedAt: new Date() },
+    })
+    // Also update the linked SheetSync
+    if (updated.sheetSyncId) {
+      await prisma.sheetSync.update({
+        where: { id: updated.sheetSyncId },
+        data: { lastRunStatus: status },
+      }).catch(() => {})
+    }
   }
 }

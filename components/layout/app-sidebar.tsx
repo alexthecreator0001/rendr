@@ -9,7 +9,7 @@ import {
   Settings, LogOut, MoreVertical, ExternalLink,
   Zap, ShieldCheck, Users, BarChart3, Headphones,
   Lightbulb, MessageSquare, Users2, Bell, FileText,
-  ChevronsUpDown, Check, Sparkles,
+  ChevronsUpDown, Check, Sparkles, Table2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -34,6 +34,7 @@ function buildNavGroups(base: string) {
     [
       { href: `${base}/api-keys`,  label: "API Keys",   icon: Key },
       { href: `${base}/templates`, label: "Templates",  icon: Layers },
+      { href: `${base}/sheets`,    label: "Sheets",     icon: Table2 },
       { href: `${base}/webhooks`,  label: "Webhooks",   icon: Webhook },
       { href: "/app/teams",        label: "Teams",      icon: Users2 },
     ],

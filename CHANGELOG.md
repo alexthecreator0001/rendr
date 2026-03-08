@@ -2,6 +2,13 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.56.0] — 2026-03-08
+### Added
+- **Google Sheets to PDF**: connect a Google Sheet, map columns to template {{variables}}, batch-render one PDF per row. Full wizard UI: paste sheet URL → pick tab → preview data → select template → auto-map columns → generate. Gated to Growth & Business plans (100/500 rows per batch). Includes `GoogleConnection`, `SheetSync`, and `BatchRun` DB models, OAuth flow, encrypted refresh token storage, batch run progress tracking in worker
+- Feature card on landing page and `/features` page for Google Sheets
+- "Sheets" sidebar nav item in app dashboard
+- New env vars: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI`, `ENCRYPTION_KEY`
+
 ## [0.55.0] — 2026-03-08
 ### Added
 - **Cookie & auth injection**: new `input.cookies` field for URL renders — set browser cookies before navigation to capture pages behind session-based auth (dashboards, admin panels, internal tools). Up to 50 cookies with full control over domain, path, secure, httpOnly, sameSite, and expires

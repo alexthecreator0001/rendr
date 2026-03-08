@@ -1,6 +1,6 @@
 import {
   Zap, Webhook, Layers, FileText, Lock,
-  Globe, Merge, Stamp, BarChart2, Cookie,
+  Globe, Merge, Stamp, BarChart2, Cookie, Table2,
 } from "lucide-react";
 
 /* ── Mini demos inside each card ── */
@@ -237,6 +237,41 @@ function MetadataDemo() {
   );
 }
 
+function GoogleSheetsDemo() {
+  const rows = [
+    { name: "Alice Johnson", amount: "$1,200", status: "Paid" },
+    { name: "Bob Smith", amount: "$890", status: "Pending" },
+    { name: "Carol Lee", amount: "$2,400", status: "Paid" },
+  ];
+  return (
+    <div className="mt-4 rounded-xl border border-border bg-muted/50 p-4">
+      <div className="mb-2 flex items-center gap-2">
+        <Table2 className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+        <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">
+          Invoice Sheet → 3 PDFs
+        </span>
+      </div>
+      <div className="space-y-1.5">
+        {rows.map((r, i) => (
+          <div key={i} className="flex items-center justify-between rounded-lg border border-border/50 bg-background px-3 py-1.5">
+            <span className="font-mono text-[10.5px] text-muted-foreground">{r.name}</span>
+            <div className="flex items-center gap-2">
+              <span className="text-[10.5px] text-foreground">{r.amount}</span>
+              <span className={`rounded-full px-1.5 py-0.5 text-[9px] font-medium ${
+                r.status === "Paid"
+                  ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
+                  : "bg-amber-500/15 text-amber-600 dark:text-amber-400"
+              }`}>
+                {r.status}
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function CookieAuthDemo() {
   return (
     <div className="mt-4 rounded-xl border border-border bg-muted/50 p-4 font-mono text-[11px] leading-[1.8]">
@@ -330,11 +365,11 @@ const features = [
     demo: <AnalyticsDemo />,
   },
   {
-    icon: Cookie,
-    title: "Cookie & auth injection",
+    icon: Table2,
+    title: "Google Sheets to PDF",
     description:
-      "Set browser cookies before rendering URLs. Capture dashboards, admin panels, or any page behind session-based authentication.",
-    demo: <CookieAuthDemo />,
+      "Connect a spreadsheet, map columns to template variables, batch-render one PDF per row. Invoices, reports, certificates.",
+    demo: <GoogleSheetsDemo />,
   },
 ];
 

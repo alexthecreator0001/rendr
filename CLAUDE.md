@@ -194,3 +194,7 @@ Navbar: scroll-aware — transparent over dark hero on `/`, frosted glass (`bg-z
 | `PLAYWRIGHT_TIMEOUT_MS` | Chromium render timeout (default 30000) |
 | `WEBHOOK_RETRY_ATTEMPTS` | Webhook retry count (default 3) |
 | `WEBHOOK_RETRY_DELAY_MS` | Initial retry delay ms (default 1000) |
+| `GOOGLE_CLIENT_ID` | Google OAuth client ID (for Sheets integration) |
+| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret |
+| `GOOGLE_REDIRECT_URI` | Google OAuth callback URL (e.g. `https://rendrpdf.com/api/google/callback`) |
+| `ENCRYPTION_KEY` | 32-byte key (hex or base64) for encrypting Google refresh tokens |
