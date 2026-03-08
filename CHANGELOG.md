@@ -2,6 +2,11 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.57.2] — 2026-03-08
+### Added
+- **Dynamic sitemap.xml** for Google indexing — includes all public pages, solutions, case studies, and blog posts from DB
+- **robots.txt** — allows crawling of public pages, blocks `/app/`, `/admin/`, `/api/`, `/invite/`
+
 ## [0.57.1] — 2026-03-08
 ### Fixed
 - **Vimeo embed blocked by CSP**: added `https://player.vimeo.com` to `frame-src` Content-Security-Policy directive so the demo video on `/sheets` page loads correctly
