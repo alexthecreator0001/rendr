@@ -96,6 +96,15 @@ export function SheetsClient({ connections, syncs, templates, plan }: SheetsClie
         </div>
       </div>
 
+      {plan === "starter" && (
+        <div className="mb-6 rounded-lg border border-blue-500/20 bg-blue-500/10 px-4 py-3 text-sm text-blue-400 flex items-center justify-between gap-4">
+          <span>Free plan: up to 10 rows per batch. Need more?</span>
+          <Link href="/app/billing" className="shrink-0 rounded-lg bg-white/10 px-3 py-1 text-xs font-medium hover:bg-white/20 transition-colors">
+            Upgrade
+          </Link>
+        </div>
+      )}
+
       {error && (
         <div className="mb-6 rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">
           {error}

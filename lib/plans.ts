@@ -31,16 +31,16 @@ export function getPlanAiLimit(plan: string): number {
   return PLAN_AI_LIMITS[plan] ?? 1;
 }
 
-// Google Sheets integration — Growth & Business only
+// Google Sheets integration — all plans (starter limited to 10 rows)
 export const PLAN_SHEETS_ENABLED: Record<string, boolean> = {
-  starter:  false,
+  starter:  true,
   growth:   true,
   business: true,
 };
 
 // Max rows per batch run
 export const PLAN_BATCH_LIMITS: Record<string, number> = {
-  starter:  0,
+  starter:  10,
   growth:   100,
   business: 500,
 };

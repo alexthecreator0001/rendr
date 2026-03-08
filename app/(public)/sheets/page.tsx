@@ -443,16 +443,34 @@ export default function SheetsPage() {
                 Plans
               </p>
               <h2 className="mt-3 text-3xl font-bold tracking-tight text-white sm:text-4xl">
-                Sheets integration on every paid plan
+                Sheets integration on every plan
               </h2>
+              <p className="mx-auto mt-4 max-w-xl text-zinc-400">
+                Try it free with up to 10 rows per batch. Upgrade when you need more.
+              </p>
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-4 sm:grid-cols-3">
+              <div className="rounded-2xl border border-white/[0.07] bg-white/[0.02] p-6">
+                <div className="flex items-center gap-2 mb-1">
+                  <h3 className="text-lg font-semibold text-white">Free</h3>
+                  <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-semibold text-emerald-400">$0/mo</span>
+                </div>
+                <p className="mt-1 text-sm text-zinc-400">Up to 10 rows per batch</p>
+                <ul className="mt-4 space-y-2">
+                  {["Google Sheets integration", "Visual column mapper", "Run history", "100 renders/month"].map((f) => (
+                    <li key={f} className="flex items-center gap-2 text-sm text-zinc-300">
+                      <Check className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+              </div>
               <div className="rounded-2xl border border-white/[0.07] bg-white/[0.02] p-6">
                 <h3 className="text-lg font-semibold text-white">Growth</h3>
                 <p className="mt-1 text-sm text-zinc-400">Up to 100 rows per batch</p>
                 <ul className="mt-4 space-y-2">
-                  {["Google Sheets integration", "Visual column mapper", "Run history", "Re-run anytime"].map((f) => (
+                  {["Everything in Free", "10x batch size", "5,000 renders/month", "Re-run anytime"].map((f) => (
                     <li key={f} className="flex items-center gap-2 text-sm text-zinc-300">
                       <Check className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
                       {f}
@@ -464,7 +482,7 @@ export default function SheetsPage() {
                 <h3 className="text-lg font-semibold text-white">Business</h3>
                 <p className="mt-1 text-sm text-zinc-400">Up to 500 rows per batch</p>
                 <ul className="mt-4 space-y-2">
-                  {["Everything in Growth", "5x batch size (500 rows)", "Multiple Google accounts", "Priority rendering"].map((f) => (
+                  {["Everything in Growth", "50x batch size", "50,000 renders/month", "Priority rendering"].map((f) => (
                     <li key={f} className="flex items-center gap-2 text-sm text-zinc-300">
                       <Check className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
                       {f}
