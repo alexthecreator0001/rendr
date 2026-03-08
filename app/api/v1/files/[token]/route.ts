@@ -34,12 +34,19 @@ export async function GET(
     downloadFilename = opts.filename.endsWith(".pdf") ? opts.filename : `${opts.filename}.pdf`
   }
 
+  // Sanitize filename: strip control chars, quotes, backslashes to prevent header injection
+  const safeFilename = downloadFilename
+    .replace(/[\x00-\x1f\x7f"\\]/g, "")
+    .slice(0, 255) || `rendr-${job.id}.pdf`
+  // RFC 5987 encoded filename for non-ASCII support
+  const encodedFilename = encodeURIComponent(safeFilename)
+
   try {
     const fileBuffer = await fs.readFile(resolvedPath)
     return new NextResponse(fileBuffer, {
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": `inline; filename="${downloadFilename}"`,
+        "Content-Disposition": `inline; filename="${safeFilename}"; filename*=UTF-8''${encodedFilename}`,
         "Content-Length": fileBuffer.length.toString(),
         "Cache-Control": "private, max-age=3600",
       },

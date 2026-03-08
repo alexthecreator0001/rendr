@@ -2,6 +2,10 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.54.2] — 2026-03-08
+### Fixed
+- **Content-Disposition header injection**: sanitize user-supplied PDF filenames (strip control chars, quotes, backslashes, limit to 255 chars) and add RFC 5987 `filename*` encoding for non-ASCII support
+
 ## [0.54.1] — 2026-02-28
 ### Fixed
 - **Google Ads conversion tracking lost when consent accepted without page reload**: `trackConversion()` fired the event while consent was still `denied` (gtag silently dropped it). Now queues to sessionStorage and flushes when user clicks "Accept all" — no page reload needed
