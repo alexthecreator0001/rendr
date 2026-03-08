@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/db"
 import { exchangeCode } from "@/lib/google-sheets"
 import { encrypt } from "@/lib/encryption"
-import { google } from "googleapis"
 import crypto from "node:crypto"
 
 export async function GET(req: NextRequest) {
@@ -44,16 +43,14 @@ export async function GET(req: NextRequest) {
       )
     }
 
-    // Get the Google account email
-    const oauth2Client = new google.auth.OAuth2(
-      process.env.GOOGLE_CLIENT_ID,
-      process.env.GOOGLE_CLIENT_SECRET,
-      process.env.GOOGLE_REDIRECT_URI
-    )
-    oauth2Client.setCredentials(tokens)
-    const oauth2 = google.oauth2({ version: "v2", auth: oauth2Client })
-    const userInfo = await oauth2.userinfo.get()
-    const email = userInfo.data.email ?? "unknown"
+    // Extract email from id_token JWT (no extra API call needed)
+    let email = "unknown"
+    if (tokens.id_token) {
+      const payload = JSON.parse(
+        Buffer.from(tokens.id_token.split(".")[1], "base64url").toString()
+      )
+      email = payload.email ?? "unknown"
+    }
 
     // Encrypt refresh token before storage
     const encryptedToken = encrypt(tokens.refresh_token)
