@@ -173,6 +173,19 @@ export default function SheetsPage() {
             How it works
           </h2>
 
+          {/* Video */}
+          <div className="mx-auto mt-10 max-w-3xl overflow-hidden rounded-2xl border border-white/[0.08]">
+            <div className="relative w-full" style={{ padding: "56.25% 0 0 0" }}>
+              <iframe
+                src="https://player.vimeo.com/video/1171585294?badge=0&autopause=0&player_id=0&app_id=58479"
+                allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media"
+                allowFullScreen
+                className="absolute top-0 left-0 h-full w-full"
+                title="How Google Sheets to PDF works"
+              />
+            </div>
+          </div>
+
           <div className="mx-auto mt-10 grid max-w-3xl gap-0">
             {[
               {
