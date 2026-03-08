@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db"
 import { redirect, notFound } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft, Download, CheckCircle2, XCircle, Loader2 } from "lucide-react"
+import { BatchRunAutoRefresh } from "./auto-refresh"
 
 export const dynamic = "force-dynamic"
 export const metadata: Metadata = { title: "Batch Run" }
@@ -51,9 +52,13 @@ export default async function BatchRunPage({
   const cfg = statusConfig[batchRun.status] ?? statusConfig.running
   const StatusIcon = cfg.icon
   const baseUrl = BASE_URL()
+  const isRunning = batchRun.status === "running"
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-8">
+      {/* Auto-refresh while running */}
+      {isRunning && <BatchRunAutoRefresh intervalMs={3000} />}
+
       <Link
         href="/app/sheets"
         className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors"
@@ -72,7 +77,7 @@ export default async function BatchRunPage({
           </p>
         </div>
         <div className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium ${cfg.color}`}>
-          <StatusIcon className={`h-3.5 w-3.5 ${batchRun.status === "running" ? "animate-spin" : ""}`} />
+          <StatusIcon className={`h-3.5 w-3.5 ${isRunning ? "animate-spin" : ""}`} />
           {cfg.label}
           <span className="text-[10px] opacity-70">
             {batchRun.succeededJobs}/{batchRun.totalJobs} done
@@ -95,10 +100,11 @@ export default async function BatchRunPage({
         </div>
       </div>
 
-      {/* Auto-refresh hint for running batches */}
-      {batchRun.status === "running" && (
-        <div className="mb-6 rounded-lg border border-blue-500/20 bg-blue-500/10 px-4 py-3 text-sm text-blue-400">
-          Processing... Refresh the page to see updated progress.
+      {/* Processing indicator */}
+      {isRunning && (
+        <div className="mb-6 flex items-center gap-3 rounded-lg border border-blue-500/20 bg-blue-500/10 px-4 py-3 text-sm text-blue-400">
+          <Loader2 className="h-4 w-4 animate-spin shrink-0" />
+          Processing... This page auto-refreshes every 3 seconds.
         </div>
       )}
 
