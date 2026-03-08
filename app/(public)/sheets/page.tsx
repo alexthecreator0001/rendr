@@ -170,24 +170,32 @@ export default function SheetsPage() {
       <section className="border-t border-white/[0.06] bg-zinc-950 py-16 sm:py-24">
         <Container>
           <h2 className="text-center text-2xl font-bold tracking-tight text-white sm:text-3xl">
-            How it works
+            See it in action
           </h2>
+          <p className="mx-auto mt-3 max-w-md text-center text-sm text-zinc-500">
+            Watch how to go from a Google Sheet to rendered PDFs in under 2 minutes.
+          </p>
 
-          {/* Video */}
-          <div className="mx-auto mt-10 max-w-3xl overflow-hidden rounded-2xl border border-white/[0.08]">
-            <div className="relative w-full" style={{ padding: "53.75% 0 0 0" }}>
-              <iframe
-                src="https://player.vimeo.com/video/1171585294?badge=0&autopause=0&player_id=0&app_id=58479"
-                frameBorder="0"
-                allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
-                referrerPolicy="strict-origin-when-cross-origin"
-                className="absolute top-0 left-0 h-full w-full"
-                title="How Google Sheets to PDF works"
-              />
+          {/* Video — hero-width, glowing border */}
+          <div className="mx-auto mt-8 max-w-4xl">
+            <div className="rounded-2xl bg-gradient-to-b from-emerald-500/20 via-blue-500/10 to-transparent p-[1px]">
+              <div className="overflow-hidden rounded-2xl bg-zinc-950">
+                <div className="relative w-full" style={{ padding: "53.75% 0 0 0" }}>
+                  <iframe
+                    src="https://player.vimeo.com/video/1171585294?badge=0&autopause=0&player_id=0&app_id=58479"
+                    frameBorder="0"
+                    allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+                    referrerPolicy="strict-origin-when-cross-origin"
+                    className="absolute top-0 left-0 h-full w-full"
+                    title="How Google Sheets to PDF works"
+                  />
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="mx-auto mt-10 grid max-w-3xl gap-0">
+          {/* Steps below video */}
+          <div className="mx-auto mt-14 grid max-w-3xl gap-0">
             {[
               {
                 n: "1",
