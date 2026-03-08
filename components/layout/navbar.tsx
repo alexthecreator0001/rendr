@@ -116,6 +116,7 @@ export function Navbar() {
   const isPricing   = pathname.startsWith("/pricing");
   const isDocs      = pathname.startsWith("/docs");
   const isBlog      = pathname.startsWith("/blog");
+  const isSheets    = pathname === "/sheets";
 
   function navItem(active: boolean) {
     return cn(
@@ -164,6 +165,11 @@ export function Navbar() {
 
             <Link href="/pricing" className={navItem(isPricing)}>
               Pricing
+            </Link>
+
+            <Link href="/sheets" className={cn(navItem(isSheets), "flex items-center gap-1.5")}>
+              <img src="/google-sheets-logo.png" alt="" className="h-3.5 w-3.5" />
+              Sheets
             </Link>
 
             <Link
@@ -324,6 +330,7 @@ export function Navbar() {
 
             {[
               { href: "/pricing", label: "Pricing", active: isPricing },
+              { href: "/sheets", label: "Sheets", active: isSheets },
               { href: "/docs", label: "Docs", active: isDocs, external: true },
               { href: "/blog", label: "Blog", active: isBlog },
             ].map((item) => (
