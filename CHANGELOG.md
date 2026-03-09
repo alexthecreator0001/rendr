@@ -2,6 +2,10 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.58.2] — 2026-03-09
+### Changed
+- **/sheets hero**: replaced spreadsheet→PDF graphic with the demo video, removed duplicate "See it in action" video section
+
 ## [0.58.1] — 2026-03-09
 ### Changed
 - Updated /sheets demo video to new recording (Vimeo 1171857006)

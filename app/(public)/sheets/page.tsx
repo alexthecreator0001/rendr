@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Container } from "@/components/ui/container";
-import { ArrowRight, Check, FileText } from "lucide-react";
+import { ArrowRight, Check } from "lucide-react";
 import { VideoPlayer } from "./video-player";
 
 export const metadata: Metadata = {
@@ -88,100 +88,19 @@ export default function SheetsPage() {
             </div>
           </div>
 
-          {/* ── Visual demo — the hero IS the demo ────────────────────── */}
-          <div className="mx-auto mt-14 max-w-5xl">
-            <div className="grid items-center gap-6 lg:grid-cols-[1fr_auto_1fr]">
-
-              {/* Spreadsheet */}
-              <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.02] shadow-xl shadow-black/30">
-                <div className="flex items-center gap-2 border-b border-white/[0.06] bg-white/[0.03] px-4 py-2.5">
-                  <img src="/google-sheets-logo.png" alt="" className="h-4 w-4" />
-                  <span className="text-xs font-medium text-zinc-400">clients.gsheet</span>
-                </div>
-                <table className="w-full text-xs">
-                  <thead>
-                    <tr className="border-b border-white/[0.06] bg-white/[0.02]">
-                      <th className="px-3 py-2 text-left font-medium text-emerald-400/80">name</th>
-                      <th className="px-3 py-2 text-left font-medium text-emerald-400/80">amount</th>
-                      <th className="px-3 py-2 text-left font-medium text-emerald-400/80 hidden sm:table-cell">date</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-white/[0.04]">
-                    <tr>
-                      <td className="px-3 py-2 text-zinc-300">Acme Corp</td>
-                      <td className="px-3 py-2 text-zinc-300">$2,400</td>
-                      <td className="px-3 py-2 text-zinc-500 hidden sm:table-cell">Mar 1</td>
-                    </tr>
-                    <tr>
-                      <td className="px-3 py-2 text-zinc-300">Globex Inc</td>
-                      <td className="px-3 py-2 text-zinc-300">$1,850</td>
-                      <td className="px-3 py-2 text-zinc-500 hidden sm:table-cell">Mar 1</td>
-                    </tr>
-                    <tr>
-                      <td className="px-3 py-2 text-zinc-300">Initech LLC</td>
-                      <td className="px-3 py-2 text-zinc-300">$3,100</td>
-                      <td className="px-3 py-2 text-zinc-500 hidden sm:table-cell">Mar 1</td>
-                    </tr>
-                    <tr className="opacity-30">
-                      <td className="px-3 py-1.5 text-zinc-600" colSpan={3}>+ 244 more rows</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Arrow */}
-              <div className="hidden lg:flex flex-col items-center gap-1">
-                <div className="h-[2px] w-10 bg-gradient-to-r from-emerald-500/30 to-blue-500/30" />
-                <ArrowRight className="h-5 w-5 text-zinc-600" />
-              </div>
-              <div className="flex lg:hidden items-center justify-center">
-                <ArrowRight className="h-5 w-5 text-zinc-600 rotate-90" />
-              </div>
-
-              {/* PDF output */}
-              <div className="space-y-2.5">
-                {[
-                  { name: "Acme Corp", amount: "$2,400" },
-                  { name: "Globex Inc", amount: "$1,850" },
-                  { name: "Initech LLC", amount: "$3,100" },
-                ].map((row, i) => (
-                  <div
-                    key={row.name}
-                    className="rounded-xl border border-white/[0.08] bg-white/[0.02] px-4 py-3 shadow-lg shadow-black/20"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2.5">
-                        <FileText className="h-3.5 w-3.5 text-red-400 shrink-0" />
-                        <span className="text-sm text-white">{row.name}</span>
-                      </div>
-                      <span className="text-sm font-semibold text-white">{row.amount}</span>
-                    </div>
-                  </div>
-                ))}
-                <div className="rounded-xl border border-dashed border-white/[0.06] px-4 py-2 text-center">
-                  <span className="text-[11px] text-zinc-600">+ 244 more PDFs</span>
-                </div>
-              </div>
-            </div>
-          </div>
+          {/* ── Hero video ────────────────────────────────────────────── */}
+          <VideoPlayer />
         </Container>
       </section>
 
-      {/* ── How it works (compact) ───────────────────────────────────── */}
+      {/* ── How it works ───────────────────────────────────────────────── */}
       <section className="border-t border-white/[0.06] bg-zinc-950 py-16 sm:py-24">
         <Container>
           <h2 className="text-center text-2xl font-bold tracking-tight text-white sm:text-3xl">
-            See it in action
+            How it works
           </h2>
-          <p className="mx-auto mt-3 max-w-md text-center text-sm text-zinc-500">
-            Watch how to go from a Google Sheet to rendered PDFs in under 2 minutes.
-          </p>
 
-          {/* Video — click to play with thumbnail overlay */}
-          <VideoPlayer />
-
-          {/* Steps below video */}
-          <div className="mx-auto mt-14 grid max-w-3xl gap-0">
+          <div className="mx-auto mt-10 grid max-w-3xl gap-0">
             {[
               {
                 n: "1",
