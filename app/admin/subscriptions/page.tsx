@@ -21,14 +21,7 @@ export default async function AdminSubscriptionsPage({
   const validPlan = ["starter", "growth", "pro"].includes(plan) ? plan : null;
   const where = validPlan ? { plan: validPlan } : {};
 
-  const [
-    totalUsers,
-    starterCount,
-    growthCount,
-    proCount,
-    users,
-    total,
-  ] = await Promise.all([
+  const [totalUsers, starterCount, growthCount, proCount, users, total] = await Promise.all([
     prisma.user.count(),
     prisma.user.count({ where: { plan: "starter" } }),
     prisma.user.count({ where: { plan: "growth" } }),
@@ -57,17 +50,14 @@ export default async function AdminSubscriptionsPage({
       </div>
 
       {/* Plan summary cards */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-3">
         {(["starter", "growth", "pro"] as const).map((p) => {
           const cfg = PLAN_CONFIG[p];
           const count = planCounts[p];
           const pct = totalUsers > 0 ? Math.round((count / totalUsers) * 100) : 0;
           return (
-            <a
-              key={p}
-              href={`/admin/subscriptions?plan=${p}`}
-              className={`rounded-xl border ${cfg.border} ${plan === p ? cfg.bg : "bg-card"} p-6 block hover:opacity-90 transition-opacity`}
-            >
+            <a key={p} href={`/admin/subscriptions?plan=${p}`}
+              className={`rounded-xl border ${cfg.border} ${plan === p ? cfg.bg : "bg-card"} p-5 sm:p-6 block hover:opacity-90 transition-opacity`}>
               <div className="flex items-start justify-between mb-4">
                 <div>
                   <p className={`text-xs font-semibold uppercase tracking-wider ${cfg.color}`}>{cfg.label}</p>
@@ -87,22 +77,17 @@ export default async function AdminSubscriptionsPage({
       {/* Filter tabs */}
       <div className="flex gap-2 flex-wrap">
         {(["all", "starter", "growth", "pro"] as const).map((p) => (
-          <a
-            key={p}
-            href={`/admin/subscriptions?plan=${p}`}
+          <a key={p} href={`/admin/subscriptions?plan=${p}`}
             className={`rounded-lg px-3 py-1.5 text-[12px] font-medium capitalize transition-colors ${
-              plan === p
-                ? "bg-foreground text-background"
-                : "border border-border text-muted-foreground hover:text-foreground"
-            }`}
-          >
+              plan === p ? "bg-foreground text-background" : "border border-border text-muted-foreground hover:text-foreground"
+            }`}>
             {p === "all" ? "All plans" : p}
           </a>
         ))}
       </div>
 
-      {/* Users table */}
-      <div className="rounded-xl border border-border bg-card overflow-x-auto">
+      {/* Desktop table */}
+      <div className="hidden md:block rounded-xl border border-border bg-card overflow-x-auto">
         <table className="w-full text-sm min-w-[500px]">
           <thead>
             <tr className="border-b border-border bg-muted/30">
@@ -115,11 +100,7 @@ export default async function AdminSubscriptionsPage({
           </thead>
           <tbody>
             {users.length === 0 ? (
-              <tr>
-                <td colSpan={5} className="px-4 py-12 text-center text-sm text-muted-foreground">
-                  No users on this plan.
-                </td>
-              </tr>
+              <tr><td colSpan={5} className="px-4 py-12 text-center text-sm text-muted-foreground">No users on this plan.</td></tr>
             ) : (
               users.map((u) => {
                 const cfg = PLAN_CONFIG[u.plan as keyof typeof PLAN_CONFIG];
@@ -149,6 +130,37 @@ export default async function AdminSubscriptionsPage({
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* Mobile cards */}
+      <div className="md:hidden space-y-3">
+        {users.length === 0 ? (
+          <div className="text-center py-12 text-sm text-muted-foreground">No users on this plan.</div>
+        ) : (
+          users.map((u) => {
+            const cfg = PLAN_CONFIG[u.plan as keyof typeof PLAN_CONFIG];
+            return (
+              <div key={u.id} className="rounded-xl border border-border bg-card p-4 space-y-2">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <p className="text-[13px] font-medium truncate">{u.email}</p>
+                    <p className="text-[11px] font-mono text-muted-foreground/50 mt-0.5">{u.id.slice(0, 12)}…</p>
+                  </div>
+                  <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold capitalize shrink-0 ${cfg?.color ?? ""} ${cfg?.border ?? ""} ${cfg?.bg ?? ""}`}>
+                    {u.plan}
+                  </span>
+                </div>
+                <div className="flex items-center gap-3 text-[12px] text-muted-foreground">
+                  <span><strong className="text-foreground tabular-nums">{u._count.jobs}</strong> jobs</span>
+                  <span>Joined {u.createdAt.toLocaleDateString()}</span>
+                  {u.role === "admin" && (
+                    <span className="rounded-full border border-red-500/30 bg-red-500/10 px-2 py-0.5 text-[10px] font-semibold text-red-400 ml-auto">admin</span>
+                  )}
+                </div>
+              </div>
+            );
+          })
+        )}
       </div>
 
       {totalPages > 1 && (

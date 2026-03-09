@@ -2,6 +2,19 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.58.0] — 2026-03-09
+### Added
+- **Email provider badges** on admin users page and overview — shows Gmail, Outlook, Yahoo, iCloud, Proton, or custom domain for each user
+- **Auth method badges** — shows whether user signed up via Google or email/password
+- **Email provider distribution chart** on overview dashboard — breakdown of users by email provider
+- **Auth method distribution chart** on overview — Google vs email signup ratio
+- **Provider filter on users page** — filter by Google login, email login, Gmail, Outlook, Yahoo, or custom domain
+- **Domain stats bar** — quick summary of auth methods and email providers on current users page
+- **Mobile card layouts** for admin jobs and subscriptions pages — card-based views on small screens instead of tables
+
+### Changed
+- **Improved mobile responsiveness** across all admin pages — better stat card sizing, responsive padding, hidden duration on mobile job lists
+
 ## [0.57.3] — 2026-03-08
 ### Changed
 - **Sheets video player**: click-to-play overlay with thumbnail and play button instead of raw Vimeo iframe — no more ugly controls before playing

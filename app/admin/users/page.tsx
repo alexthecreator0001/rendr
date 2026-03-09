@@ -30,6 +30,7 @@ export default async function AdminUsersPage({
         emailVerified: true,
         bannedAt: true,
         createdAt: true,
+        googleId: true,
         _count: { select: { jobs: true, apiKeys: true } },
       },
     }),
@@ -40,6 +41,7 @@ export default async function AdminUsersPage({
     <AdminUsersClient
       users={users.map((u) => ({
         ...u,
+        googleId: u.googleId ?? null,
         emailVerified: u.emailVerified?.toISOString() ?? null,
         bannedAt: u.bannedAt?.toISOString() ?? null,
         createdAt: u.createdAt.toISOString(),
