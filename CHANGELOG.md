@@ -2,6 +2,11 @@
 
 All notable changes to Rendr are documented here.
 
+## [0.58.1] — 2026-03-09
+### Changed
+- Updated /sheets demo video to new recording (Vimeo 1171857006)
+- Custom overlay thumbnail for video player
+
 ## [0.58.0] — 2026-03-09
 ### Added
 - **Email provider badges** on admin users page and overview — shows Gmail, Outlook, Yahoo, iCloud, Proton, or custom domain for each user
